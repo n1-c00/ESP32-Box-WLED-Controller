@@ -1,9 +1,6 @@
-# Project Name
+# ESP32-S3-Box WLED
 
 <br/>
-
-  <h3 align="center">ESP32-S3-Box WLED </h3>
-
   <p align="center">
     The open source solution for a stationary WLED-Controller. Be that battery powered or wall       mounted!
     <br/>
