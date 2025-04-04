@@ -31,4 +31,3 @@ Build and flash the code via esptool.py
 idf.py build
 idf.py flash
 ```
-<a href="https://htl-anichstrasse.tirol" target="_blank"><img src=".github/htl-anichstrasse-logo.svg" width="200px"></a>
