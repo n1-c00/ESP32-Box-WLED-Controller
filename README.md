@@ -4,9 +4,9 @@
   <p align="center">
     The open source solution for a stationary WLED-Controller. Be that battery powered or wall       mounted!
     <br/>
-    <a href="https://github.com/htl-anichstrasse/template/issues">Report Bug</a>
+    <a href="https://github.com/n1-c00/ESP32-Box-WLED-Controller/issues">Report Bug</a>
     ·
-    <a href="https://github.com/htl-anichstrasse/template/issues">Request Feature</a>
+    <a href="https://github.com/n1-c00/ESP32-Box-WLED-Controller/issues">Request Feature</a>
   </p>
 </p>
 
