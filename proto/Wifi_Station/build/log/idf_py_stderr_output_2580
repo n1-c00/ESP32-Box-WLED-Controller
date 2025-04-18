@@ -1,0 +1,21 @@
+CMake Error at C:/Users/nicoz/esp/v5.4/esp-idf/tools/cmake/component.cmake:228 (message):
+  CMake Error at
+  C:/Users/nicoz/esp/v5.4/esp-idf/tools/cmake/scripts/component_get_requirements.cmake:16
+  (include):
+
+    include could not find requested file:
+
+  
+
+      /tools/cmake/utilities.cmake
+
+  
+
+
+
+Call Stack (most recent call first):
+  C:/Users/nicoz/esp/v5.4/esp-idf/tools/cmake/build.cmake:644 (__component_get_requirements)
+  C:/Users/nicoz/esp/v5.4/esp-idf/tools/cmake/project.cmake:710 (idf_build_process)
+  CMakeLists.txt:6 (project)
+
+
