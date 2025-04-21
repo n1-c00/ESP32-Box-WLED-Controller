@@ -1,4 +1,4 @@
-/* * Data converted from C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)

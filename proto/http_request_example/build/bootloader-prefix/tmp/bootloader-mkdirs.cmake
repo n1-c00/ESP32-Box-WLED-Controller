@@ -10,18 +10,18 @@ if(NOT EXISTS "C:/Users/nicoz/esp/v5.4/esp-idf/components/bootloader/subproject"
   file(MAKE_DIRECTORY "C:/Users/nicoz/esp/v5.4/esp-idf/components/bootloader/subproject")
 endif()
 file(MAKE_DIRECTORY
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader"
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix"
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/tmp"
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/src/bootloader-stamp"
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/src"
-  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/tmp"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/src/bootloader-stamp"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/src"
+  "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/src/bootloader-stamp"
 )
 
 set(configSubDirs )
 foreach(subDir IN LISTS configSubDirs)
-    file(MAKE_DIRECTORY "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
+    file(MAKE_DIRECTORY "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/src/bootloader-stamp/${subDir}")
 endforeach()
 if(cfgdir)
-  file(MAKE_DIRECTORY "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
+  file(MAKE_DIRECTORY "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/bootloader-prefix/src/bootloader-stamp${cfgdir}") # cfgdir has leading slash
 endif()

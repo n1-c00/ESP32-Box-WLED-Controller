@@ -39,6 +39,6 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/build/esp-idf/newlib/port/cmake_install.cmake")
+  include("C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/esp-idf/newlib/port/cmake_install.cmake")
 endif()
 

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/http_request_example/main
+# Install script for directory: C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -1,6 +1,6 @@
 /* Automatically generated file; DO NOT EDIT */
 /* Espressif IoT Development Framework Linker Script */
-/* Generated from: C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\http_request_example\build\esp-idf\esp_system\ld\sections.ld.in */
+/* Generated from: C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\proto\http_request_example\build\esp-idf\esp_system\ld\sections.ld.in */
 
 /*
 
