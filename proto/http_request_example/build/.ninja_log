@@ -2248,3 +2248,5 @@
 14780	15102	7666940880009436	C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/.bin_timestamp	7c4b4352619d3598
 15102	15196	7666940880068975	esp-idf/esptool_py/CMakeFiles/app_check_size	416860b997d879b
 15102	15196	7666940880068975	C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/esp-idf/esptool_py/CMakeFiles/app_check_size	416860b997d879b
+71	17094781	7666896122724032	CMakeFiles/confserver	4a424ea726456b9b
+71	17094781	7666896122724032	C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build/CMakeFiles/confserver	4a424ea726456b9b
