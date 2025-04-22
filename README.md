@@ -21,6 +21,11 @@ Clone the repository.
 git clone https://github.com/n1-c00/ESP32-Box-WLED-Controller
 ```
 
+cd into the Build-Enviroment
+```
+cd ./BuildEnv
+```
+
 (optional) change/inspect the current settings:
 ```
 idf.py menuconfig
