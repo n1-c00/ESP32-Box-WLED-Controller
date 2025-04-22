@@ -22,12 +22,12 @@
 #include "ewrte.h"
 #include "ew_bsp_system.h"
 
-/* Constants that aren't configurable in menuconfig */
-#define WEB_SERVER "192.168.150.150" // IP of the WLED device
-#define WEB_PORT "80"
-#define WEB_PATH "/win&T=2" // Path to toggle the light on/off
+static const char *TAG = "WLED_control";
 
-static const char *TAG = "WLED_API";
+/* Constants that aren't configurable in menuconfig */
+#define WEB_SERVER "192.168.150.164"  // Remove http:// and trailing slash
+#define WEB_PORT "80"
+#define WEB_PATH "/win&T=2"
 
 /* Create a suitable HTTP-GET request out of from the URL*/
 static const char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n"
@@ -75,48 +75,33 @@ void GUI_Task(void *pvParameters)
 **************************************************************************/
 static int toggleLight(void *pvParameters)
 {
-    const struct addrinfo hints = {
-        .ai_family = AF_INET,
-        .ai_socktype = SOCK_STREAM,
-    };
-    struct addrinfo *res;
-    struct in_addr *addr;
+    struct sockaddr_in dest_addr;
     int s, size;
     char recv_buf[64];
     char responsecode[4];
     int ret_responsecode;
+    
+    // Initialize the server address structure
+    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = htons(atoi(WEB_PORT));
 
-    /* Resolve the server address and port */
-    int err = getaddrinfo(WEB_SERVER, WEB_PORT, &hints, &res);
-
-    if(err != 0 || res == NULL) {
-        ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-
-    /* Code to print the resolved IP.
-    Note: inet_ntoa is non-reentrant, look at ipaddr_ntoa_r for "real" code */
-    addr = &((struct sockaddr_in *)res->ai_addr)->sin_addr;
-    ESP_LOGI(TAG, "DNS lookup succeeded. IP=%s", inet_ntoa(*addr));
-
-    /* Code to create socket and connect to the server */
-    s = socket(res->ai_family,res->ai_socktype,0);
+    // Create socket
+    s = socket(AF_INET, SOCK_STREAM, 0);
     if(s < 0) {
         ESP_LOGE(TAG, "... Failed to allocate socket.");
-        freeaddrinfo(res);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
     ESP_LOGI(TAG, "... allocated socket");
-
-        if(connect(s, res->ai_addr, res->ai_addrlen) != 0) {
-        ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
+    
+    // Connect to the server
+    if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
+       ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
         close(s);
-        freeaddrinfo(res);
         vTaskDelay(4000 / portTICK_PERIOD_MS);
     }
 
-    ESP_LOGI(TAG, "... connected");
-    freeaddrinfo(res);
+        ESP_LOGI(TAG, "... connected");
 
     if (write(s, REQUEST, strlen(REQUEST)) < 0) {
         ESP_LOGE(TAG, "... socket send failed");
