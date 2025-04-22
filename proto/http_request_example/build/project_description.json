@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "http_request_example",
-    "project_version":    "d99c67e-dirty",
+    "project_version":    "3d839c8-dirty",
     "project_path":       "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example",
     "idf_path":           "C:/Users/nicoz/esp/v5.4/esp-idf",
     "build_dir":          "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/proto/http_request_example/build",

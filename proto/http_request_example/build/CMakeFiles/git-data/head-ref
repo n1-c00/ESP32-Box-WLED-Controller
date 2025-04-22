@@ -1,1 +1,4 @@
-d99c67e6323e426b50ff4828f1820c42854979f9
+0000000000000000000000000000000000000000 f38de33af7b102aa86efdd1b467a2657bbf3ff3d n1-c00 <nzehetner@tsn.at> 1743781902 +0200	branch: Created from HEAD
+f38de33af7b102aa86efdd1b467a2657bbf3ff3d d99c67e6323e426b50ff4828f1820c42854979f9 n1-c00 <nzehetner@tsn.at> 1744982116 +0200	commit: added Build-env for Embedded Wizard
+d99c67e6323e426b50ff4828f1820c42854979f9 2b83a75194a4f202f927a4a47bfa7a2288df4e2d n1-c00 <nzehetner@tsn.at> 1745249725 +0200	commit: compiles without errors but ESP still aborts
+2b83a75194a4f202f927a4a47bfa7a2288df4e2d 3d839c882db564032b2b61054280c80b2519725b n1-c00 <nzehetner@tsn.at> 1745249985 +0200	commit: Compiles but gets I2C driver conflict
