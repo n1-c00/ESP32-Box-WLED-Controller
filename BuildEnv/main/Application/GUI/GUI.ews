@@ -30,7 +30,6 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
@@ -40,7 +39,6 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
@@ -49,6 +47,6 @@ view unit Application
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-183,-7>;
+  attr scrollTo = <-22,-55>;
   attr zoom = 1.0;
 }

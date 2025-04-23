@@ -41,7 +41,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object Views::Text Text
   {
-    preset Bounds = <72,74,248,102>;
+    preset Bounds = <72,0,248,28>;
     preset OverflowWarning = true;
     preset String = "On Off Button";
     preset Font = Application::Font;
@@ -52,11 +52,49 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::ToggleButton OnOffSwitch
   {
-    preset Bounds = <99,102,222,166>;
+    preset Bounds = <99,28,222,92>;
     preset LabelOn = "On";
     preset LabelOff = "Off";
     preset Label = "|";
     preset Appearance = WidgetSet::Switch_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalSlider BrightnessSlider
+  {
+    preset Bounds = <60,181,260,240>;
+    preset StepSize = 1;
+    preset CurrentValue = 50;
+    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::ValueDisplay BrightnessDisplay
+  {
+    preset Bounds = <88,152,222,184>;
+    preset Outlet = ^BrightnessSlider.CurrentValue;
+    preset Unit = "%%";
+    preset Precision = 1;
+    preset CurrentValue = 0;
+    preset Appearance = WidgetSet::ValueDisplay_Mono_Medium;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Text Text1
+  {
+    preset Bounds = <72,124,248,152>;
+    preset OverflowWarning = true;
+    preset String = "Brightness Controll";
+    preset Font = Application::Font;
+    preset Color = #000000FF;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::PushButton PushButton
+  {
+    preset Bounds = <160,88,310,138>;
+    preset Label = "Caption";
+    preset Appearance = WidgetSet::PushButton_Mono_Medium;
   }
 }
 
