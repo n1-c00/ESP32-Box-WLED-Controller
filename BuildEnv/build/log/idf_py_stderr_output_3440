@@ -1,0 +1,11 @@
+C:\Users\domin\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\python.exe: No module named kconfgen
+CMake Error at C:/Users/domin/esp/v5.4.1/esp-idf/tools/cmake/kconfig.cmake:209 (message):
+  Failed to run kconfgen
+  (C:/Users/domin/AppData/Local/Microsoft/WindowsApps/PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0/python.exe;-m;kconfgen;--list-separator=semicolon;--kconfig;C:/Users/domin/esp/v5.4.1/esp-idf/Kconfig;--sdkconfig-rename;C:/Users/domin/esp/v5.4.1/esp-idf/sdkconfig.rename;--config;C:/FSST/ESP32-Box-WLED-Controller/BuildEnv/sdkconfig;--defaults;C:/FSST/ESP32-Box-WLED-Controller/BuildEnv/sdkconfig.defaults;--env-file;C:/FSST/ESP32-Box-WLED-Controller/BuildEnv/build/config.env).
+  Error 1
+Call Stack (most recent call first):
+  C:/Users/domin/esp/v5.4.1/esp-idf/tools/cmake/build.cmake:681 (__kconfig_generate_config)
+  C:/Users/domin/esp/v5.4.1/esp-idf/tools/cmake/project.cmake:717 (idf_build_process)
+  CMakeLists.txt:6 (project)
+
+

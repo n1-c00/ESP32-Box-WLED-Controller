@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -103,6 +103,7 @@ EW_DEFINE_FIELDS( CoreView, XObject )
   EW_VARIABLE( Owner,           CoreGroup )
   EW_VARIABLE( layoutContext,   CoreLayoutContext )
   EW_VARIABLE( viewState,       XSet )
+  EW_PROPERTY( StackingPriority, XInt32 )
 EW_END_OF_FIELDS( CoreView )
 
 /* Virtual Method Table (VMT) for the class : 'Core::View' */
@@ -121,6 +122,9 @@ EW_DEFINE_METHODS( CoreView, XObject )
   EW_METHOD( GetExtent,         XRect )( CoreView _this )
   EW_METHOD( ChangeViewState,   void )( CoreView _this, XSet aSetState, XSet aClearState )
 EW_END_OF_METHODS( CoreView )
+
+/* 'C' function for method : 'Core::View.OnSetStackingPriority()' */
+void CoreView_OnSetStackingPriority( CoreView _this, XInt32 value );
 
 /* The method GetRoot() delivers the application object, this view belongs to. The 
    application object represents the entire screen of the GUI application. Thus 

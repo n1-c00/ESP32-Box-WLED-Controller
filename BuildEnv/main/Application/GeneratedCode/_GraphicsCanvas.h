@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -148,38 +148,27 @@ void GraphicsCanvas_DrawText( GraphicsCanvas _this, XRect aClip, ResourcesFont a
   XInt32 aMinWidth, XEnum aOrientation, XColor aColorTL, XColor aColorTR, XColor 
   aColorBR, XColor aColorBL, XBool aBlend );
 
-/* The method ScaleBitmap() copies and scales an area of a aBitmap into the canvas. 
-   The bitmap is specified in the parameter aBitmap and the desired area to copy 
-   in aSrcRect. In case of a multi-frame bitmap the desired frame can be selected 
-   in the parameter aFrameNr.
-   The destination area in canvas is determined by the parameter aDstRect. The parameters 
-   aColorTL, aColorTR, aColorBL, aColorBR determine the colors or opacities at the 
-   corresponding corners of the aDstRect area.
-   The parameter aClip limits the drawing operation. Pixel lying outside this area 
-   remain unchanged. The aBlend parameter controls the mode how drawn pixel are 
-   combined with the pixel already existing in the destination bitmap. If aBlend 
-   is 'true', the drawn pixel are alpha-blended with the background, otherwise the 
-   drawn pixel will overwrite the old content. The last parameter aFilter controls 
-   the bi-linear filter. If aFilter is 'true', the source bitmap pixel will be bi-linear 
-   filtered in order to get better output. */
-void GraphicsCanvas_ScaleBitmap( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
-  aBitmap, XInt32 aFrameNr, XRect aDstRect, XRect aSrcRect, XColor aColorTL, XColor 
-  aColorTR, XColor aColorBR, XColor aColorBL, XBool aBlend, XBool aFilter );
-
-/* The method CopyBitmap() copies an area of a aBitmap into the canvas. The bitmap 
-   is specified in the parameter aBitmap. In case of a multi-frame bitmap the desired 
-   frame can be selected in the parameter aFrameNr.
-   The area to copy the bitmap is determined by the parameter aDstRect. The optional 
-   aSrcPos parameter determines a displacement of the bitmap within this aDstRect 
-   area. The parameters aColorTL, aColorTR, aColorBL, aColorBR determine the colors 
-   or opacities at the corresponding corners of the aDstRect area.
-   The parameter aClip limits the drawing operation. Pixel lying outside this area 
-   remain unchanged. The last aBlend parameter controls the mode how drawn pixel 
-   are combined with the pixel already existing in the destination bitmap. If aBlend 
-   is 'true', the drawn pixel are alpha-blended with the background, otherwise the 
-   drawn pixel will overwrite the old content. */
-void GraphicsCanvas_CopyBitmap( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
-  aBitmap, XInt32 aFrameNr, XRect aDstRect, XPoint aSrcPos, XColor aColorTL, XColor 
+/* The method DrawBitmapFrame() draws a free scalable frame by composing it of bitmap 
+   segments. These segments are used to draw the frame's corners, to fill its edges 
+   and to fill its interior area. The bitmap has thus to contain nine equal segments 
+   arranged in three rows and three columns. The top-left segment e.g. is used to 
+   draw the top-left corner of the frame. In contrast, the top-middle segment corresponds 
+   to the frame's top edge. If the edge is wider than the segment, multiple copies 
+   of the segment are used to fill the entire edge. In this manner the entire frame 
+   is composed by simply copying bitmap segments.
+   The bitmap is specified in the parameter aBitmap. In case of a multi-frame bitmap 
+   the desired frame can be selected in the parameter aFrameNr. The resulting size 
+   of the drawn frame is specified by aDstRect parameter. The parameter aEdges control 
+   which edges are drawn and which are omitted. Optionally the copied pixel can 
+   be modulated by a color gradient specified by the four parameters aColorTL .. 
+   aColorBL.
+   An additional clipping area aClip limits the operation. All pixel lying outside 
+   this area will not be drawn. The last aBlend parameter controls the mode how 
+   drawn pixel are combined with the pixel already existing in the destination bitmap. 
+   If aBlend is 'true', the drawn pixel are alpha-blended with the background, otherwise 
+   the drawn pixel will overwrite the old content. */
+void GraphicsCanvas_DrawBitmapFrame( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
+  aBitmap, XInt32 aFrameNr, XRect aDstRect, XSet aEdges, XColor aColorTL, XColor 
   aColorTR, XColor aColorBR, XColor aColorBL, XBool aBlend );
 
 /* The method FillRectangle() fills an area of canvas. The area is determined by 

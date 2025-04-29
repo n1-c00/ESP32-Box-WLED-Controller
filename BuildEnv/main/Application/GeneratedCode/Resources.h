@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -45,6 +45,10 @@
 #include "_ResourcesBitmap.h"
 #include "_ResourcesFont.h"
 #include "_ResourcesFontSet.h"
+
+/* The large version of the default font resource. The resource is using 'Roboto' 
+   TrueType font with 36 pixel height. */
+EW_DECLARE_FONT_RES( ResourcesFontLarge )
 
 #ifdef __cplusplus
   }

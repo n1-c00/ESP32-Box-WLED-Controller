@@ -19,60 +19,36 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
 #include "ewlocale.h"
 #include "_ApplicationApplication.h"
-#include "_CoreSimpleTouchHandler.h"
+#include "_ApplicationDeviceClass.h"
 #include "_CoreView.h"
-#include "_ResourcesBitmap.h"
 #include "_ResourcesFont.h"
-#include "_ViewsImage.h"
 #include "_ViewsRectangle.h"
 #include "_ViewsText.h"
+#include "_WidgetSetToggleButton.h"
+#include "_WidgetSetToggleButtonConfig.h"
 #include "Application.h"
-#include "Views.h"
+#include "WidgetSet.h"
 
-/* Strings for the language 'Default'. */
-EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
+/* Compressed strings for the language 'Default'. */
+EW_CONST_STRING_PRAGMA static const unsigned int _StringsDefault0[] =
 {
-  0xFFFF, 0xFFFF, 0xC557, 0x0048, 0x0065, 0x006C, 0x006C, 0x006F, 0x0020, 0x0057,
-  0x006F, 0x0072, 0x006C, 0x0064, 0x0021, 0x0000, 0xC557, 0x0054, 0x0068, 0x0069,
-  0x0073, 0x0020, 0x0069, 0x0073, 0x0020, 0x0061, 0x0020, 0x0073, 0x0069, 0x006D,
-  0x0070, 0x006C, 0x0065, 0x0020, 0x0055, 0x0049, 0x0020, 0x0061, 0x0070, 0x0070,
-  0x006C, 0x0069, 0x0063, 0x0061, 0x0074, 0x0069, 0x006F, 0x006E, 0x002C, 0x0020,
-  0x0063, 0x006F, 0x006E, 0x0074, 0x0061, 0x0069, 0x006E, 0x0069, 0x006E, 0x0067,
-  0x0020, 0x0073, 0x006F, 0x006D, 0x0065, 0x0020, 0x0074, 0x0065, 0x0078, 0x0074,
-  0x0020, 0x0076, 0x0069, 0x0065, 0x0077, 0x0073, 0x0020, 0x0061, 0x006E, 0x0064,
-  0x0020, 0x0061, 0x0020, 0x006C, 0x006F, 0x0067, 0x006F, 0x0020, 0x0069, 0x006D,
-  0x0061, 0x0067, 0x0065, 0x002E, 0x0000, 0xC557, 0x004A, 0x0075, 0x0073, 0x0074,
-  0x0020, 0x0074, 0x006F, 0x0075, 0x0063, 0x0068, 0x0020, 0x006F, 0x006E, 0x0020,
-  0x0074, 0x0068, 0x0065, 0x0020, 0x0073, 0x0063, 0x0072, 0x0065, 0x0065, 0x006E,
-  0x002E, 0x002E, 0x002E, 0x0000, 0xC557, 0x0077, 0x0077, 0x0077, 0x002E, 0x0065,
-  0x006D, 0x0062, 0x0065, 0x0064, 0x0064, 0x0065, 0x0064, 0x002D, 0x0077, 0x0069,
-  0x007A, 0x0061, 0x0072, 0x0064, 0x002E, 0x0064, 0x0065, 0x0000
+  0x00000016, /* ratio 127.27 % */
+  0xB8001300, 0x0009E452, 0x00400037, 0x40066830, 0x23100043, 0x00000406, 0x00000000
 };
 
 /* Constant values used in this 'C' module only. */
-static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
-static const XPoint _Const0001 = { 0, 0 };
-static const XPoint _Const0002 = { 320, 0 };
-static const XPoint _Const0003 = { 320, 240 };
-static const XPoint _Const0004 = { 0, 240 };
-static const XColor _Const0005 = { 0x56, 0x56, 0x56, 0xFF };
-static const XRect _Const0006 = {{ 210, 10 }, { 306, 106 }};
-static const XRect _Const0007 = {{ 10, 40 }, { 200, 80 }};
-static const XStringRes _Const0008 = { _StringsDefault0, 0x0003 };
-static const XColor _Const0009 = { 0xFF, 0xFF, 0xFF, 0xFF };
-static const XRect _Const000A = {{ 5, 115 }, { 315, 165 }};
-static const XStringRes _Const000B = { _StringsDefault0, 0x0011 };
-static const XRect _Const000C = {{ 5, 165 }, { 315, 200 }};
-static const XStringRes _Const000D = { _StringsDefault0, 0x0060 };
-static const XRect _Const000E = {{ 50, 200 }, { 260, 230 }};
-static const XStringRes _Const000F = { _StringsDefault0, 0x007D };
+static const XRect _Const0000 = {{ 0, 0 }, { 800, 480 }};
+static const XRect _Const0001 = {{ 304, 190 }, { 497, 240 }};
+static const XStringRes _Const0002 = { _StringsDefault0, 0x0002 };
+static const XColor _Const0003 = { 0x00, 0x00, 0x00, 0xFF };
+static const XRect _Const0004 = {{ 348, 240 }, { 452, 299 }};
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -84,62 +60,29 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationApplication );
 
   /* ... then construct all embedded objects */
-  CoreSimpleTouchHandler__Init( &_this->SimpleTouchHandler, &_this->_.XObject, 0 );
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
-  ViewsImage__Init( &_this->Image, &_this->_.XObject, 0 );
-  ViewsText__Init( &_this->Caption, &_this->_.XObject, 0 );
-  ViewsText__Init( &_this->Text1, &_this->_.XObject, 0 );
-  ViewsText__Init( &_this->Text2, &_this->_.XObject, 0 );
-  ViewsText__Init( &_this->Text3, &_this->_.XObject, 0 );
+  ViewsText__Init( &_this->Text, &_this->_.XObject, 0 );
+  WidgetSetToggleButton__Init( &_this->toggleLightSwitch, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
 
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
-  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->SimpleTouchHandler, _Const0001 );
-  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->SimpleTouchHandler, _Const0002 );
-  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->SimpleTouchHandler, _Const0003 );
-  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->SimpleTouchHandler, _Const0004 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  ViewsRectangle_OnSetColor( &_this->Rectangle, _Const0005 );
-  CoreRectView__OnSetBounds( &_this->Image, _Const0006 );
-  ViewsImage_OnSetAutoSize( &_this->Image, 1 );
-  CoreRectView__OnSetBounds( &_this->Caption, _Const0007 );
-  ViewsText_OnSetAlignment( &_this->Caption, ViewsTextAlignmentAlignHorzLeft | ViewsTextAlignmentAlignVertTop );
-  ViewsText_OnSetString( &_this->Caption, EwLoadString( &_Const0008 ));
-  ViewsText_OnSetColor( &_this->Caption, _Const0009 );
-  CoreRectView__OnSetBounds( &_this->Text1, _Const000A );
-  ViewsText_OnSetWrapText( &_this->Text1, 1 );
-  ViewsText_OnSetAlignment( &_this->Text1, ViewsTextAlignmentAlignHorzJustified 
-  | ViewsTextAlignmentAlignVertCenter );
-  ViewsText_OnSetString( &_this->Text1, EwLoadString( &_Const000B ));
-  ViewsText_OnSetColor( &_this->Text1, _Const0009 );
-  CoreRectView__OnSetBounds( &_this->Text2, _Const000C );
-  ViewsText_OnSetWrapText( &_this->Text2, 1 );
-  ViewsText_OnSetAlignment( &_this->Text2, ViewsTextAlignmentAlignHorzJustified 
-  | ViewsTextAlignmentAlignVertCenter );
-  ViewsText_OnSetString( &_this->Text2, EwLoadString( &_Const000D ));
-  ViewsText_OnSetColor( &_this->Text2, _Const0009 );
-  CoreRectView__OnSetBounds( &_this->Text3, _Const000E );
-  ViewsText_OnSetWrapText( &_this->Text3, 1 );
-  ViewsText_OnSetAlignment( &_this->Text3, ViewsTextAlignmentAlignHorzCenter | ViewsTextAlignmentAlignVertCenter );
-  ViewsText_OnSetString( &_this->Text3, EwLoadString( &_Const000F ));
-  ViewsText_OnSetColor( &_this->Text3, _Const0009 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->SimpleTouchHandler ), 0 );
+  CoreRectView__OnSetBounds( &_this->Text, _Const0001 );
+  ViewsText_OnSetWrapText( &_this->Text, 1 );
+  ViewsText_OnSetString( &_this->Text, EwLoadString( &_Const0002 ));
+  ViewsText_OnSetColor( &_this->Text, _Const0003 );
+  CoreRectView__OnSetBounds( &_this->toggleLightSwitch, _Const0004 );
+  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightSwitch, 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Image ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Caption ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Text1 ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Text2 ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Text3 ), 0 );
-  _this->SimpleTouchHandler.OnDrag = EwNewSlot( _this, ApplicationApplication_OnTouch );
-  _this->SimpleTouchHandler.OnPress = EwNewSlot( _this, ApplicationApplication_OnTouch );
-  ViewsImage_OnSetBitmap( &_this->Image, EwLoadResource( &ApplicationLogo, ResourcesBitmap ));
-  ViewsText_OnSetFont( &_this->Caption, EwLoadResource( &ApplicationFontLarge, ResourcesFont ));
-  ViewsText_OnSetFont( &_this->Text1, EwLoadResource( &ApplicationFontSmall, ResourcesFont ));
-  ViewsText_OnSetFont( &_this->Text2, EwLoadResource( &ApplicationFontSmall, ResourcesFont ));
-  ViewsText_OnSetFont( &_this->Text3, EwLoadResource( &ApplicationFontSmall, ResourcesFont ));
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Text ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightSwitch ), 0 );
+  ViewsText_OnSetFont( &_this->Text, EwLoadResource( &ApplicationFont, ResourcesFont ));
+  _this->toggleLightSwitch.OnUpdate = EwNewSlot( _this, ApplicationApplication_toggleLightSlot );
+  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightSwitch, EwGetAutoObject( 
+  &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -149,13 +92,9 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   CoreRoot__ReInit( &_this->_.Super );
 
   /* ... then re-construct all embedded objects */
-  CoreSimpleTouchHandler__ReInit( &_this->SimpleTouchHandler );
   ViewsRectangle__ReInit( &_this->Rectangle );
-  ViewsImage__ReInit( &_this->Image );
-  ViewsText__ReInit( &_this->Caption );
-  ViewsText__ReInit( &_this->Text1 );
-  ViewsText__ReInit( &_this->Text2 );
-  ViewsText__ReInit( &_this->Text3 );
+  ViewsText__ReInit( &_this->Text );
+  WidgetSetToggleButton__ReInit( &_this->toggleLightSwitch );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -165,29 +104,24 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   _this->_.Super._.VMT = EW_CLASS( CoreRoot );
 
   /* Finalize all embedded objects */
-  CoreSimpleTouchHandler__Done( &_this->SimpleTouchHandler );
   ViewsRectangle__Done( &_this->Rectangle );
-  ViewsImage__Done( &_this->Image );
-  ViewsText__Done( &_this->Caption );
-  ViewsText__Done( &_this->Text1 );
-  ViewsText__Done( &_this->Text2 );
-  ViewsText__Done( &_this->Text3 );
+  ViewsText__Done( &_this->Text );
+  WidgetSetToggleButton__Done( &_this->toggleLightSwitch );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
 }
 
-/* This is a slot method connected with the touch handler. Each time the user touches 
-   on the screen, this method is called. As a result, the position of the logo image 
-   will be changed. */
-void ApplicationApplication_OnTouch( ApplicationApplication _this, XObject sender )
+/* 'C' function for method : 'Application::Application.toggleLightSlot()' */
+void ApplicationApplication_toggleLightSlot( ApplicationApplication _this, XObject 
+  sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
   EW_UNUSED_ARG( sender );
 
-  CoreRectView__OnSetBounds( &_this->Image, EwSetRectOrigin( _this->Image.Super1.Bounds, 
-  EwMovePointNeg( _this->SimpleTouchHandler.CurrentPos, EwNewPoint( EwGetRectW( 
-  _this->Image.Super1.Bounds ) / 2, EwGetRectH( _this->Image.Super1.Bounds ) / 2 ))));
+  ApplicationDeviceClass_toggleLightHandler( EwGetAutoObject( &ApplicationDevice, 
+  ApplicationDeviceClass ));
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -195,8 +129,8 @@ EW_DEFINE_CLASS_VARIANTS( ApplicationApplication )
 EW_END_OF_CLASS_VARIANTS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
-EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, SimpleTouchHandler, _.VMT, _.VMT, 
-                 _.VMT, _.VMT, _.VMT, "Application::Application" )
+EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, Rectangle, _.VMT, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, "Application::Application" )
   CoreRoot_GetRoot,
   CoreRoot_Draw,
   CoreGroup_GetClipping,
@@ -211,25 +145,182 @@ EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, SimpleTouchHandler, _.VMT, _.
   CoreRoot_OnSetFocus,
   CoreRoot_DispatchEvent,
   CoreRoot_BroadcastEvent,
+  CoreGroup_UpdateViewState,
   CoreRoot_InvalidateArea,
 EW_END_OF_CLASS( ApplicationApplication )
 
-/* Include a file containing the font resource : 'Application::FontLarge' */
-#include "_ApplicationFontLarge.h"
+/* Include a file containing the font resource : 'Application::Font' */
+#include "_ApplicationFont.h"
 
-/* Table with links to derived variants of the font resource : 'Application::FontLarge' */
-EW_RES_WITHOUT_VARIANTS( ApplicationFontLarge )
+/* Table with links to derived variants of the font resource : 'Application::Font' */
+EW_RES_WITHOUT_VARIANTS( ApplicationFont )
 
-/* Include a file containing the bitmap resource : 'Application::Logo' */
-#include "_ApplicationLogo.h"
+/* User defined inline code: 'Application::Inline' */
+/*
 
-/* Table with links to derived variants of the bitmap resource : 'Application::Logo' */
-EW_RES_WITHOUT_VARIANTS( ApplicationLogo )
+  TO DO:
 
-/* Include a file containing the font resource : 'Application::FontSmall' */
-#include "_ApplicationFontSmall.h"
+  Include external header files or add type and function declarations needed
+  in the implementation of Application::DeviceClass. For example:
 
-/* Table with links to derived variants of the font resource : 'Application::FontSmall' */
-EW_RES_WITHOUT_VARIANTS( ApplicationFontSmall )
+    #include "DeviceDriver.h"
+
+    #include "your_middleware_api.h"
+
+    void Your_Middleware_Some_Function( int aSomeArg );
+
+*/
+
+/* Initializer for the class 'Application::DeviceClass' */
+void ApplicationDeviceClass__Init( ApplicationDeviceClass _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  TemplatesDeviceClass__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationDeviceClass );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( ApplicationDeviceClass );
+
+  /* Call the user defined constructor */
+  ApplicationDeviceClass_Init( _this, aArg );
+}
+
+/* Re-Initializer for the class 'Application::DeviceClass' */
+void ApplicationDeviceClass__ReInit( ApplicationDeviceClass _this )
+{
+  /* At first re-initialize the super class ... */
+  TemplatesDeviceClass__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Application::DeviceClass' */
+void ApplicationDeviceClass__Done( ApplicationDeviceClass _this )
+{
+  /* Call the user defined destructor of the class */
+  ApplicationDeviceClass_Done( _this );
+
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( TemplatesDeviceClass );
+
+  /* Don't forget to deinitialize the super class ... */
+  TemplatesDeviceClass__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Application::DeviceClass.Done()' */
+void ApplicationDeviceClass_Done( ApplicationDeviceClass _this )
+{
+  XObject thisObject = ((XObject)_this );
+
+  {
+    /*
+       TO DO:
+
+       Depending on your application case you call functions of the underlying
+       middleware (or access the device directly) in order to perform the necessary
+       de-initialization steps. For example, you invoke some 'C' function:
+
+         YourDevice_DeInitialize();
+
+       IMPORTANT:
+       ----------
+
+       The variable 'thisObject' represents the actually de-initialized instance of the
+       Application::DeviceClass. If you have stored this object at the initialization
+       time (in the 'Init' method) in some global C variable or registered it by the
+       middleware, it is important to perform now the opposite operation. Set the
+       global variable to NULL or de-register 'thisObject' object from the middleware.
+
+    */
+  }
+}
+
+/* 'C' function for method : 'Application::DeviceClass.Init()' */
+void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg )
+{
+  XObject thisObject;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( aArg );
+
+  thisObject = ((XObject)_this );
+  {
+    /*
+       TO DO:
+
+       Depending on your application case you call functions of the underlying
+       middleware (or access the device directly) in order to perform the necessary
+       initialization steps. For example, you invoke some 'C' function:
+
+         YourDevice_Initialize();
+
+       The variable 'thisObject' represents the actually initialized instance of the
+       Application::DeviceClass. You can store this variable e.g. in the middleware
+       and use it whenever the middleware needs to notify the GUI application about
+       some state alternation or events. In this manner, the middleware will be able
+       to invoke methods of the interface device object.
+
+       For example, you can store 'thisObject' in some global C variable:
+
+         // Declaration of the global C variable
+         XObject theDeviceObject;
+
+         // Store the instance in the global variable
+         theDeviceObject = thisObject;
+
+       Later use the global variable e.g. to provide the GUI application with events:
+
+         ApplicationDeviceClass__TriggerSomeEvent( theDeviceObject );
+
+       IMPORTANT:
+       ----------
+
+       If you store 'thisObject' for later use, don't forget to implement the opposite
+       operation in the method 'Done'. Concrete, 'Done' should set the global variable
+       again to the value NULL.
+
+    */
+  }
+}
+
+/* 'C' function for method : 'Application::DeviceClass.toggleLightHandler()' */
+void ApplicationDeviceClass_toggleLightHandler( ApplicationDeviceClass _this )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+
+  {
+    extern void ew_request_task();
+    ew_request_task();
+  }
+}
+
+/* Variants derived from the class : 'Application::DeviceClass' */
+EW_DEFINE_CLASS_VARIANTS( ApplicationDeviceClass )
+EW_END_OF_CLASS_VARIANTS( ApplicationDeviceClass )
+
+/* Virtual Method Table (VMT) for the class : 'Application::DeviceClass' */
+EW_DEFINE_CLASS( ApplicationDeviceClass, TemplatesDeviceClass, _.VMT, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, _.VMT, "Application::DeviceClass" )
+EW_END_OF_CLASS( ApplicationDeviceClass )
+
+/* User defined auto object: 'Application::Device' */
+EW_DEFINE_AUTOOBJECT( ApplicationDevice, ApplicationDeviceClass )
+
+/* Initializer for the auto object 'Application::Device' */
+void ApplicationDevice__Init( ApplicationDeviceClass _this )
+{
+  EW_UNUSED_ARG( _this );
+}
+
+/* Re-Initializer for the auto object 'Application::Device' */
+void ApplicationDevice__ReInit( ApplicationDeviceClass _this )
+{
+  EW_UNUSED_ARG( _this );
+}
+
+/* Table with links to derived variants of the auto object : 'Application::Device' */
+EW_DEFINE_AUTOOBJECT_VARIANTS( ApplicationDevice )
+EW_END_OF_AUTOOBJECT_VARIANTS( ApplicationDevice )
 
 /* Embedded Wizard */

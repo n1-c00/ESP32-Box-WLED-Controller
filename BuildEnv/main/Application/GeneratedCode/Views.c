@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -32,17 +32,26 @@
 #include "_ResourcesBitmap.h"
 #include "_ResourcesFont.h"
 #include "_ResourcesFontSet.h"
-#include "_ViewsImage.h"
+#include "_ViewsFrame.h"
 #include "_ViewsRectangle.h"
 #include "_ViewsText.h"
 #include "Core.h"
 #include "Effects.h"
+#include "Graphics.h"
 #include "Views.h"
+
+/* Compressed strings for the language 'Default'. */
+EW_CONST_STRING_PRAGMA static const unsigned int _StringsDefault0[] =
+{
+  0x0000000C, /* ratio 166.67 % */
+  0xB8000900, 0x3F9FE452, 0x06130800, 0x00000004, 0x00000000
+};
 
 /* Constant values used in this 'C' module only. */
 static const XColor _Const0000 = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const XPoint _Const0001 = { 0, 0 };
-static const XRect _Const0002 = {{ 0, 0 }, { 0, 0 }};
+static const XStringRes _Const0002 = { _StringsDefault0, 0x0002 };
+static const XRect _Const0003 = {{ 0, 0 }, { 0, 0 }};
 
 /* Initializer for the class 'Views::Rectangle' */
 void ViewsRectangle__Init( ViewsRectangle _this, XObject aLink, XHandle aArg )
@@ -57,7 +66,6 @@ void ViewsRectangle__Init( ViewsRectangle _this, XObject aLink, XHandle aArg )
   _this->_.VMT = EW_CLASS( ViewsRectangle );
 
   /* ... and initialize objects, variables, properties, etc. */
-  _this->Color = _Const0000;
 }
 
 /* Re-Initializer for the class 'Views::Rectangle' */
@@ -109,36 +117,22 @@ void ViewsRectangle_Draw( ViewsRectangle _this, GraphicsCanvas aCanvas, XRect aC
   XColor ctr;
   XColor cbl;
   XColor cbr;
-  XColor c = _this->Color;
 
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
   aOpacity = aOpacity + 1;
-  ctl = ctr = cbl = cbr = c;
+  ctl = ctr = cbl = cbr = _Const0000;
 
   if ( aOpacity < 256 )
   {
-    ctl.Alpha = (XUInt8)(( aOpacity * ctl.Alpha ) >> 8 );
-    ctr.Alpha = (XUInt8)(( aOpacity * ctr.Alpha ) >> 8 );
-    cbl.Alpha = (XUInt8)(( aOpacity * cbl.Alpha ) >> 8 );
-    cbr.Alpha = (XUInt8)(( aOpacity * cbr.Alpha ) >> 8 );
+    ctl.Alpha = (XUInt8)(( aOpacity * 255 ) >> 8 );
+    ctr.Alpha = (XUInt8)(( aOpacity * 255 ) >> 8 );
+    cbl.Alpha = (XUInt8)(( aOpacity * 255 ) >> 8 );
+    cbr.Alpha = (XUInt8)(( aOpacity * 255 ) >> 8 );
   }
 
   GraphicsCanvas_FillRectangle( aCanvas, aClip, EwMoveRectPos( _this->Super1.Bounds, 
   aOffset ), ctl, ctr, cbr, cbl, aBlend );
-}
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColor()' */
-void ViewsRectangle_OnSetColor( ViewsRectangle _this, XColor value )
-{
-  if ( !EwCompColor( value, _this->Color ))
-    return;
-
-  _this->Color = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
 /* Variants derived from the class : 'Views::Rectangle' */
@@ -161,30 +155,32 @@ EW_DEFINE_CLASS( ViewsRectangle, CoreRectView, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT
   CoreRectView_OnSetBounds,
 EW_END_OF_CLASS( ViewsRectangle )
 
-/* Initializer for the class 'Views::Image' */
-void ViewsImage__Init( ViewsImage _this, XObject aLink, XHandle aArg )
+/* Initializer for the class 'Views::Frame' */
+void ViewsFrame__Init( ViewsFrame _this, XObject aLink, XHandle aArg )
 {
   /* At first initialize the super class ... */
   CoreRectView__Init( &_this->_.Super, aLink, aArg );
 
   /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( ViewsImage );
+  _this->_.XObject._.GCT = EW_CLASS_GCT( ViewsFrame );
 
   /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( ViewsImage );
+  _this->_.VMT = EW_CLASS( ViewsFrame );
 
   /* ... and initialize objects, variables, properties, etc. */
+  _this->animFrameNumber = -1;
+  _this->Color = _Const0000;
 }
 
-/* Re-Initializer for the class 'Views::Image' */
-void ViewsImage__ReInit( ViewsImage _this )
+/* Re-Initializer for the class 'Views::Frame' */
+void ViewsFrame__ReInit( ViewsFrame _this )
 {
   /* At first re-initialize the super class ... */
   CoreRectView__ReInit( &_this->_.Super );
 }
 
-/* Finalizer method for the class 'Views::Image' */
-void ViewsImage__Done( ViewsImage _this )
+/* Finalizer method for the class 'Views::Frame' */
+void ViewsFrame__Done( ViewsFrame _this )
 {
   /* Finalize this class */
   _this->_.Super._.VMT = EW_CLASS( CoreRectView );
@@ -218,17 +214,17 @@ void ViewsImage__Done( ViewsImage _this )
    operation. If the view implements its own 'Blend' property, the Draw() method 
    should calculate the resulting real blend mode by using logical AND operation 
    of the value of the property and the one passed in aBlend parameter. */
-void ViewsImage_Draw( ViewsImage _this, GraphicsCanvas aCanvas, XRect aClip, XPoint 
+void ViewsFrame_Draw( ViewsFrame _this, GraphicsCanvas aCanvas, XRect aClip, XPoint 
   aOffset, XInt32 aOpacity, XBool aBlend )
 {
-  XInt32 frameNr = 0;
-  XRect area;
-  XPoint size;
+  XInt32 frameNr = _this->FrameNumber;
   XColor ctl;
   XColor ctr;
   XColor cbr;
   XColor cbl;
+  XColor c;
   XInt32 opacity;
+  XRect r;
 
   if ( _this->animFrameNumber >= 0 )
     frameNr = _this->animFrameNumber;
@@ -237,52 +233,39 @@ void ViewsImage_Draw( ViewsImage _this, GraphicsCanvas aCanvas, XRect aClip, XPo
     return;
 
   ResourcesBitmap__Update( _this->Bitmap );
-  area = ViewsImage_GetContentArea( _this );
-  size = _this->Bitmap->FrameSize;
-
-  if ( EwIsRectEmpty( area ))
-    return;
-
+  c = _this->Color;
   opacity = ((( aOpacity + 1 ) * 255 ) >> 8 ) + 1;
+  r = EwMoveRectPos( _this->Super1.Bounds, aOffset );
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
-  ctl = ctr = cbl = cbr = _Const0000;
+  ctl = ctr = cbl = cbr = c;
 
   if ( opacity < 256 )
   {
-    ctl.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
-    ctr.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
-    cbr.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
-    cbl.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
+    ctl.Alpha = (XUInt8)(( ctl.Alpha * opacity ) >> 8 );
+    ctr.Alpha = (XUInt8)(( ctr.Alpha * opacity ) >> 8 );
+    cbr.Alpha = (XUInt8)(( cbr.Alpha * opacity ) >> 8 );
+    cbl.Alpha = (XUInt8)(( cbl.Alpha * opacity ) >> 8 );
   }
 
-  if ( !EwCompPoint( EwGetRectSize( area ), size ))
-    GraphicsCanvas_CopyBitmap( aCanvas, aClip, _this->Bitmap, frameNr, EwMoveRectPos( 
-    _this->Super1.Bounds, aOffset ), EwMovePointNeg( _this->Super1.Bounds.Point1, 
-    area.Point1 ), ctl, ctr, cbr, cbl, aBlend );
-  else
-    GraphicsCanvas_ScaleBitmap( aCanvas, aClip, _this->Bitmap, frameNr, EwMoveRectPos( 
-    area, aOffset ), EwNewRect2Point( _Const0001, size ), ctl, ctr, cbr, cbl, aBlend, 
-    1 );
+  GraphicsCanvas_DrawBitmapFrame( aCanvas, aClip, _this->Bitmap, frameNr, r, GraphicsEdgesBottom 
+  | GraphicsEdgesInterior | GraphicsEdgesLeft | GraphicsEdgesRight | GraphicsEdgesTop, 
+  ctl, ctr, cbr, cbl, aBlend );
 }
 
-/* 'C' function for method : 'Views::Image.observerSlot()' */
-void ViewsImage_observerSlot( ViewsImage _this, XObject sender )
+/* 'C' function for method : 'Views::Frame.observerSlot()' */
+void ViewsFrame_observerSlot( ViewsFrame _this, XObject sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
-
-  if ((( _this->AutoSize && ( _this->Bitmap != 0 )) && ( _this->Bitmap->FrameSize.X 
-      > 0 )) && ( _this->Bitmap->FrameSize.Y > 0 ))
-    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
-/* 'C' function for method : 'Views::Image.timerSlot()' */
-void ViewsImage_timerSlot( ViewsImage _this, XObject sender )
+/* 'C' function for method : 'Views::Frame.timerSlot()' */
+void ViewsFrame_timerSlot( ViewsFrame _this, XObject sender )
 {
   XInt32 frameNr;
   XInt32 period;
@@ -297,7 +280,7 @@ void ViewsImage_timerSlot( ViewsImage _this, XObject sender )
     period = _this->Bitmap->NoOfFrames * _this->Bitmap->FrameDelay;
 
   if ((( _this->timer != 0 ) && ( _this->animFrameNumber < 0 )) && ( period > 0 ))
-    _this->startTime = _this->timer->Time;
+    _this->startTime = _this->timer->Time - ( _this->FrameNumber * _this->Bitmap->FrameDelay );
 
   if (( _this->timer != 0 ) && ( period > 0 ))
   {
@@ -319,27 +302,27 @@ void ViewsImage_timerSlot( ViewsImage _this, XObject sender )
 
   if (( period == 0 ) && ( _this->timer != 0 ))
   {
-    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+    EwDetachObjObserver( EwNewSlot( _this, ViewsFrame_timerSlot ), (XObject)_this->timer, 
       0 );
     _this->timer = 0;
   }
 }
 
-/* 'C' function for method : 'Views::Image.OnSetAutoSize()' */
-void ViewsImage_OnSetAutoSize( ViewsImage _this, XBool value )
+/* 'C' function for method : 'Views::Frame.OnSetColor()' */
+void ViewsFrame_OnSetColor( ViewsFrame _this, XColor value )
 {
-  if ( value == _this->AutoSize )
+  if ( !EwCompColor( value, _this->Color ))
     return;
 
-  _this->AutoSize = value;
+  _this->Color = value;
 
-  if ((( value && ( _this->Bitmap != 0 )) && ( _this->Bitmap->FrameSize.X > 0 )) 
-      && ( _this->Bitmap->FrameSize.Y > 0 ))
-    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
-/* 'C' function for method : 'Views::Image.OnSetAnimated()' */
-void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value )
+/* 'C' function for method : 'Views::Frame.OnSetAnimated()' */
+void ViewsFrame_OnSetAnimated( ViewsFrame _this, XBool value )
 {
   if ( _this->Animated == value )
     return;
@@ -349,7 +332,7 @@ void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value )
 
   if ( !value && ( _this->timer != 0 ))
   {
-    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+    EwDetachObjObserver( EwNewSlot( _this, ViewsFrame_timerSlot ), (XObject)_this->timer, 
       0 );
     _this->timer = 0;
   }
@@ -357,9 +340,9 @@ void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value )
   if ( value )
   {
     _this->timer = ((CoreTimer)EwGetAutoObject( &EffectsEffectTimer, EffectsEffectTimerClass ));
-    EwAttachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+    EwAttachObjObserver( EwNewSlot( _this, ViewsFrame_timerSlot ), (XObject)_this->timer, 
       0 );
-    EwPostSignal( EwNewSlot( _this, ViewsImage_timerSlot ), ((XObject)_this ));
+    EwPostSignal( EwNewSlot( _this, ViewsFrame_timerSlot ), ((XObject)_this ));
   }
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
@@ -367,88 +350,62 @@ void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value )
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
-/* 'C' function for method : 'Views::Image.OnSetBitmap()' */
-void ViewsImage_OnSetBitmap( ViewsImage _this, ResourcesBitmap value )
+/* 'C' function for method : 'Views::Frame.OnSetFrameNumber()' */
+void ViewsFrame_OnSetFrameNumber( ViewsFrame _this, XInt32 value )
+{
+  if ( value < 0 )
+    value = 0;
+
+  if (( value == _this->FrameNumber ) && ( _this->animFrameNumber == -1 ))
+    return;
+
+  _this->FrameNumber = value;
+
+  if ( _this->timer == 0 )
+    _this->animFrameNumber = -1;
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* 'C' function for method : 'Views::Frame.OnSetBitmap()' */
+void ViewsFrame_OnSetBitmap( ViewsFrame _this, ResourcesBitmap value )
 {
   if ( value == _this->Bitmap )
     return;
 
   if (( _this->Bitmap != 0 ) && _this->Bitmap->Mutable )
-    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_observerSlot ), (XObject)_this->Bitmap, 
+    EwDetachObjObserver( EwNewSlot( _this, ViewsFrame_observerSlot ), (XObject)_this->Bitmap, 
       0 );
 
   _this->Bitmap = value;
   _this->animFrameNumber = -1;
 
   if (( value != 0 ) && value->Mutable )
-    EwAttachObjObserver( EwNewSlot( _this, ViewsImage_observerSlot ), (XObject)value, 
+    EwAttachObjObserver( EwNewSlot( _this, ViewsFrame_observerSlot ), (XObject)value, 
       0 );
 
   if ( _this->Animated )
   {
-    ViewsImage_OnSetAnimated( _this, 0 );
-    ViewsImage_OnSetAnimated( _this, 1 );
+    ViewsFrame_OnSetAnimated( _this, 0 );
+    ViewsFrame_OnSetAnimated( _this, 1 );
   }
-
-  if ((( _this->AutoSize && ( value != 0 )) && ( value->FrameSize.X > 0 )) && ( 
-      value->FrameSize.Y > 0 ))
-    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
-/* The method GetContentArea() returns the position and the size of an area where 
-   the view will show the bitmap. This area is expressed in coordinates relative 
-   to the top-left corner of the view's @Owner. The method takes in account all 
-   properties which do affect the position and the alignment of the bitmap, e.g. 
-   @Alignment or @ScrollOffset. */
-XRect ViewsImage_GetContentArea( ViewsImage _this )
-{
-  XPoint size;
-  XRect bounds;
-  XInt32 width;
-  XInt32 height;
-  XRect rd;
-  XRect rs;
+/* Variants derived from the class : 'Views::Frame' */
+EW_DEFINE_CLASS_VARIANTS( ViewsFrame )
+EW_END_OF_CLASS_VARIANTS( ViewsFrame )
 
-  if ( _this->Bitmap == 0 )
-    return _Const0002;
-
-  size = _this->Bitmap->FrameSize;
-  bounds = _this->Super1.Bounds;
-  width = EwGetRectW( bounds );
-  height = EwGetRectH( bounds );
-
-  if (( size.X == 0 ) || ( size.Y == 0 ))
-    return _Const0002;
-
-  rd = EwNewRect( 0, 0, width, height );
-  rs = rd;
-  rs = EwSetRectSize( rs, size );
-
-  if ( EwGetRectW( rs ) != EwGetRectW( rd ))
-    rs = EwSetRectX( rs, ( rd.Point1.X + ( EwGetRectW( rd ) / 2 )) - ( EwGetRectW( 
-    rs ) / 2 ));
-
-  if ( EwGetRectH( rs ) != EwGetRectH( rd ))
-    rs = EwSetRectY( rs, ( rd.Point1.Y + ( EwGetRectH( rd ) / 2 )) - ( EwGetRectH( 
-    rs ) / 2 ));
-
-  rs = EwMoveRectPos( rs, bounds.Point1 );
-  return rs;
-}
-
-/* Variants derived from the class : 'Views::Image' */
-EW_DEFINE_CLASS_VARIANTS( ViewsImage )
-EW_END_OF_CLASS_VARIANTS( ViewsImage )
-
-/* Virtual Method Table (VMT) for the class : 'Views::Image' */
-EW_DEFINE_CLASS( ViewsImage, CoreRectView, timer, timer, startTime, startTime, startTime, 
-                 startTime, "Views::Image" )
+/* Virtual Method Table (VMT) for the class : 'Views::Frame' */
+EW_DEFINE_CLASS( ViewsFrame, CoreRectView, timer, timer, animFrameNumber, animFrameNumber, 
+                 animFrameNumber, animFrameNumber, "Views::Frame" )
   CoreView_GetRoot,
-  ViewsImage_Draw,
+  ViewsFrame_Draw,
   CoreView_GetClipping,
   CoreView_HandleEvent,
   CoreView_CursorHitTest,
@@ -458,7 +415,7 @@ EW_DEFINE_CLASS( ViewsImage, CoreRectView, timer, timer, startTime, startTime, s
   CoreRectView_GetExtent,
   CoreView_ChangeViewState,
   CoreRectView_OnSetBounds,
-EW_END_OF_CLASS( ViewsImage )
+EW_END_OF_CLASS( ViewsFrame )
 
 /* Initializer for the class 'Views::Text' */
 void ViewsText__Init( ViewsText _this, XObject aLink, XHandle aArg )
@@ -500,8 +457,11 @@ void ViewsText__Done( ViewsText _this )
 /* 'C' function for method : 'Views::Text.Done()' */
 void ViewsText_Done( ViewsText _this )
 {
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
+  if ( _this->bidiContext != 0 )
+  {
+    ViewsText_freeBidi( _this, _this->bidiContext );
+    _this->bidiContext = 0;
+  }
 }
 
 /* The method Draw() is invoked automatically if parts of the view should be redrawn 
@@ -675,9 +635,9 @@ void ViewsText_OnSetBounds( ViewsText _this, XRect value )
     EwPostSignal( EwNewSlot( _this, ViewsText_preReparseSlot ), ((XObject)_this ));
   }
 
-  if (((( _this->usedFont != _this->Font ) && _this->reparsed ) && EwCompPoint( 
-      EwGetRectSize( _this->Super1.Bounds ), EwGetRectSize( value ))) && !(( _this->Super2.viewState 
-      & CoreViewStateUpdatingLayout ) == CoreViewStateUpdatingLayout ))
+  if (((( _this->Ellipsis || ( _this->usedFont != _this->Font )) && _this->reparsed ) 
+      && EwCompPoint( EwGetRectSize( _this->Super1.Bounds ), EwGetRectSize( value ))) 
+      && !(( _this->Super2.viewState & CoreViewStateUpdatingLayout ) == CoreViewStateUpdatingLayout ))
   {
     _this->flowString = 0;
     _this->reparsed = 0;
@@ -687,6 +647,31 @@ void ViewsText_OnSetBounds( ViewsText _this, XRect value )
   CoreRectView_OnSetBounds((CoreRectView)_this, value );
   EwPostSignal( EwNewSlot( _this, ViewsText_preOnUpdateSlot ), ((XObject)_this ));
   EwIdleSignal( EwNewSlot( _this, ViewsText_onOverflowTest ), ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Views::Text.freeBidi()' */
+void ViewsText_freeBidi( ViewsText _this, XHandle aBidi )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+
+  if ( aBidi == 0 )
+    return;
+
+  EwFreeBidi( aBidi );
+}
+
+/* 'C' function for method : 'Views::Text.createBidi()' */
+XHandle ViewsText_createBidi( ViewsText _this, XInt32 aSize )
+{
+  XHandle bidi;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+
+  bidi = 0;
+  bidi = EwCreateBidi( aSize );
+  return bidi;
 }
 
 /* 'C' function for method : 'Views::Text.preOnUpdateSlot()' */
@@ -768,13 +753,29 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
     if ((( font != 0 ) && !!!font->Ascent ) && !!!font->Descent )
       font = 0;
 
+    if ( _this->bidiContext != 0 )
+    {
+      ViewsText_freeBidi( _this, _this->bidiContext );
+      _this->bidiContext = 0;
+    }
+
     _this->reparsed = 1;
 
     if (( EwCompString( _this->String, 0 ) != 0 ) && ( font != 0 ))
     {
       XInt32 length = EwGetStringLength( _this->String );
+
+      if ( _this->EnableBidiText )
+        _this->bidiContext = ViewsText_createBidi( _this, length );
+
       _this->flowString = EwShareString( ResourcesFont_ParseFlowString( font, _this->String, 
-      0, maxWidth, length, 0 ));
+      0, maxWidth, length, _this->bidiContext ));
+
+      if (( _this->bidiContext != 0 ) && !ViewsText_IsBidiText( _this ))
+      {
+        ViewsText_freeBidi( _this, _this->bidiContext );
+        _this->bidiContext = 0;
+      }
     }
     else
       _this->flowString = 0;
@@ -813,12 +814,297 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
   }
   while (( fontSet != 0 ) && !EwIsStringEmpty( _this->flowString ));
 
+  if (( _this->Ellipsis && ( EwCompString( _this->flowString, 0 ) != 0 )) && ( font 
+      != 0 ))
+  {
+    XSet align = _this->Alignment;
+    XInt32 leading = font->Leading;
+    XString res = _this->flowString;
+    XBool rtl = ViewsText_IsBaseDirectionRTL( _this );
+    XInt32 rh;
+    XInt32 noOfRows;
+    XInt32 maxNoOfRows;
+    XBool clipF;
+    XBool clipL;
+    XInt32 row;
+    XInt32 inx;
+    XInt32 maxW;
+
+    if ((( align & ViewsTextAlignmentAlignHorzAuto ) == ViewsTextAlignmentAlignHorzAuto ))
+    {
+      if ( rtl )
+        align = ( align & ~ViewsTextAlignmentAlignHorzAuto ) | ViewsTextAlignmentAlignHorzRight;
+      else
+        align = ( align & ~ViewsTextAlignmentAlignHorzAuto ) | ViewsTextAlignmentAlignHorzLeft;
+    }
+
+    rh = ( font->Ascent + font->Descent ) + leading;
+    noOfRows = EwGetStringChar( res, 0 );
+    maxNoOfRows = ( height + leading ) / rh;
+    clipF = 0;
+    clipL = 0;
+
+    if ( maxNoOfRows <= 0 )
+      maxNoOfRows = 1;
+
+    if ( noOfRows > maxNoOfRows )
+    {
+      XInt32 row = 0;
+      XInt32 rowF = 0;
+      XInt32 rowL = noOfRows - 1;
+      XInt32 inxF;
+      XInt32 inxL = EwGetStringLength( res );
+      XString tmp = 0;
+
+      if ( !!( align & ( ViewsTextAlignmentAlignVertCenter | ViewsTextAlignmentAlignVertCenterBaseline )) 
+          && !!( align & ( ViewsTextAlignmentAlignVertBottom | ViewsTextAlignmentAlignVertTop )))
+        align &= ~( ViewsTextAlignmentAlignVertCenter | ViewsTextAlignmentAlignVertCenterBaseline );
+
+      if ( !!( align & ( ViewsTextAlignmentAlignVertCenter | ViewsTextAlignmentAlignVertCenterBaseline )))
+        align &= ~( ViewsTextAlignmentAlignVertBottom | ViewsTextAlignmentAlignVertTop );
+
+      if ((( align & ViewsTextAlignmentAlignVertBottom ) == ViewsTextAlignmentAlignVertBottom ))
+        rowF = noOfRows - maxNoOfRows;
+      else
+        if ((( align & ViewsTextAlignmentAlignVertCenter ) == ViewsTextAlignmentAlignVertCenter ) 
+            || (( align & ViewsTextAlignmentAlignVertCenterBaseline ) == ViewsTextAlignmentAlignVertCenterBaseline ))
+        {
+          rowF = ( noOfRows - maxNoOfRows ) / 2;
+          rowL = ( rowF + maxNoOfRows ) - 1;
+        }
+        else
+          rowL = maxNoOfRows - 1;
+
+      clipF = (XBool)( rowF > 0 );
+      clipL = (XBool)( rowL < ( noOfRows - 1 ));
+
+      for ( inxF = 1; row < rowF; row = row + 1 )
+        inxF = inxF + EwGetStringChar( res, inxF );
+
+      if ( clipL )
+        for ( inxL = inxF; row < rowL; row = row + 1 )
+          inxL = inxL + EwGetStringChar( res, inxL );
+
+      if ( clipF )
+      {
+        XInt32 len = EwGetStringChar( res, inxF );
+        tmp = EwShareString( EwConcatString( EwConcatString( EwLoadString( &_Const0002 ), 
+        EwStringMiddle( res, inxF, len )), EwLoadString( &_Const0002 )));
+        tmp = EwSetStringChar( tmp, 0, (XChar)( len + 2 ));
+        inxF = inxF + len;
+
+        if ( EwGetStringChar( tmp, len ) == 0x000A )
+        {
+          tmp = EwSetStringChar( tmp, len, 0xFEFF );
+          tmp = EwSetStringChar( tmp, len + 1, 0x000A );
+        }
+
+        if ( EwGetStringChar( tmp, 2 ) == 0x000A )
+        {
+          tmp = EwSetStringChar( tmp, 2, 0xFEFF );
+          tmp = EwSetStringChar( tmp, 1, 0x000A );
+        }
+        else
+          tmp = EwSetStringChar( tmp, 1, 0xFEFF );
+      }
+
+      tmp = EwShareString( EwConcatString( tmp, EwStringMiddle( res, inxF, inxL 
+      - inxF )));
+
+      if ( clipL && ( inxL >= inxF ))
+      {
+        XInt32 len = EwGetStringChar( res, inxL );
+        XString tmp2 = EwShareString( EwConcatString( EwConcatString( EwLoadString( 
+          &_Const0002 ), EwStringMiddle( res, inxL, len )), EwLoadString( &_Const0002 )));
+        tmp2 = EwSetStringChar( tmp2, 0, (XChar)( len + 2 ));
+        tmp2 = EwSetStringChar( tmp2, 1, 0xFEFF );
+
+        if ( EwGetStringChar( tmp2, len ) == 0x000A )
+        {
+          tmp2 = EwSetStringChar( tmp2, len, 0xFEFF );
+          tmp2 = EwSetStringChar( tmp2, len + 1, 0x000A );
+        }
+
+        if ( EwGetStringChar( tmp2, 2 ) == 0x000A )
+        {
+          tmp2 = EwSetStringChar( tmp2, 2, 0xFEFF );
+          tmp2 = EwSetStringChar( tmp2, 1, 0x000A );
+        }
+        else
+          tmp2 = EwSetStringChar( tmp2, 1, 0xFEFF );
+
+        tmp = EwShareString( EwConcatString( tmp, tmp2 ));
+      }
+
+      res = EwShareString( EwConcatCharString((XChar)maxNoOfRows, tmp ));
+    }
+
+    row = 0;
+    inx = 1;
+    maxW = width;
+    noOfRows = EwGetStringChar( res, 0 );
+
+    for ( ; row < noOfRows; row = row + 1 )
+    {
+      XBool rowEllipF = (XBool)( clipF && ( row == 0 ));
+      XBool rowEllipL = (XBool)( clipL && ( row == ( noOfRows - 1 )));
+      XBool colEllipF = 0;
+      XBool colEllipL = 0;
+      XBool rtl2 = rtl;
+      XInt32 start;
+      XInt32 len;
+      XInt32 inxF;
+      XInt32 inxL;
+      XInt32 inxF2;
+      XInt32 inxL2;
+
+      if (( rtl && rowEllipF ) && !rowEllipL )
+      {
+        rowEllipF = 0;
+        rowEllipL = 1;
+      }
+      else
+        if (( rtl && rowEllipL ) && !rowEllipF )
+        {
+          rowEllipL = 0;
+          rowEllipF = 1;
+        }
+
+      start = inx + 1;
+      len = EwGetStringChar( res, inx );
+      inxF = start;
+      inxL = ( start + len ) - 2;
+      inxF2 = -1;
+      inxL2 = -1;
+
+      if ( !_this->WrapText && ( ResourcesFont_GetTextAdvance( font, res, start, 
+          len - 1 ) > maxW ))
+      {
+        XSet align2 = align;
+
+        if ((( align2 & ViewsTextAlignmentAlignHorzCenter ) == ViewsTextAlignmentAlignHorzCenter ) 
+            && !!( align2 & ( ViewsTextAlignmentAlignHorzLeft | ViewsTextAlignmentAlignHorzRight )))
+          align2 &= ~ViewsTextAlignmentAlignHorzCenter;
+
+        if ((( align2 & ViewsTextAlignmentAlignHorzCenter ) == ViewsTextAlignmentAlignHorzCenter ))
+          align2 &= ~( ViewsTextAlignmentAlignHorzLeft | ViewsTextAlignmentAlignHorzRight );
+
+        if ((( align2 & ViewsTextAlignmentAlignHorzRight ) == ViewsTextAlignmentAlignHorzRight ))
+          colEllipF = 1;
+        else
+          if ((( align2 & ViewsTextAlignmentAlignHorzCenter ) == ViewsTextAlignmentAlignHorzCenter ))
+          {
+            colEllipF = 1;
+            colEllipL = 1;
+          }
+          else
+            colEllipL = 1;
+      }
+
+      if ( EwGetStringChar( res, inxF ) == 0x000A )
+        inxF = inxF + 1;
+
+      if ( EwGetStringChar( res, inxL ) == 0x000A )
+        inxL = inxL - 1;
+
+      while ( colEllipF && ( EwGetStringChar( res, inxF ) == 0xFEFF ))
+        inxF = inxF + 1;
+
+      while ( colEllipL && ( EwGetStringChar( res, inxL ) == 0xFEFF ))
+        inxL = inxL - 1;
+
+      colEllipF = (XBool)( colEllipF && !rowEllipL );
+      colEllipL = (XBool)( colEllipL && !rowEllipF );
+
+      while (((( colEllipF || colEllipL ) || rowEllipF ) || rowEllipL ) && ( inxF 
+             < inxL ))
+      {
+        if (( colEllipF && ( rtl2 || !colEllipL )) || rowEllipF )
+        {
+          if ( inxF2 > 0 )
+            res = EwSetStringChar( res, inxF2, 0xFEFF );
+
+          res = EwSetStringChar( res, inxF, 0x2026 );
+          inxF2 = inxF;
+          inxF = inxF + 1;
+          rtl2 = (XBool)!rtl2;
+          rowEllipF = 0;
+
+          if ( ResourcesFont_GetTextAdvance( font, res, start, len - 1 ) <= maxW )
+          {
+            colEllipF = 0;
+            colEllipL = 0;
+          }
+          else
+            colEllipF = (XBool)( colEllipF || !colEllipL );
+        }
+
+        if (( colEllipL && ( !rtl2 || !colEllipF )) || rowEllipL )
+        {
+          if ( inxL2 > 0 )
+            res = EwSetStringChar( res, inxL2, 0xFEFF );
+
+          res = EwSetStringChar( res, inxL, 0x2026 );
+          inxL2 = inxL;
+          inxL = inxL - 1;
+          rtl2 = (XBool)!rtl2;
+          rowEllipL = 0;
+
+          if ( ResourcesFont_GetTextAdvance( font, res, start, len - 1 ) <= maxW )
+          {
+            colEllipF = 0;
+            colEllipL = 0;
+          }
+          else
+            colEllipL = (XBool)( colEllipL || !colEllipF );
+        }
+      }
+
+      inx = inx + len;
+    }
+
+    _this->textSize = EwNewPoint( ResourcesFont_GetFlowTextAdvance( font, res ), 
+    ( EwGetStringChar( res, 0 ) * rh ) - leading );
+    _this->flowString = EwShareString( res );
+  }
+
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 
   EwPostSignal( EwNewSlot( _this, ViewsText_preOnUpdateSlot ), ((XObject)_this ));
   EwIdleSignal( EwNewSlot( _this, ViewsText_onOverflowTest ), ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Views::Text.OnSetEnableBidiText()' */
+void ViewsText_OnSetEnableBidiText( ViewsText _this, XBool value )
+{
+  if ( value == _this->EnableBidiText )
+    return;
+
+  _this->EnableBidiText = value;
+  _this->flowString = 0;
+  _this->reparsed = 0;
+  EwPostSignal( EwNewSlot( _this, ViewsText_preReparseSlot ), ((XObject)_this ));
+}
+
+/* The onset method for the property 'Ellipsis' changes the ellipsis mode and forces 
+   an update. */
+void ViewsText_OnSetEllipsis( ViewsText _this, XBool value )
+{
+  if ( value == _this->Ellipsis )
+    return;
+
+  _this->Ellipsis = value;
+
+  if (( _this->WrapText || value ) || ( _this->usedFont != _this->Font ))
+    _this->Super2.viewState = _this->Super2.viewState & ~CoreViewStateFastReshape;
+  else
+    _this->Super2.viewState = _this->Super2.viewState | CoreViewStateFastReshape;
+
+  _this->flowString = 0;
+  _this->reparsed = 0;
+  EwPostSignal( EwNewSlot( _this, ViewsText_preReparseSlot ), ((XObject)_this ));
 }
 
 /* 'C' function for method : 'Views::Text.OnSetWrapText()' */
@@ -836,7 +1122,7 @@ void ViewsText_OnSetWrapText( ViewsText _this, XBool value )
     EwPostSignal( EwNewSlot( _this, ViewsText_preReparseSlot ), ((XObject)_this ));
   }
 
-  if ( value || ( _this->usedFont != _this->Font ))
+  if (( value || _this->Ellipsis ) || ( _this->usedFont != _this->Font ))
     _this->Super2.viewState = _this->Super2.viewState & ~CoreViewStateFastReshape;
   else
     _this->Super2.viewState = _this->Super2.viewState | CoreViewStateFastReshape;
@@ -854,7 +1140,7 @@ void ViewsText_OnSetAlignment( ViewsText _this, XSet value )
       == CoreViewStateVisible ))
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 
-  if ( _this->usedFont != _this->Font )
+  if ( _this->Ellipsis || ( _this->usedFont != _this->Font ))
   {
     _this->flowString = 0;
     _this->reparsed = 0;
@@ -922,10 +1208,41 @@ void ViewsText_OnSetColor( ViewsText _this, XColor value )
    sign or the property @EnableBidiText is 'false', this method returns 'false'. */
 XBool ViewsText_IsBaseDirectionRTL( ViewsText _this )
 {
+  XBool result;
+  XHandle bidi;
+
   if ( !_this->reparsed )
     EwSignal( EwNewSlot( _this, ViewsText_reparseSlot ), ((XObject)_this ));
 
-  return 0;
+  if ( _this->bidiContext == 0 )
+    return 0;
+
+  result = 0;
+  bidi = _this->bidiContext;
+  result = EwBidiIsRTL( bidi );
+  return result;
+}
+
+/* The method IsBidiText() returns 'true' if the text specified in the property 
+   @String contains any right-to-left contents or any other Bidi algorithm specific 
+   control codes requiring the Bidi processing of this text. Please note, if the 
+   property @EnableBidiText is false, the text is not processed by the Bidi algorithm 
+   and this method returns 'false'. */
+XBool ViewsText_IsBidiText( ViewsText _this )
+{
+  XBool result;
+  XHandle bidi;
+
+  if ( !_this->reparsed )
+    EwSignal( EwNewSlot( _this, ViewsText_reparseSlot ), ((XObject)_this ));
+
+  if ( _this->bidiContext == 0 )
+    return 0;
+
+  result = 0;
+  bidi = _this->bidiContext;
+  result = EwBidiIsNeeded( bidi );
+  return result;
 }
 
 /* The method GetContentArea() returns the position and the size of an area where 
@@ -945,13 +1262,13 @@ XRect ViewsText_GetContentArea( ViewsText _this )
   XRect rs;
 
   if ( !EwCompString( _this->String, 0 ) || ( _this->usedFont == 0 ))
-    return _Const0002;
+    return _Const0003;
 
   if ( !_this->reparsed )
     EwSignal( EwNewSlot( _this, ViewsText_reparseSlot ), ((XObject)_this ));
 
   if ( !EwCompString( _this->flowString, 0 ))
-    return _Const0002;
+    return _Const0003;
 
   leading = _this->usedFont->Leading;
   rh = ( _this->usedFont->Ascent + _this->usedFont->Descent ) + _this->usedFont->Leading;
@@ -1038,7 +1355,7 @@ EW_END_OF_CLASS_VARIANTS( ViewsText )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Text' */
 EW_DEFINE_CLASS( ViewsText, CoreRectView, usedFont, usedFont, flowString, flowString, 
-                 flowString, textSize, "Views::Text" )
+                 flowString, bidiContext, "Views::Text" )
   CoreView_GetRoot,
   ViewsText_Draw,
   CoreView_GetClipping,

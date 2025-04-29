@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -98,6 +98,29 @@ typedef XSet CoreViewState;
 #define CoreViewStateDontClipViews                          0x00080000
 #define CoreViewStatePreEnabled                             0x00100000
 #define CoreViewStateDeriveEnabledState                     0x00200000
+
+/* The definition Core::Layout determines the set of available arrangement constraints 
+   to apply on views during the automatic GUI arrangement. Each view can determine 
+   its own set of constraints how it want to behave when e.g. its owner changes 
+   the size.
+   The constraints @ResizeVert and @ResizeHorz e.g. determine the resize behavior 
+   of the view in response to the size modification of its owner. Views with these 
+   constraints disabled always will keep their size unchanged. In conflict cases 
+   when the alignment and resize constraints do contradict, the view will maintain 
+   its size and will be pulled into the middle area resulting by the alignment constraints.
+   In case of views automatically arranged in rows or columns within a Core::Outline, 
+   the alignment constraints determine the vertical or horizontal alignment of the 
+   view within the corresponding row or column. The resize constraints in this case 
+   enable the view to fill the entire height of a column or the entire width of 
+   a row. */
+typedef XSet CoreLayout;
+
+#define CoreLayoutResizeHorz                                0x00000001
+#define CoreLayoutResizeVert                                0x00000002
+#define CoreLayoutAlignToLeft                               0x00000004
+#define CoreLayoutAlignToRight                              0x00000008
+#define CoreLayoutAlignToTop                                0x00000010
+#define CoreLayoutAlignToBottom                             0x00000020
 
 /* The definition Core::Formation determines the available arrangement modes to 
    apply on all views embedded within a Core::Outline view. Depending on the mode, 

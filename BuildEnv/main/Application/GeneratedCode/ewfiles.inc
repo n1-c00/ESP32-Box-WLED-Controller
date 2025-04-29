@@ -1,4 +1,4 @@
-EMWI_COLOR_FORMAT := RGB565
+EMWI_COLOR_FORMAT := RGBA8888
 EMWI_SURFACE_ROTATION := 0
 EMWIFILES := \
 	Core.c \
@@ -6,4 +6,6 @@ EMWIFILES := \
 	Graphics.c \
 	Resources.c \
 	Views.c \
-	Application.c
+	Application.c \
+	Templates.c \
+	WidgetSet.c

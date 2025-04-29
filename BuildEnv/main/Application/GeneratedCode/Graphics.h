@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -43,6 +43,16 @@
 #endif
 
 #include "_GraphicsCanvas.h"
+
+/* The definition Graphics::Edges enumerates the parts of a free scalable frame. 
+   It is used to determine, which parts should be drawn. */
+typedef XSet GraphicsEdges;
+
+#define GraphicsEdgesLeft                                   0x00000001
+#define GraphicsEdgesTop                                    0x00000002
+#define GraphicsEdgesRight                                  0x00000004
+#define GraphicsEdgesBottom                                 0x00000008
+#define GraphicsEdgesInterior                               0x00000010
 
 #ifdef __cplusplus
   }

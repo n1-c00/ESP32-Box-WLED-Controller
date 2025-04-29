@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -43,11 +43,10 @@
 #endif
 
 #include "_CoreRoot.h"
-#include "_CoreSimpleTouchHandler.h"
 #include "_CoreTimer.h"
-#include "_ViewsImage.h"
 #include "_ViewsRectangle.h"
 #include "_ViewsText.h"
+#include "_WidgetSetToggleButton.h"
 
 /* Forward declaration of the class Application::Application */
 #ifndef _ApplicationApplication_
@@ -88,13 +87,9 @@
 
 /* This is the root component of the entire GUI application. */
 EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
-  EW_OBJECT  ( SimpleTouchHandler, CoreSimpleTouchHandler )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
-  EW_OBJECT  ( Image,           ViewsImage )
-  EW_OBJECT  ( Caption,         ViewsText )
-  EW_OBJECT  ( Text1,           ViewsText )
-  EW_OBJECT  ( Text2,           ViewsText )
-  EW_OBJECT  ( Text3,           ViewsText )
+  EW_OBJECT  ( Text,            ViewsText )
+  EW_OBJECT  ( toggleLightSwitch, WidgetSetToggleButton )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -119,13 +114,13 @@ EW_DEFINE_METHODS( ApplicationApplication, CoreRoot )
   EW_METHOD( DispatchEvent,     XObject )( CoreRoot _this, CoreEvent aEvent )
   EW_METHOD( BroadcastEvent,    XObject )( CoreRoot _this, CoreEvent aEvent, XSet 
     aFilter )
+  EW_METHOD( UpdateViewState,   void )( CoreGroup _this, XSet aState )
   EW_METHOD( InvalidateArea,    void )( CoreRoot _this, XRect aArea )
 EW_END_OF_METHODS( ApplicationApplication )
 
-/* This is a slot method connected with the touch handler. Each time the user touches 
-   on the screen, this method is called. As a result, the position of the logo image 
-   will be changed. */
-void ApplicationApplication_OnTouch( ApplicationApplication _this, XObject sender );
+/* 'C' function for method : 'Application::Application.toggleLightSlot()' */
+void ApplicationApplication_toggleLightSlot( ApplicationApplication _this, XObject 
+  sender );
 
 #ifdef __cplusplus
   }

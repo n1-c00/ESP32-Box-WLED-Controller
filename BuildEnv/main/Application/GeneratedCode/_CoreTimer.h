@@ -19,8 +19,8 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
-* Platform : Espressif.ESP32.RGB565
+* Profile  : Profile
+* Platform : Windows.Software.RGBA8888
 *
 *******************************************************************************/
 
@@ -65,6 +65,7 @@ EW_DEFINE_FIELDS( CoreTimer, XObject )
   EW_VARIABLE( timer,           XHandle )
   EW_VARIABLE( Time,            XUInt32 )
   EW_PROPERTY( Period,          XInt32 )
+  EW_PROPERTY( Begin,           XInt32 )
   EW_PROPERTY( Enabled,         XBool )
 EW_END_OF_FIELDS( CoreTimer )
 
@@ -81,6 +82,9 @@ void CoreTimer_restart( CoreTimer _this, XInt32 aBegin, XInt32 aPeriod );
 
 /* 'C' function for method : 'Core::Timer.OnSetPeriod()' */
 void CoreTimer_OnSetPeriod( CoreTimer _this, XInt32 value );
+
+/* 'C' function for method : 'Core::Timer.OnSetBegin()' */
+void CoreTimer_OnSetBegin( CoreTimer _this, XInt32 value );
 
 /* 'C' function for method : 'Core::Timer.OnSetEnabled()' */
 void CoreTimer_OnSetEnabled( CoreTimer _this, XBool value );
