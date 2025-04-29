@@ -1,7 +1,9 @@
 $version 1.0
 
+attr active = Application::DeviceClass;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
+attr currentCodeInspector = Application::DeviceClass.toggleLightMethod;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -18,6 +20,7 @@ attr language = Default;
 attr profile = Profile;
 attr profilerMonitor_Show = false;
 attr search_CaseSensitive = false;
+attr search_IgnoreComments = false;
 attr search_IgnoreDescription = false;
 attr search_IgnoreMosaic = false;
 attr search_LimitToComposer = true;
@@ -28,6 +31,7 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
@@ -37,13 +41,38 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-7,-7>;
+  attr scrollTo = <1020,-7>;
   attr zoom = 1.0;
 }
 
 view class Application::Application
 {
+  attr enableWireMode = false;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
+}
+
+view class Application::DeviceClass
+{
+  attr enableWireMode = false;
+  attr scrollTo = <1321,-7>;
+  attr zoom = 1.0;
+}
+
+codeview Application::DeviceClass.toggleLightMethod
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <30,1>;
+  attr codeSelStart = <30,1>;
+}
+
+codeview Application::Application.toggleLightSlot
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <40,0>;
+  attr codeSelStart = <40,0>;
 }

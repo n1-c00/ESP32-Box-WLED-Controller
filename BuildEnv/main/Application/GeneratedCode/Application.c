@@ -276,7 +276,7 @@ void ApplicationDeviceClass_toggleLightMethod( ApplicationDeviceClass _this )
   EW_UNUSED_ARG( _this );
 
   {
-    extern void ew_request_task();
+    extern void ew_request_task(void);
     ew_request_task();
   }
 }

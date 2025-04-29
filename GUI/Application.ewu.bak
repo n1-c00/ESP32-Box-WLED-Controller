@@ -1,0 +1,116 @@
+$version 14.02
+
+// This is the root component of the entire GUI application.
+$rect <20,20,220,60>
+$output false
+class Application : Core::Root
+{
+  $rect <340,10,540,50>
+  inherited property Bounds = <0,0,320,240>;
+
+  // To do:
+  // 
+  // - Adjust the visible size of your application (the thick blue border). It should \
+  // correspond to the size of your target display.
+  // 
+  // - The simplest way to compose the appearance of the application is to use the \
+  // 'Views' and 'Widgets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To store values use the 'Variable', 'Array' and 'Property' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  note legend Note1
+  {
+    attr Bounds = <10,260,790,490>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Text Text
+  {
+    preset Bounds = <66,93,254,147>;
+    preset WrapText = true;
+    preset String = "Welcome to\nEmbedded Wizard!";
+    preset Font = Application::Font;
+    preset Color = #000000FF;
+  }
+
+  $rect <340,63,540,103>
+  object Effects::Int32Effect Int32Effect
+  {
+    preset OnFinished = ConfigureText;
+    preset Symmetric = true;
+    preset NoOfCycles = 1;
+    preset CycleDuration = 2000;
+    preset Enabled = true;
+    preset Value2 = 255;
+    preset Value1 = 0;
+    preset Outlet = ^Text.Opacity;
+  }
+
+  $rect <340,110,540,150>
+  slot ConfigureText
+  {
+    /* put the welcome message to a random position */
+    Text.Bounds.origin = point( math_rand( 0, Bounds.w - Text.Bounds.w), math_rand( 0, Bounds.h - Text.Bounds.h ));
+
+    /* change the color using random red, green and blue values */
+    Text.Color = color((uint8)math_rand( 0x00, 0xFF ), (uint8)math_rand( 0x00, 0xFF ), (uint8)math_rand( 0x00, 0xFF ));
+
+    /* restart the animation */
+    postsignal Int32Effect.StartEffect;
+  }
+}
+
+// To do:
+// 
+// - Open the 'Application' component for editing. It represents your entire GUI. \
+// Use widgets, views, event handlers and effects from the Gallery to assemble there \
+// your desired GUI look and feel.
+// 
+// - Create your own GUI components, widgets, panels, etc. The Gallery folder 'Component \
+// Templates' contains for this purpose various templates you can simply add to the \
+// unit and thus start your own component development.
+// 
+// - You can add your own bitmap and font resources to the unit. Use the templates \
+// 'Bitmap Resource' and 'Font Resource' from the Gallery folder 'Resources' for \
+// this purpose.
+// 
+// - You can add here also constants to store e.g. multilingual text fragments. Use \
+// for this purpose the template 'Constant' from the Gallery folder 'Chora'.
+// 
+// - To add an interface for communication with the target device use the template \
+// 'Device Interface' from the Gallery folder 'Device'.
+note legend Note1
+{
+  attr Bounds = <20,80,710,390>;
+}
+
+$rect <230,20,430,60>
+$output false
+resource Resources::Font Font
+{
+  attr fontname FontName = Roboto;
+  attr fontheight Height = 16;
+  attr fontheightmode HeightMode = Popular;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontrowdistance RowDistance;
+}
