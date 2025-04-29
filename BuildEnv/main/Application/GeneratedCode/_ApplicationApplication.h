@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -45,7 +45,6 @@
 #include "_CoreRoot.h"
 #include "_CoreTimer.h"
 #include "_ViewsRectangle.h"
-#include "_ViewsText.h"
 #include "_WidgetSetToggleButton.h"
 
 /* Forward declaration of the class Application::Application */
@@ -88,8 +87,7 @@
 /* This is the root component of the entire GUI application. */
 EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
-  EW_OBJECT  ( Text,            ViewsText )
-  EW_OBJECT  ( toggleLightSwitch, WidgetSetToggleButton )
+  EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */

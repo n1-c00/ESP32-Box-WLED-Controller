@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -28,27 +28,25 @@
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
 #include "_CoreView.h"
-#include "_ResourcesFont.h"
 #include "_ViewsRectangle.h"
-#include "_ViewsText.h"
 #include "_WidgetSetToggleButton.h"
 #include "_WidgetSetToggleButtonConfig.h"
 #include "Application.h"
 #include "WidgetSet.h"
 
-/* Compressed strings for the language 'Default'. */
-EW_CONST_STRING_PRAGMA static const unsigned int _StringsDefault0[] =
+/* Strings for the language 'Default'. */
+EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 {
-  0x00000016, /* ratio 127.27 % */
-  0xB8001300, 0x0009E452, 0x00400037, 0x40066830, 0x23100043, 0x00000406, 0x00000000
+  0xFFFF, 0xFFFF, 0xC557, 0x004F, 0x006E, 0x0000, 0xC557, 0x004F, 0x0066, 0x0066,
+  0x0000, 0xC557, 0x007C, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
-static const XRect _Const0000 = {{ 0, 0 }, { 800, 480 }};
-static const XRect _Const0001 = {{ 304, 190 }, { 497, 240 }};
-static const XStringRes _Const0002 = { _StringsDefault0, 0x0002 };
-static const XColor _Const0003 = { 0x00, 0x00, 0x00, 0xFF };
-static const XRect _Const0004 = {{ 348, 240 }, { 452, 299 }};
+static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
+static const XRect _Const0001 = {{ 67, 93 }, { 217, 143 }};
+static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
+static const XStringRes _Const0003 = { _StringsDefault0, 0x0007 };
+static const XStringRes _Const0004 = { _StringsDefault0, 0x000C };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -61,8 +59,7 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
 
   /* ... then construct all embedded objects */
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
-  ViewsText__Init( &_this->Text, &_this->_.XObject, 0 );
-  WidgetSetToggleButton__Init( &_this->toggleLightSwitch, &_this->_.XObject, 0 );
+  WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -70,18 +67,15 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->Text, _Const0001 );
-  ViewsText_OnSetWrapText( &_this->Text, 1 );
-  ViewsText_OnSetString( &_this->Text, EwLoadString( &_Const0002 ));
-  ViewsText_OnSetColor( &_this->Text, _Const0003 );
-  CoreRectView__OnSetBounds( &_this->toggleLightSwitch, _Const0004 );
-  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightSwitch, 0 );
+  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
+  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, EwLoadString( &_Const0002 ));
+  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, EwLoadString( 
+  &_Const0003 ));
+  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, EwLoadString( &_Const0004 ));
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Text ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightSwitch ), 0 );
-  ViewsText_OnSetFont( &_this->Text, EwLoadResource( &ApplicationFont, ResourcesFont ));
-  _this->toggleLightSwitch.OnUpdate = EwNewSlot( _this, ApplicationApplication_toggleLightSlot );
-  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightSwitch, EwGetAutoObject( 
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
+  _this->toggleLightButton.OnUpdate = EwNewSlot( _this, ApplicationApplication_toggleLightSlot );
+  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
 }
 
@@ -93,8 +87,7 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
 
   /* ... then re-construct all embedded objects */
   ViewsRectangle__ReInit( &_this->Rectangle );
-  ViewsText__ReInit( &_this->Text );
-  WidgetSetToggleButton__ReInit( &_this->toggleLightSwitch );
+  WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -105,8 +98,7 @@ void ApplicationApplication__Done( ApplicationApplication _this )
 
   /* Finalize all embedded objects */
   ViewsRectangle__Done( &_this->Rectangle );
-  ViewsText__Done( &_this->Text );
-  WidgetSetToggleButton__Done( &_this->toggleLightSwitch );
+  WidgetSetToggleButton__Done( &_this->toggleLightButton );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -120,7 +112,7 @@ void ApplicationApplication_toggleLightSlot( ApplicationApplication _this, XObje
   EW_UNUSED_ARG( _this );
   EW_UNUSED_ARG( sender );
 
-  ApplicationDeviceClass_toggleLightHandler( EwGetAutoObject( &ApplicationDevice, 
+  ApplicationDeviceClass_toggleLightMethod( EwGetAutoObject( &ApplicationDevice, 
   ApplicationDeviceClass ));
 }
 
@@ -148,12 +140,6 @@ EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, Rectangle, _.VMT, _.VMT, _.VM
   CoreGroup_UpdateViewState,
   CoreRoot_InvalidateArea,
 EW_END_OF_CLASS( ApplicationApplication )
-
-/* Include a file containing the font resource : 'Application::Font' */
-#include "_ApplicationFont.h"
-
-/* Table with links to derived variants of the font resource : 'Application::Font' */
-EW_RES_WITHOUT_VARIANTS( ApplicationFont )
 
 /* User defined inline code: 'Application::Inline' */
 /*
@@ -283,8 +269,8 @@ void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg )
   }
 }
 
-/* 'C' function for method : 'Application::DeviceClass.toggleLightHandler()' */
-void ApplicationDeviceClass_toggleLightHandler( ApplicationDeviceClass _this )
+/* 'C' function for method : 'Application::DeviceClass.toggleLightMethod()' */
+void ApplicationDeviceClass_toggleLightMethod( ApplicationDeviceClass _this )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( _this );

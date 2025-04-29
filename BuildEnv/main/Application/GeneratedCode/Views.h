@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 

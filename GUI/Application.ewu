@@ -5,8 +5,8 @@ $rect <20,20,220,60>
 $output false
 class Application : Core::Root
 {
-  $rect <820,10,1020,50>
-  inherited property Bounds = <0,0,800,480>;
+  $rect <340,10,540,50>
+  inherited property Bounds = <0,0,320,240>;
 
   // To do:
   // 
@@ -29,26 +29,26 @@ class Application : Core::Root
   // in the Gallery folder 'Chora'.
   note legend Note1
   {
-    attr Bounds = <10,500,790,730>;
+    attr Bounds = <10,260,790,490>;
   }
 
   $rect <20,20,160,60>
   object Views::Rectangle Rectangle
   {
-    preset Bounds = <0,0,800,480>;
+    preset Bounds = <0,0,320,240>;
   }
 
   $rect <20,20,160,60>
   object Views::Text Text
   {
-    preset Bounds = <165,186,636,294>;
+    preset Bounds = <66,93,254,147>;
     preset WrapText = true;
     preset String = "Welcome to\nEmbedded Wizard!";
     preset Font = Application::Font;
     preset Color = #000000FF;
   }
 
-  $rect <820,63,1020,103>
+  $rect <340,63,540,103>
   object Effects::Int32Effect Int32Effect
   {
     preset OnFinished = ConfigureText;
@@ -61,7 +61,7 @@ class Application : Core::Root
     preset Outlet = ^Text.Opacity;
   }
 
-  $rect <820,110,1020,150>
+  $rect <340,110,540,150>
   slot ConfigureText
   {
     /* put the welcome message to a random position */
@@ -104,7 +104,7 @@ $output false
 resource Resources::Font Font
 {
   attr fontname FontName = Roboto;
-  attr fontheight Height = 38;
+  attr fontheight Height = 16;
   attr fontheightmode HeightMode = Popular;
   attr fontquality Quality = High;
   attr fontranges Ranges = 0x20-0xFF;

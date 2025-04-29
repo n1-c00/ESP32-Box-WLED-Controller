@@ -103,10 +103,10 @@ note legend Note
 // This is a profile member for the project. This profile controls the code generation \
 // for the target system.
 $rect <290,70,490,110>
-profile Profile : Windows.Software.RGBA8888
+profile Profile : Espressif.ESP32.RGB565
 {
   attr Verbose = false;
-  attr ScreenSize = <800,480>;
+  attr ScreenSize = <320,240>;
   attr Optimization = High;
   attr ApplicationClass = Application::Application;
   attr CleanOutputDirectories = false;
@@ -115,8 +115,8 @@ profile Profile : Windows.Software.RGBA8888
   attr ScreenOrientation = Normal;
   attr StorageOfResources = Code;
   attr StorageOfConstants = Code;
-  attr ModeOfBitmapResources = Compressed;
-  attr ModeOfStringConstants = Compressed;
+  attr ModeOfBitmapResources = DirectAccess;
+  attr ModeOfStringConstants = DirectAccess;
   attr OutputDirectory = C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\main\Application\GeneratedCode;
 
   $rect <10,10,154,50>

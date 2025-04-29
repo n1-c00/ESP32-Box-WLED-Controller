@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -44,9 +44,6 @@
 
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
-
-/* Font resource : 'Application::Font' */
-EW_DECLARE_FONT_RES( ApplicationFont )
 
 /* User defined auto object: 'Application::Device' */
 EW_DECLARE_AUTOOBJECT( ApplicationDevice, ApplicationDeviceClass )

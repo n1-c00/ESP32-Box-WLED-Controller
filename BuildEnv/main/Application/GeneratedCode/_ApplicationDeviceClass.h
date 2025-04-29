@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -65,8 +65,8 @@ void ApplicationDeviceClass_Done( ApplicationDeviceClass _this );
 /* 'C' function for method : 'Application::DeviceClass.Init()' */
 void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg );
 
-/* 'C' function for method : 'Application::DeviceClass.toggleLightHandler()' */
-void ApplicationDeviceClass_toggleLightHandler( ApplicationDeviceClass _this );
+/* 'C' function for method : 'Application::DeviceClass.toggleLightMethod()' */
+void ApplicationDeviceClass_toggleLightMethod( ApplicationDeviceClass _this );
 
 #ifdef __cplusplus
   }

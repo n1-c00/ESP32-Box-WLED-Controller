@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -219,6 +219,12 @@ void WidgetSetToggleButton_onPressTouch( WidgetSetToggleButton _this, XObject se
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.OnSetChecked()' */
 void WidgetSetToggleButton_OnSetChecked( WidgetSetToggleButton _this, XBool value );
+
+/* 'C' function for method : 'WidgetSet::ToggleButton.OnSetLabelOn()' */
+void WidgetSetToggleButton_OnSetLabelOn( WidgetSetToggleButton _this, XString value );
+
+/* 'C' function for method : 'WidgetSet::ToggleButton.OnSetLabelOff()' */
+void WidgetSetToggleButton_OnSetLabelOff( WidgetSetToggleButton _this, XString value );
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.OnSetLabel()' */
 void WidgetSetToggleButton_OnSetLabel( WidgetSetToggleButton _this, XString value );

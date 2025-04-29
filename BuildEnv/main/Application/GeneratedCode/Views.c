@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -40,17 +40,16 @@
 #include "Graphics.h"
 #include "Views.h"
 
-/* Compressed strings for the language 'Default'. */
-EW_CONST_STRING_PRAGMA static const unsigned int _StringsDefault0[] =
+/* Strings for the language 'Default'. */
+EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 {
-  0x0000000C, /* ratio 166.67 % */
-  0xB8000900, 0x3F9FE452, 0x06130800, 0x00000004, 0x00000000
+  0xFFFF, 0xFFFF, 0xC557, 0xFEFF, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
 static const XColor _Const0000 = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const XPoint _Const0001 = { 0, 0 };
-static const XStringRes _Const0002 = { _StringsDefault0, 0x0002 };
+static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
 static const XRect _Const0003 = {{ 0, 0 }, { 0, 0 }};
 
 /* Initializer for the class 'Views::Rectangle' */

@@ -20,7 +20,7 @@
 *
 * Version  : 14.02
 * Profile  : Profile
-* Platform : Windows.Software.RGBA8888
+* Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
@@ -1250,6 +1250,26 @@ void WidgetSetToggleButton_OnSetChecked( WidgetSetToggleButton _this, XBool valu
     return;
 
   _this->Checked = value;
+  CoreGroup_InvalidateViewState((CoreGroup)_this );
+}
+
+/* 'C' function for method : 'WidgetSet::ToggleButton.OnSetLabelOn()' */
+void WidgetSetToggleButton_OnSetLabelOn( WidgetSetToggleButton _this, XString value )
+{
+  if ( !EwCompString( _this->LabelOn, value ))
+    return;
+
+  _this->LabelOn = EwShareString( value );
+  CoreGroup_InvalidateViewState((CoreGroup)_this );
+}
+
+/* 'C' function for method : 'WidgetSet::ToggleButton.OnSetLabelOff()' */
+void WidgetSetToggleButton_OnSetLabelOff( WidgetSetToggleButton _this, XString value )
+{
+  if ( !EwCompString( _this->LabelOff, value ))
+    return;
+
+  _this->LabelOff = EwShareString( value );
   CoreGroup_InvalidateViewState((CoreGroup)_this );
 }
 
