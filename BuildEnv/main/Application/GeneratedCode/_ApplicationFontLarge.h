@@ -19,16 +19,16 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
-#include "_EwFont_Arial_HC24_C16.h"
+#include "_EwFont_Arial_HC32_C16.h"
 
 /* Font resource for large font - used for the caption text items. */
 EW_DEFINE_FONT_RES( ApplicationFontLarge )
-  EW_FONT_ENTRY( EwFont_Arial_HC24_C16, 24, 24, 1, 0, 0, 16 )
+  EW_FONT_ENTRY( EwFont_Arial_HC32_C16, 32, 32, 1, 0, 0, 16 )
 
   EW_FONT_RANGES( ApplicationFontLarge )
 

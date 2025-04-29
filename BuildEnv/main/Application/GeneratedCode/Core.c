@@ -19,13 +19,13 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
 
 #include "ewlocale.h"
-#include "_ApplicationApplication_Landscape.h"
+#include "_ApplicationApplication.h"
 #include "_CoreCursorEvent.h"
 #include "_CoreCursorGrabEvent.h"
 #include "_CoreCursorHit.h"
@@ -113,7 +113,7 @@ static const XStringRes _Const000A = { _StringsDefault0, 0x0086 };
 const XPoint EwScreenSize = { 320, 240 };
 
 /* Global constant containing the main application class. */
-const XClass EwApplicationClass = EW_CLASS( ApplicationApplication_Landscape );
+const XClass EwApplicationClass = EW_CLASS( ApplicationApplication );
 
 /* Global constant containing the user defined application title. */
 const char* EwApplicationTitle = "";
@@ -1172,12 +1172,6 @@ void CoreRectView__OnSetBounds( void* _this, XRect value )
   ((CoreRectView)_this)->_.VMT->OnSetBounds((CoreRectView)_this, value );
 }
 
-/* Default onget method for the property 'Bounds' */
-XRect CoreRectView_OnGetBounds( CoreRectView _this )
-{
-  return _this->Bounds;
-}
-
 /* Variants derived from the class : 'Core::RectView' */
 EW_DEFINE_CLASS_VARIANTS( CoreRectView )
 EW_END_OF_CLASS_VARIANTS( CoreRectView )
@@ -1700,7 +1694,7 @@ void CoreGroup_recalculateLayout( CoreGroup _this )
   }
 
   _this->Super2.viewState = _this->Super2.viewState & ~CoreViewStateUpdatingLayout;
-  CoreGroup__UpdateLayout( _this, EwGetRectSize( groupBounds ));
+  CoreGroup_UpdateLayout( _this, EwGetRectSize( groupBounds ));
 }
 
 /* 'C' function for method : 'Core::Group.updateComponentWithDelay()' */
@@ -2190,12 +2184,6 @@ void CoreGroup_UpdateLayout( CoreGroup _this, XPoint aSize )
   EW_UNUSED_ARG( aSize );
 }
 
-/* Wrapper function for the virtual method : 'Core::Group.UpdateLayout()' */
-void CoreGroup__UpdateLayout( void* _this, XPoint aSize )
-{
-  ((CoreGroup)_this)->_.VMT->UpdateLayout((CoreGroup)_this, aSize );
-}
-
 /* The method UpdateViewState() is invoked automatically after the state of the 
    component has been changed. This method can be overridden and filled with logic 
    to ensure the visual aspect of the component does reflect its current state. 
@@ -2442,7 +2430,6 @@ EW_DEFINE_CLASS( CoreGroup, CoreRectView, first, first, extClipLeft, extClipLeft
   CoreGroup_OnSetFocus,
   CoreGroup_DispatchEvent,
   CoreGroup_BroadcastEvent,
-  CoreGroup_UpdateLayout,
   CoreGroup_InvalidateArea,
 EW_END_OF_CLASS( CoreGroup )
 
@@ -3719,7 +3706,6 @@ EW_DEFINE_CLASS( CoreRoot, CoreGroup, cursorHoldTimer, keyLastTarget, keyLastCod
   CoreRoot_OnSetFocus,
   CoreRoot_DispatchEvent,
   CoreRoot_BroadcastEvent,
-  CoreGroup_UpdateLayout,
   CoreRoot_InvalidateArea,
 EW_END_OF_CLASS( CoreRoot )
 
@@ -4963,12 +4949,6 @@ XBool CoreKeyPressHandler_HandleEvent( CoreKeyPressHandler _this, CoreKeyEvent a
     {
       _this->RepetitionCount = _this->pressCounter;
       _this->Repetition = (XBool)( _this->pressCounter > 0 );
-
-      if ( _this->Repetition )
-        EwSignal( _this->OnHold, ((XObject)_this ));
-      else
-        EwSignal( _this->OnPress, ((XObject)_this ));
-
       _this->pressCounter = _this->pressCounter + 1;
       return 1;
     }
@@ -4990,7 +4970,7 @@ EW_DEFINE_CLASS_VARIANTS( CoreKeyPressHandler )
 EW_END_OF_CLASS_VARIANTS( CoreKeyPressHandler )
 
 /* Virtual Method Table (VMT) for the class : 'Core::KeyPressHandler' */
-EW_DEFINE_CLASS( CoreKeyPressHandler, XObject, next, next, OnPress, pressCounter, 
+EW_DEFINE_CLASS( CoreKeyPressHandler, XObject, next, next, pressCounter, pressCounter, 
                  pressCounter, pressCounter, "Core::KeyPressHandler" )
 EW_END_OF_CLASS( CoreKeyPressHandler )
 

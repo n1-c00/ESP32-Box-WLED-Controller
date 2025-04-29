@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -137,7 +137,6 @@ EW_DEFINE_FIELDS( ViewsText, CoreRectView )
   EW_VARIABLE( flowString,      XString )
   EW_PROPERTY( String,          XString )
   EW_VARIABLE( textSize,        XPoint )
-  EW_PROPERTY( Orientation,     XEnum )
   EW_PROPERTY( Alignment,       XSet )
   EW_PROPERTY( Color,           XColor )
   EW_VARIABLE( reparsed,        XBool )
@@ -212,9 +211,6 @@ void ViewsText_onUpdateFont( ViewsText _this, XObject sender );
 
 /* 'C' function for method : 'Views::Text.reparseSlot()' */
 void ViewsText_reparseSlot( ViewsText _this, XObject sender );
-
-/* 'C' function for method : 'Views::Text.OnSetOrientation()' */
-void ViewsText_OnSetOrientation( ViewsText _this, XEnum value );
 
 /* 'C' function for method : 'Views::Text.OnSetWrapText()' */
 void ViewsText_OnSetWrapText( ViewsText _this, XBool value );

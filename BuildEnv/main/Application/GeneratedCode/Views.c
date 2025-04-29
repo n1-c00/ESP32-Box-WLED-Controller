@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -57,10 +57,7 @@ void ViewsRectangle__Init( ViewsRectangle _this, XObject aLink, XHandle aArg )
   _this->_.VMT = EW_CLASS( ViewsRectangle );
 
   /* ... and initialize objects, variables, properties, etc. */
-  _this->ColorBL = _Const0000;
-  _this->ColorBR = _Const0000;
-  _this->ColorTR = _Const0000;
-  _this->ColorTL = _Const0000;
+  _this->Color = _Const0000;
 }
 
 /* Re-Initializer for the class 'Views::Rectangle' */
@@ -108,18 +105,16 @@ void ViewsRectangle__Done( ViewsRectangle _this )
 void ViewsRectangle_Draw( ViewsRectangle _this, GraphicsCanvas aCanvas, XRect aClip, 
   XPoint aOffset, XInt32 aOpacity, XBool aBlend )
 {
-  XColor ctl = _this->ColorTL;
-  XColor ctr = _this->ColorTR;
-  XColor cbl = _this->ColorBL;
-  XColor cbr = _this->ColorBR;
+  XColor ctl;
+  XColor ctr;
+  XColor cbl;
+  XColor cbr;
+  XColor c = _this->Color;
 
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
   aOpacity = aOpacity + 1;
-
-  if ((( !EwCompColor( ctl, ctr ) && !EwCompColor( cbl, cbr )) && !EwCompColor( 
-      ctl, cbl )) && !EwCompColor( ctl, _Const0000 ))
-    ctl = ctr = cbl = cbr = _Const0000;
+  ctl = ctr = cbl = cbr = c;
 
   if ( aOpacity < 256 )
   {
@@ -133,52 +128,13 @@ void ViewsRectangle_Draw( ViewsRectangle _this, GraphicsCanvas aCanvas, XRect aC
   aOffset ), ctl, ctr, cbr, cbl, aBlend );
 }
 
-/* 'C' function for method : 'Views::Rectangle.OnSetColorBL()' */
-void ViewsRectangle_OnSetColorBL( ViewsRectangle _this, XColor value )
+/* 'C' function for method : 'Views::Rectangle.OnSetColor()' */
+void ViewsRectangle_OnSetColor( ViewsRectangle _this, XColor value )
 {
-  if ( !EwCompColor( value, _this->ColorBL ))
+  if ( !EwCompColor( value, _this->Color ))
     return;
 
-  _this->ColorBL = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
-}
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorBR()' */
-void ViewsRectangle_OnSetColorBR( ViewsRectangle _this, XColor value )
-{
-  if ( !EwCompColor( value, _this->ColorBR ))
-    return;
-
-  _this->ColorBR = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
-}
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorTR()' */
-void ViewsRectangle_OnSetColorTR( ViewsRectangle _this, XColor value )
-{
-  if ( !EwCompColor( value, _this->ColorTR ))
-    return;
-
-  _this->ColorTR = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
-}
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorTL()' */
-void ViewsRectangle_OnSetColorTL( ViewsRectangle _this, XColor value )
-{
-  if ( !EwCompColor( value, _this->ColorTL ))
-    return;
-
-  _this->ColorTL = value;
+  _this->Color = value;
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
@@ -218,7 +174,6 @@ void ViewsImage__Init( ViewsImage _this, XObject aLink, XHandle aArg )
   _this->_.VMT = EW_CLASS( ViewsImage );
 
   /* ... and initialize objects, variables, properties, etc. */
-  _this->Color = _Const0000;
 }
 
 /* Re-Initializer for the class 'Views::Image' */
@@ -273,7 +228,6 @@ void ViewsImage_Draw( ViewsImage _this, GraphicsCanvas aCanvas, XRect aClip, XPo
   XColor ctr;
   XColor cbr;
   XColor cbl;
-  XColor c;
   XInt32 opacity;
 
   if ( _this->animFrameNumber >= 0 )
@@ -289,18 +243,17 @@ void ViewsImage_Draw( ViewsImage _this, GraphicsCanvas aCanvas, XRect aClip, XPo
   if ( EwIsRectEmpty( area ))
     return;
 
-  c = _this->Color;
   opacity = ((( aOpacity + 1 ) * 255 ) >> 8 ) + 1;
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
-  ctl = ctr = cbl = cbr = c;
+  ctl = ctr = cbl = cbr = _Const0000;
 
   if ( opacity < 256 )
   {
-    ctl.Alpha = (XUInt8)(( ctl.Alpha * opacity ) >> 8 );
-    ctr.Alpha = (XUInt8)(( ctr.Alpha * opacity ) >> 8 );
-    cbr.Alpha = (XUInt8)(( cbr.Alpha * opacity ) >> 8 );
-    cbl.Alpha = (XUInt8)(( cbl.Alpha * opacity ) >> 8 );
+    ctl.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
+    ctr.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
+    cbr.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
+    cbl.Alpha = (XUInt8)(( 255 * opacity ) >> 8 );
   }
 
   if ( !EwCompPoint( EwGetRectSize( area ), size ))
@@ -318,6 +271,10 @@ void ViewsImage_observerSlot( ViewsImage _this, XObject sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
+
+  if ((( _this->AutoSize && ( _this->Bitmap != 0 )) && ( _this->Bitmap->FrameSize.X 
+      > 0 )) && ( _this->Bitmap->FrameSize.Y > 0 ))
+    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
@@ -368,17 +325,17 @@ void ViewsImage_timerSlot( ViewsImage _this, XObject sender )
   }
 }
 
-/* 'C' function for method : 'Views::Image.OnSetColor()' */
-void ViewsImage_OnSetColor( ViewsImage _this, XColor value )
+/* 'C' function for method : 'Views::Image.OnSetAutoSize()' */
+void ViewsImage_OnSetAutoSize( ViewsImage _this, XBool value )
 {
-  if ( !EwCompColor( value, _this->Color ))
+  if ( value == _this->AutoSize )
     return;
 
-  _this->Color = value;
+  _this->AutoSize = value;
 
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+  if ((( value && ( _this->Bitmap != 0 )) && ( _this->Bitmap->FrameSize.X > 0 )) 
+      && ( _this->Bitmap->FrameSize.Y > 0 ))
+    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
 }
 
 /* 'C' function for method : 'Views::Image.OnSetAnimated()' */
@@ -432,6 +389,10 @@ void ViewsImage_OnSetBitmap( ViewsImage _this, ResourcesBitmap value )
     ViewsImage_OnSetAnimated( _this, 0 );
     ViewsImage_OnSetAnimated( _this, 1 );
   }
+
+  if ((( _this->AutoSize && ( value != 0 )) && ( value->FrameSize.X > 0 )) && ( 
+      value->FrameSize.Y > 0 ))
+    CoreRectView__OnSetBounds( _this, ViewsImage_GetContentArea( _this ));
 
   if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
       == CoreViewStateVisible ))
@@ -512,7 +473,6 @@ void ViewsText__Init( ViewsText _this, XObject aLink, XHandle aArg )
   _this->_.VMT = EW_CLASS( ViewsText );
 
   /* ... and initialize objects, variables, properties, etc. */
-  _this->Orientation = ViewsOrientationNormal;
   _this->Alignment = ViewsTextAlignmentAlignHorzCenter | ViewsTextAlignmentAlignVertCenter;
   _this->Color = _Const0000;
 }
@@ -573,7 +533,6 @@ void ViewsText_Draw( ViewsText _this, GraphicsCanvas aCanvas, XRect aClip, XPoin
   aOffset, XInt32 aOpacity, XBool aBlend )
 {
   XSet align;
-  XEnum orient;
   ResourcesFont font;
   XRect rd;
   XColor ctl;
@@ -601,7 +560,6 @@ void ViewsText_Draw( ViewsText _this, GraphicsCanvas aCanvas, XRect aClip, XPoin
     return;
 
   align = _this->Alignment;
-  orient = _this->Orientation;
   font = _this->usedFont;
   rd = EwMoveRectPos( _this->Super1.Bounds, aOffset );
   col = _this->Color;
@@ -632,11 +590,12 @@ void ViewsText_Draw( ViewsText _this, GraphicsCanvas aCanvas, XRect aClip, XPoin
       align = ( align & ~ViewsTextAlignmentAlignHorzAuto ) | ViewsTextAlignmentAlignHorzLeft;
   }
 
-  if ((( noOfRows == 1 ) && !(( align & ViewsTextAlignmentAlignHorzJustified ) == 
-      ViewsTextAlignmentAlignHorzJustified )) && ( orient == ViewsOrientationNormal ))
+  if (( noOfRows == 1 ) && !(( align & ViewsTextAlignmentAlignHorzJustified ) == 
+      ViewsTextAlignmentAlignHorzJustified ))
   {
     GraphicsCanvas_DrawText( aCanvas, aClip, font, _this->flowString, 2, EwGetStringChar( 
-    _this->flowString, 1 ) - 1, rd, ofs, 0, orient, ctl, ctr, cbr, cbl, 1 );
+    _this->flowString, 1 ) - 1, rd, ofs, 0, ViewsOrientationNormal, ctl, ctr, cbr, 
+    cbl, 1 );
     return;
   }
 
@@ -648,32 +607,6 @@ void ViewsText_Draw( ViewsText _this, GraphicsCanvas aCanvas, XRect aClip, XPoin
   y = 0;
   i = 1;
   c = EwGetStringChar( _this->flowString, 1 );
-
-  if ( orient == ViewsOrientationRotated_90 )
-  {
-    ofs = EwNewPoint( area.Point2.Y - rd.Point2.Y, ( rd.Point1.X - area.Point1.X ) 
-    - font->Ascent );
-    clipY1 = aClip.Point1.X - area.Point1.X;
-    clipY2 = aClip.Point2.X - area.Point1.X;
-    areaW = EwGetRectH( area );
-  }
-  else
-    if ( orient == ViewsOrientationRotated_180 )
-    {
-      ofs = EwNewPoint( area.Point2.X - rd.Point2.X, ( area.Point2.Y - rd.Point2.Y ) 
-      - font->Ascent );
-      clipY1 = area.Point2.Y - aClip.Point2.Y;
-      clipY2 = area.Point2.Y - aClip.Point1.Y;
-    }
-    else
-      if ( orient == ViewsOrientationRotated_270 )
-      {
-        ofs = EwNewPoint( rd.Point1.Y - area.Point1.Y, ( area.Point2.X - rd.Point2.X ) 
-        - font->Ascent );
-        clipY1 = area.Point2.X - aClip.Point2.X;
-        clipY2 = area.Point2.X - aClip.Point1.X;
-        areaW = EwGetRectH( area );
-      }
 
   while ((( y + rowHeight ) < clipY1 ) && ( c > 0 ))
   {
@@ -717,7 +650,7 @@ void ViewsText_Draw( ViewsText _this, GraphicsCanvas aCanvas, XRect aClip, XPoin
           font, _this->flowString, i + 1, c - 1 ) / 2 ));
 
     GraphicsCanvas_DrawText( aCanvas, aClip, font, _this->flowString, i + 1, c - 
-    1, rd, ofs2, rw, orient, ctl, ctr, cbr, cbl, 1 );
+    1, rd, ofs2, rw, ViewsOrientationNormal, ctl, ctr, cbr, cbl, 1 );
     i = i + c;
     y = y + rowHeight;
     c = EwGetStringChar( _this->flowString, i );
@@ -732,11 +665,7 @@ void ViewsText_OnSetBounds( ViewsText _this, XRect value )
   if ( !EwCompRect( value, _this->Super1.Bounds ))
     return;
 
-  if (( _this->Orientation == ViewsOrientationNormal ) || ( _this->Orientation == 
-      ViewsOrientationRotated_180 ))
-    resized = (XBool)( EwGetRectW( _this->Super1.Bounds ) != EwGetRectW( value ));
-  else
-    resized = (XBool)( EwGetRectH( _this->Super1.Bounds ) != EwGetRectH( value ));
+  resized = (XBool)( EwGetRectW( _this->Super1.Bounds ) != EwGetRectW( value ));
 
   if ((( resized && _this->WrapText ) && _this->reparsed ) && !(( _this->Super2.viewState 
       & CoreViewStateUpdatingLayout ) == CoreViewStateUpdatingLayout ))
@@ -806,7 +735,6 @@ void ViewsText_onUpdateFont( ViewsText _this, XObject sender )
 /* 'C' function for method : 'Views::Text.reparseSlot()' */
 void ViewsText_reparseSlot( ViewsText _this, XObject sender )
 {
-  XEnum orient;
   XInt32 width;
   XInt32 height;
   XInt32 maxWidth;
@@ -820,19 +748,12 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
   if ( _this->reparsed )
     return;
 
-  orient = _this->Orientation;
   width = EwGetRectW( _this->Super1.Bounds );
   height = EwGetRectH( _this->Super1.Bounds );
   maxWidth = -1;
   font = _this->usedFont;
   fontSet = EwCastObject( _this->Font, ResourcesFontSet );
   shrink = 0;
-
-  if (( orient == ViewsOrientationRotated_90 ) || ( orient == ViewsOrientationRotated_270 ))
-  {
-    width = height;
-    height = EwGetRectW( _this->Super1.Bounds );
-  }
 
   if ( _this->WrapText )
   {
@@ -898,32 +819,6 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
 
   EwPostSignal( EwNewSlot( _this, ViewsText_preOnUpdateSlot ), ((XObject)_this ));
   EwIdleSignal( EwNewSlot( _this, ViewsText_onOverflowTest ), ((XObject)_this ));
-}
-
-/* 'C' function for method : 'Views::Text.OnSetOrientation()' */
-void ViewsText_OnSetOrientation( ViewsText _this, XEnum value )
-{
-  if ( value == _this->Orientation )
-    return;
-
-  _this->Orientation = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
-
-  if ( _this->reparsed && ( _this->WrapText || ( _this->usedFont != _this->Font )))
-  {
-    _this->flowString = 0;
-    _this->reparsed = 0;
-    EwPostSignal( EwNewSlot( _this, ViewsText_preReparseSlot ), ((XObject)_this ));
-  }
-
-  if ( _this->reparsed )
-  {
-    EwPostSignal( EwNewSlot( _this, ViewsText_preOnUpdateSlot ), ((XObject)_this ));
-    EwIdleSignal( EwNewSlot( _this, ViewsText_onOverflowTest ), ((XObject)_this ));
-  }
 }
 
 /* 'C' function for method : 'Views::Text.OnSetWrapText()' */
@@ -1043,7 +938,6 @@ XRect ViewsText_GetContentArea( ViewsText _this )
   XInt32 leading;
   XInt32 rh;
   XSet align;
-  XEnum orient;
   XRect bounds;
   XInt32 width;
   XInt32 height;
@@ -1067,17 +961,9 @@ XRect ViewsText_GetContentArea( ViewsText _this )
 
   _this->textSize.Y = (( EwGetStringChar( _this->flowString, 0 ) * rh ) - leading );
   align = _this->Alignment;
-  orient = _this->Orientation;
   bounds = _this->Super1.Bounds;
   width = EwGetRectW( bounds );
   height = EwGetRectH( bounds );
-
-  if (( orient == ViewsOrientationRotated_90 ) || ( orient == ViewsOrientationRotated_270 ))
-  {
-    width = height;
-    height = EwGetRectW( bounds );
-  }
-
   rd = EwNewRect( 0, 0, width, height );
   rs = EwNewRect2Point( rd.Point1, EwMovePointPos( rd.Point1, _this->textSize ));
 
@@ -1142,32 +1028,7 @@ XRect ViewsText_GetContentArea( ViewsText _this )
           rs ) / 2 ));
   }
 
-  if ( orient == ViewsOrientationNormal )
-    rs = EwMoveRectPos( rs, bounds.Point1 );
-  else
-    if ( orient == ViewsOrientationRotated_90 )
-    {
-      XPoint org = EwNewPoint( bounds.Point1.X + rs.Point1.Y, bounds.Point2.Y - 
-        rs.Point2.X );
-      rs = EwNewRect2Point( org, EwMovePointPos( org, EwNewPoint( _this->textSize.Y, 
-      _this->textSize.X )));
-    }
-    else
-      if ( orient == ViewsOrientationRotated_180 )
-      {
-        XPoint org = EwNewPoint( bounds.Point2.X - rs.Point2.X, bounds.Point2.Y 
-          - rs.Point2.Y );
-        rs = EwNewRect2Point( org, EwMovePointPos( org, _this->textSize ));
-      }
-      else
-        if ( orient == ViewsOrientationRotated_270 )
-        {
-          XPoint org = EwNewPoint( bounds.Point2.X - rs.Point2.Y, bounds.Point1.Y 
-            + rs.Point1.X );
-          rs = EwNewRect2Point( org, EwMovePointPos( org, EwNewPoint( _this->textSize.Y, 
-          _this->textSize.X )));
-        }
-
+  rs = EwMoveRectPos( rs, bounds.Point1 );
   return rs;
 }
 

@@ -1,0 +1,21 @@
+info: INFO: Symbol BUTTON_PERIOD_TIME_MS defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:3
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:3
+info: INFO: Symbol BUTTON_DEBOUNCE_TICKS defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:10
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:10
+info: INFO: Symbol BUTTON_SHORT_PRESS_TIME_MS defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:17
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:17
+info: INFO: Symbol BUTTON_LONG_PRESS_TIME_MS defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:22
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:22
+info: INFO: Symbol ADC_BUTTON_MAX_CHANNEL defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:34
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:34
+info: INFO: Symbol ADC_BUTTON_MAX_BUTTON_PER_CHANNEL defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:41
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:41
+info: INFO: Symbol ADC_BUTTON_SAMPLE_TIMES defined in multiple locations (see below). Please check if this is a correct behavior or a random name match:
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\managed_components\espressif__button\Kconfig:48
+    C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Kconfig.projbuild:48

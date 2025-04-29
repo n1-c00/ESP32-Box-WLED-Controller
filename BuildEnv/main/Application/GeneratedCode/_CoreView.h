@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/

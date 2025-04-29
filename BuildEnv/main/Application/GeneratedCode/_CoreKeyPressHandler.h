@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -76,8 +76,6 @@
    Disabled handler will not react to the events. */
 EW_DEFINE_FIELDS( CoreKeyPressHandler, XObject )
   EW_VARIABLE( next,            CoreKeyPressHandler )
-  EW_PROPERTY( OnPress,         XSlot )
-  EW_PROPERTY( OnHold,          XSlot )
   EW_VARIABLE( pressCounter,    XInt32 )
   EW_VARIABLE( Time,            XUInt32 )
   EW_VARIABLE( Code,            XEnum )

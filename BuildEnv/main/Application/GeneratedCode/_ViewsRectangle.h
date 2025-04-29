@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -92,10 +92,7 @@
    within the GUI component itself. Very useful for any kind of scrollable lists, 
    menus, etc. */
 EW_DEFINE_FIELDS( ViewsRectangle, CoreRectView )
-  EW_PROPERTY( ColorBL,         XColor )
-  EW_PROPERTY( ColorBR,         XColor )
-  EW_PROPERTY( ColorTR,         XColor )
-  EW_PROPERTY( ColorTL,         XColor )
+  EW_PROPERTY( Color,           XColor )
 EW_END_OF_FIELDS( ViewsRectangle )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Rectangle' */
@@ -146,17 +143,8 @@ EW_END_OF_METHODS( ViewsRectangle )
 void ViewsRectangle_Draw( ViewsRectangle _this, GraphicsCanvas aCanvas, XRect aClip, 
   XPoint aOffset, XInt32 aOpacity, XBool aBlend );
 
-/* 'C' function for method : 'Views::Rectangle.OnSetColorBL()' */
-void ViewsRectangle_OnSetColorBL( ViewsRectangle _this, XColor value );
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorBR()' */
-void ViewsRectangle_OnSetColorBR( ViewsRectangle _this, XColor value );
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorTR()' */
-void ViewsRectangle_OnSetColorTR( ViewsRectangle _this, XColor value );
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColorTL()' */
-void ViewsRectangle_OnSetColorTL( ViewsRectangle _this, XColor value );
+/* 'C' function for method : 'Views::Rectangle.OnSetColor()' */
+void ViewsRectangle_OnSetColor( ViewsRectangle _this, XColor value );
 
 #ifdef __cplusplus
   }

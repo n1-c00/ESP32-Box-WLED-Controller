@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -124,7 +124,7 @@ EW_DEFINE_FIELDS( ViewsImage, CoreRectView )
   EW_PROPERTY( Bitmap,          ResourcesBitmap )
   EW_VARIABLE( startTime,       XUInt32 )
   EW_VARIABLE( animFrameNumber, XInt32 )
-  EW_PROPERTY( Color,           XColor )
+  EW_PROPERTY( AutoSize,        XBool )
   EW_PROPERTY( Animated,        XBool )
 EW_END_OF_FIELDS( ViewsImage )
 
@@ -182,8 +182,8 @@ void ViewsImage_observerSlot( ViewsImage _this, XObject sender );
 /* 'C' function for method : 'Views::Image.timerSlot()' */
 void ViewsImage_timerSlot( ViewsImage _this, XObject sender );
 
-/* 'C' function for method : 'Views::Image.OnSetColor()' */
-void ViewsImage_OnSetColor( ViewsImage _this, XColor value );
+/* 'C' function for method : 'Views::Image.OnSetAutoSize()' */
+void ViewsImage_OnSetAutoSize( ViewsImage _this, XBool value );
 
 /* 'C' function for method : 'Views::Image.OnSetAnimated()' */
 void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value );

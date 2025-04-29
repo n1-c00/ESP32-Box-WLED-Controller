@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -42,16 +42,13 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
-#include "_ApplicationApplication_Landscape.h"
-
-/* This is a bitmap resource. */
-EW_DECLARE_BITMAP_RES( ApplicationCross )
-
-/* This is a bitmap resource. */
-EW_DECLARE_BITMAP_RES( ApplicationBall )
+#include "_ApplicationApplication.h"
 
 /* Font resource for large font - used for the caption text items. */
 EW_DECLARE_FONT_RES( ApplicationFontLarge )
+
+/* Bitmap resource for the Embedded Wizard logo. */
+EW_DECLARE_BITMAP_RES( ApplicationLogo )
 
 /* Font resource for small font - used for the description text items. */
 EW_DECLARE_FONT_RES( ApplicationFontSmall )

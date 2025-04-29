@@ -182,17 +182,19 @@ void app_main(void)
     /* Create a event loop where our code will be handled */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+    /* Create a queue to send requests from the frontend to the task*/
+    ew_queue = xQueueCreate(1, sizeof(bool));
+
+    
+    /* Start the GUI task */
+    xTaskCreate(&GUI_Task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
+
     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
      * examples/protocols/README.md for more information about this function.
      */
     ESP_ERROR_CHECK(example_connect());
 
-    /* Create a queue to send requests from the frontend to the task*/
-    ew_queue = xQueueCreate(1, sizeof(bool));
-
     /* Put the wled task into the event-loop*/
     xTaskCreate(&wled_http_task, "wled_http_GET", 4096, NULL, 5, NULL);
-    /* Start the GUI task */
-    xTaskCreate(&GUI_Task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
 }

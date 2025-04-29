@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32_0
+* Profile  : ESP32
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -118,9 +118,6 @@ void CoreRectView_OnSetBounds( CoreRectView _this, XRect value );
 
 /* Wrapper function for the virtual method : 'Core::RectView.OnSetBounds()' */
 void CoreRectView__OnSetBounds( void* _this, XRect value );
-
-/* Default onget method for the property 'Bounds' */
-XRect CoreRectView_OnGetBounds( CoreRectView _this );
 
 #ifdef __cplusplus
   }
