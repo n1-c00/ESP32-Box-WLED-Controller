@@ -21,11 +21,12 @@
 #include "ewmain.h"
 #include "ewrte.h"
 #include "ew_bsp_system.h"
+#include "main.h" // Add this include
 
 static const char *TAG = "WLED_control";
 
 /* Constants that aren't configurable in menuconfig */
-#define WEB_SERVER "192.168.150.164"  // Remove http:// and trailing slash
+#define WEB_SERVER "192.168.219.164"  // Remove http:// and trailing slash
 #define WEB_PORT "80"
 #define WEB_PATH "/win&T=2"
 
@@ -141,7 +142,7 @@ static int toggleLight(void *pvParameters)
 /***********************************************************************
 This function is called by the frontend to send a request into the queue
 ************************************************************************/
-static void ew_request_task(void *pvParameters)
+void ew_request_task(void) // Removed static keyword
 {
     bool trigger = true;
     xQueueSend(ew_queue, &trigger, portMAX_DELAY);
