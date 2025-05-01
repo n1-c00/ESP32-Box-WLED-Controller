@@ -1,2 +1,3 @@
-./.vscode
-./BuildEnv/.vscode
+.vscode/
+BuildEnv/.vscode/
+BuildEnv/.metadata/

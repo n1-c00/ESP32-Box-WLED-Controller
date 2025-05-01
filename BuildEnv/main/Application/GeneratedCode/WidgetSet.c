@@ -764,9 +764,6 @@ void WidgetSetToggleButton__Done( WidgetSetToggleButton _this )
 /* 'C' function for method : 'WidgetSet::ToggleButton.OnSetBounds()' */
 void WidgetSetToggleButton_OnSetBounds( WidgetSetToggleButton _this, XRect value )
 {
-  if ( EwCompRect( _this->Super2.Bounds, value ))
-    EwPostSignal( _this->OnUpdate, ((XObject)_this ));
-
   if ( _this->Appearance != 0 )
   {
     XPoint cs = EwGetRectSize( value );
@@ -1097,8 +1094,6 @@ void WidgetSetToggleButton_UpdateViewState( WidgetSetToggleButton _this, XSet aS
     CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, EwNewPoint( touchArea.Point1.X, 
     touchArea.Point2.Y ));
   }
-
-  EwPostSignal( _this->OnUpdate, ((XObject)_this ));
 }
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.onConfigChanged()' */
@@ -1133,6 +1128,11 @@ void WidgetSetToggleButton_onFlashTimer( WidgetSetToggleButton _this, XObject se
 
   CoreGroup_InvalidateViewState((CoreGroup)_this );
   WidgetSetToggleButton_OnSetChecked( _this, (XBool)!_this->Checked );
+
+  if ( _this->Checked )
+    EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
+  else
+    EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
 }
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.onReleaseKey()' */
@@ -1152,7 +1152,14 @@ void WidgetSetToggleButton_onReleaseKey( WidgetSetToggleButton _this, XObject se
   CoreGroup_InvalidateViewState((CoreGroup)_this );
 
   if ((XInt32)( _this->KeyHandler.Time - _this->onPressKeyTime ) >= pressFeedbackDuration )
+  {
     WidgetSetToggleButton_OnSetChecked( _this, (XBool)!_this->Checked );
+
+    if ( _this->Checked )
+      EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
+    else
+      EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+  }
   else
   {
     CoreTimer_OnSetBegin( &_this->FlashTimer, pressFeedbackDuration - (XInt32)( 
@@ -1174,6 +1181,11 @@ void WidgetSetToggleButton_onPressKey( WidgetSetToggleButton _this, XObject send
   {
     CoreTimer_OnSetEnabled( &_this->FlashTimer, 0 );
     WidgetSetToggleButton_OnSetChecked( _this, (XBool)!_this->Checked );
+
+    if ( _this->Checked )
+      EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
+    else
+      EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
   }
 
   _this->onPressKeyTime = _this->KeyHandler.Time;
@@ -1220,7 +1232,14 @@ void WidgetSetToggleButton_onReleaseTouch( WidgetSetToggleButton _this, XObject
     return;
 
   if ( _this->TouchHandler.HoldPeriod >= pressFeedbackDuration )
+  {
     WidgetSetToggleButton_OnSetChecked( _this, (XBool)!_this->Checked );
+
+    if ( _this->Checked )
+      EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
+    else
+      EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+  }
   else
   {
     CoreTimer_OnSetBegin( &_this->FlashTimer, pressFeedbackDuration - _this->TouchHandler.HoldPeriod );
@@ -1240,6 +1259,11 @@ void WidgetSetToggleButton_onPressTouch( WidgetSetToggleButton _this, XObject se
   {
     CoreTimer_OnSetEnabled( &_this->FlashTimer, 0 );
     WidgetSetToggleButton_OnSetChecked( _this, (XBool)!_this->Checked );
+
+    if ( _this->Checked )
+      EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
+    else
+      EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
   }
 }
 
@@ -1309,7 +1333,7 @@ EW_DEFINE_CLASS_VARIANTS( WidgetSetToggleButton )
 EW_END_OF_CLASS_VARIANTS( WidgetSetToggleButton )
 
 /* Virtual Method Table (VMT) for the class : 'WidgetSet::ToggleButton' */
-EW_DEFINE_CLASS( WidgetSetToggleButton, CoreGroup, FlashTimer, textView, OnUpdate, 
+EW_DEFINE_CLASS( WidgetSetToggleButton, CoreGroup, FlashTimer, textView, OnSwitchOn, 
                  LabelOn, LabelOn, onPressKeyTime, "WidgetSet::ToggleButton" )
   CoreView_GetRoot,
   CoreGroup_Draw,

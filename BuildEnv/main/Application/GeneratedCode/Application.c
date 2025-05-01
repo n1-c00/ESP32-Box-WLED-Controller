@@ -37,8 +37,8 @@
 /* Strings for the language 'Default'. */
 EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 {
-  0xFFFF, 0xFFFF, 0xC557, 0x004F, 0x006E, 0x0000, 0xC557, 0x004F, 0x0066, 0x0066,
-  0x0000, 0xC557, 0x007C, 0x0000
+  0xFFFF, 0xFFFF, 0xC557, 0x006F, 0x006E, 0x0000, 0xC557, 0x0066, 0x0061, 0x006C,
+  0x0073, 0x0065, 0x0000, 0xC557, 0x0074, 0x0072, 0x0075, 0x0065, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -46,7 +46,7 @@ static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
 static const XRect _Const0001 = {{ 67, 93 }, { 217, 143 }};
 static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
 static const XStringRes _Const0003 = { _StringsDefault0, 0x0007 };
-static const XStringRes _Const0004 = { _StringsDefault0, 0x000C };
+static const XStringRes _Const0004 = { _StringsDefault0, 0x000E };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -68,13 +68,13 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
   CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
-  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, EwLoadString( &_Const0002 ));
-  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, EwLoadString( 
-  &_Const0003 ));
-  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, EwLoadString( &_Const0004 ));
+  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
-  _this->toggleLightButton.OnUpdate = EwNewSlot( _this, ApplicationApplication_toggleLightSlot );
+  _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
+  _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
 }
@@ -104,16 +104,27 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   CoreRoot__Done( &_this->_.Super );
 }
 
-/* 'C' function for method : 'Application::Application.toggleLightSlot()' */
-void ApplicationApplication_toggleLightSlot( ApplicationApplication _this, XObject 
+/* 'C' function for method : 'Application::Application.LightOnSlot()' */
+void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( sender );
+
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0002 ), EwLoadString( &_Const0003 ));
+}
+
+/* 'C' function for method : 'Application::Application.LightOffSlot()' */
+void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject 
   sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( _this );
   EW_UNUSED_ARG( sender );
 
-  ApplicationDeviceClass_toggleLightMethod( EwGetAutoObject( &ApplicationDevice, 
-  ApplicationDeviceClass ));
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0002 ), EwLoadString( &_Const0004 ));
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -269,15 +280,18 @@ void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg )
   }
 }
 
-/* 'C' function for method : 'Application::DeviceClass.toggleLightMethod()' */
-void ApplicationDeviceClass_toggleLightMethod( ApplicationDeviceClass _this )
+/* 'C' function for method : 'Application::DeviceClass.LedSetMethod()' */
+void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString 
+  key, XString setpoint )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( setpoint );
+  EW_UNUSED_ARG( key );
 
   {
-    extern void ew_request_task(void);
-    ew_request_task();
+    extern void LedSet(string key, string setpoint);
+    LedSet(key, setpoint);
   }
 }
 

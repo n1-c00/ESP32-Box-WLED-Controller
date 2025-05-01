@@ -116,8 +116,11 @@ EW_DEFINE_METHODS( ApplicationApplication, CoreRoot )
   EW_METHOD( InvalidateArea,    void )( CoreRoot _this, XRect aArea )
 EW_END_OF_METHODS( ApplicationApplication )
 
-/* 'C' function for method : 'Application::Application.toggleLightSlot()' */
-void ApplicationApplication_toggleLightSlot( ApplicationApplication _this, XObject 
+/* 'C' function for method : 'Application::Application.LightOnSlot()' */
+void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject sender );
+
+/* 'C' function for method : 'Application::Application.LightOffSlot()' */
+void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject 
   sender );
 
 #ifdef __cplusplus

@@ -3,7 +3,7 @@ $version 1.0
 attr active = Application::DeviceClass;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.toggleLightMethod;
+attr currentCodeInspector = Application::Application.LightOnSlot;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -31,7 +31,6 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
@@ -43,36 +42,36 @@ view unit Application
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <1020,-7>;
+  attr scrollTo = <649,-46>;
   attr zoom = 1.0;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-7,-7>;
+  attr scrollTo = <49,-31>;
   attr zoom = 1.0;
 }
 
 view class Application::DeviceClass
 {
   attr enableWireMode = false;
-  attr scrollTo = <1321,-7>;
+  attr scrollTo = <1097,-7>;
   attr zoom = 1.0;
 }
 
-codeview Application::DeviceClass.toggleLightMethod
+codeview Application::DeviceClass.LedSetMethod
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <30,1>;
-  attr codeSelStart = <30,1>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <1,3>;
 }
 
-codeview Application::Application.toggleLightSlot
+codeview Application::Application.LightOnSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <40,0>;
-  attr codeSelStart = <40,0>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <48,0>;
 }

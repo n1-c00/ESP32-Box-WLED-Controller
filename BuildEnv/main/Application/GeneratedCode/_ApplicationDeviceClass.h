@@ -65,8 +65,9 @@ void ApplicationDeviceClass_Done( ApplicationDeviceClass _this );
 /* 'C' function for method : 'Application::DeviceClass.Init()' */
 void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg );
 
-/* 'C' function for method : 'Application::DeviceClass.toggleLightMethod()' */
-void ApplicationDeviceClass_toggleLightMethod( ApplicationDeviceClass _this );
+/* 'C' function for method : 'Application::DeviceClass.LedSetMethod()' */
+void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString 
+  key, XString setpoint );
 
 #ifdef __cplusplus
   }
