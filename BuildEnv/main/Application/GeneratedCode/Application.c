@@ -29,6 +29,8 @@
 #include "_ApplicationDeviceClass.h"
 #include "_CoreView.h"
 #include "_ViewsRectangle.h"
+#include "_WidgetSetHorizontalSlider.h"
+#include "_WidgetSetHorizontalSliderConfig.h"
 #include "_WidgetSetToggleButton.h"
 #include "_WidgetSetToggleButtonConfig.h"
 #include "Application.h"
@@ -37,16 +39,19 @@
 /* Strings for the language 'Default'. */
 EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 {
-  0xFFFF, 0xFFFF, 0xC557, 0x006F, 0x006E, 0x0000, 0xC557, 0x0066, 0x0061, 0x006C,
-  0x0073, 0x0065, 0x0000, 0xC557, 0x0074, 0x0072, 0x0075, 0x0065, 0x0000
+  0xFFFF, 0xFFFF, 0xC557, 0x006F, 0x006E, 0x0000, 0xC557, 0x0074, 0x0072, 0x0075,
+  0x0065, 0x0000, 0xC557, 0x0066, 0x0061, 0x006C, 0x0073, 0x0065, 0x0000, 0xC557,
+  0x0062, 0x0072, 0x0069, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
 static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
-static const XRect _Const0001 = {{ 67, 93 }, { 217, 143 }};
-static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
-static const XStringRes _Const0003 = { _StringsDefault0, 0x0007 };
-static const XStringRes _Const0004 = { _StringsDefault0, 0x000E };
+static const XRect _Const0001 = {{ 216, 181 }, { 320, 240 }};
+static const XRect _Const0002 = {{ 0, 181 }, { 200, 240 }};
+static const XStringRes _Const0003 = { _StringsDefault0, 0x0003 };
+static const XStringRes _Const0004 = { _StringsDefault0, 0x0007 };
+static const XStringRes _Const0005 = { _StringsDefault0, 0x000D };
+static const XStringRes _Const0006 = { _StringsDefault0, 0x0014 };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -60,6 +65,7 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   /* ... then construct all embedded objects */
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
   WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
+  WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -71,12 +77,17 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
   WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
   WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
+  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
   _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
   _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
+  _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
+  WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
+  &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -88,6 +99,7 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   /* ... then re-construct all embedded objects */
   ViewsRectangle__ReInit( &_this->Rectangle );
   WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
+  WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -99,6 +111,7 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   /* Finalize all embedded objects */
   ViewsRectangle__Done( &_this->Rectangle );
   WidgetSetToggleButton__Done( &_this->toggleLightButton );
+  WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -112,7 +125,7 @@ void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject s
   EW_UNUSED_ARG( sender );
 
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0002 ), EwLoadString( &_Const0003 ));
+  EwLoadString( &_Const0003 ), EwLoadString( &_Const0004 ));
 }
 
 /* 'C' function for method : 'Application::Application.LightOffSlot()' */
@@ -124,7 +137,23 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
   EW_UNUSED_ARG( sender );
 
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0002 ), EwLoadString( &_Const0004 ));
+  EwLoadString( &_Const0003 ), EwLoadString( &_Const0005 ));
+}
+
+/* 'C' function for method : 'Application::Application.BrightnessSlot()' */
+void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
+  sender )
+{
+  XInt32 brightnessValue;
+  XString brightnessString;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  brightnessValue = WidgetSetHorizontalSlider_OnGetCurrentValue( &_this->BrightnessSlider );
+  brightnessString = EwNewStringInt( brightnessValue, 0, 10 );
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0006 ), brightnessString );
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -134,6 +163,7 @@ EW_END_OF_CLASS_VARIANTS( ApplicationApplication )
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
 EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, Rectangle, _.VMT, _.VMT, _.VMT, 
                  _.VMT, _.VMT, "Application::Application" )
+  CoreRectView_initLayoutContext,
   CoreRoot_GetRoot,
   CoreRoot_Draw,
   CoreGroup_GetClipping,
@@ -290,7 +320,7 @@ void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString
   EW_UNUSED_ARG( key );
 
   {
-    extern void LedSet(string key, string setpoint);
+    extern void LedSet(const char* key, const char* setpoint);
     LedSet(key, setpoint);
   }
 }

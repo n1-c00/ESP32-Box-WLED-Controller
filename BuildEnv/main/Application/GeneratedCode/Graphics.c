@@ -51,7 +51,18 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
   0x0069, 0x0061, 0x006C, 0x0069, 0x007A, 0x0065, 0x0064, 0x0020, 0x0077, 0x0069,
   0x0074, 0x0068, 0x0020, 0x0061, 0x0020, 0x0067, 0x0072, 0x0061, 0x0070, 0x0068,
   0x0069, 0x0063, 0x0073, 0x0020, 0x0065, 0x006E, 0x0067, 0x0069, 0x006E, 0x0065,
-  0x0020, 0x0062, 0x0069, 0x0074, 0x006D, 0x0061, 0x0070, 0x0000
+  0x0020, 0x0062, 0x0069, 0x0074, 0x006D, 0x0061, 0x0070, 0x0000, 0xC557, 0x0053,
+  0x0063, 0x0061, 0x006C, 0x0065, 0x0042, 0x0069, 0x0074, 0x006D, 0x0061, 0x0070,
+  0x0028, 0x0029, 0x0020, 0x006F, 0x0070, 0x0065, 0x0072, 0x0061, 0x0074, 0x0069,
+  0x006F, 0x006E, 0x0020, 0x0068, 0x0061, 0x0073, 0x0020, 0x0062, 0x0065, 0x0065,
+  0x006E, 0x0020, 0x006F, 0x006D, 0x0069, 0x0074, 0x0074, 0x0065, 0x0064, 0x0020,
+  0x0064, 0x0075, 0x0065, 0x0020, 0x0074, 0x006F, 0x0020, 0x0074, 0x0068, 0x0065,
+  0x0020, 0x0072, 0x0065, 0x0073, 0x0075, 0x006C, 0x0074, 0x0069, 0x006E, 0x0067,
+  0x0020, 0x0061, 0x0072, 0x0065, 0x0061, 0x0020, 0x0062, 0x0065, 0x0069, 0x006E,
+  0x0067, 0x0020, 0x0077, 0x0069, 0x0064, 0x0065, 0x0072, 0x0020, 0x006F, 0x0072,
+  0x0020, 0x0068, 0x0069, 0x0067, 0x0068, 0x0065, 0x0072, 0x0020, 0x0074, 0x0068,
+  0x0061, 0x006E, 0x0020, 0x0034, 0x0030, 0x0036, 0x0039, 0x0020, 0x0070, 0x0069,
+  0x0078, 0x0065, 0x006C, 0x002E, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -61,6 +72,7 @@ static const XColor _Const0002 = { 0x00, 0x00, 0x00, 0x00 };
 static const XRect _Const0003 = {{ 0, 0 }, { 0, 0 }};
 static const XStringRes _Const0004 = { _StringsDefault0, 0x003F };
 static const XStringRes _Const0005 = { _StringsDefault0, 0x0072 };
+static const XStringRes _Const0006 = { _StringsDefault0, 0x00B3 };
 
 /* Initializer for the class 'Graphics::Canvas' */
 void GraphicsCanvas__Init( GraphicsCanvas _this, XObject aLink, XHandle aArg )
@@ -381,6 +393,105 @@ void GraphicsCanvas_DrawBitmapFrame( GraphicsCanvas _this, XRect aClip, Resource
     EwDrawBitmapFrame((XBitmap*)dstBitmap, (XBitmap*)srcBitmap, dstFrameNo, aFrameNr,
                        aClip, aDstRect, srcRect, left, top, right, bottom,
                        interior, aColorTL, aColorTR, aColorBR, aColorBL, aBlend );
+  }
+}
+
+/* The method ScaleBitmap() copies and scales an area of a aBitmap into the canvas. 
+   The bitmap is specified in the parameter aBitmap and the desired area to copy 
+   in aSrcRect. In case of a multi-frame bitmap the desired frame can be selected 
+   in the parameter aFrameNr.
+   The destination area in canvas is determined by the parameter aDstRect. The parameters 
+   aColorTL, aColorTR, aColorBL, aColorBR determine the colors or opacities at the 
+   corresponding corners of the aDstRect area.
+   The parameter aClip limits the drawing operation. Pixel lying outside this area 
+   remain unchanged. The aBlend parameter controls the mode how drawn pixel are 
+   combined with the pixel already existing in the destination bitmap. If aBlend 
+   is 'true', the drawn pixel are alpha-blended with the background, otherwise the 
+   drawn pixel will overwrite the old content. The last parameter aFilter controls 
+   the bi-linear filter. If aFilter is 'true', the source bitmap pixel will be bi-linear 
+   filtered in order to get better output. */
+void GraphicsCanvas_ScaleBitmap( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
+  aBitmap, XInt32 aFrameNr, XRect aDstRect, XRect aSrcRect, XColor aColorTL, XColor 
+  aColorTR, XColor aColorBR, XColor aColorBL, XBool aBlend, XBool aFilter )
+{
+  XFloat top;
+  XFloat left;
+  XFloat right;
+  XFloat bottom;
+  XHandle dstBitmap;
+  XHandle srcBitmap;
+  XInt32 dstFrameNo;
+
+  if ( _this->Super1.bitmap == 0 )
+    ResourcesBitmap__Update( _this );
+
+  if ( _this->Super1.bitmap == 0 )
+    return;
+
+  if (((( aBitmap == 0 ) || ( aBitmap->bitmap == 0 )) || ( aFrameNr < 0 )) || ( 
+      aFrameNr >= aBitmap->NoOfFrames ))
+    return;
+
+  top = (XFloat)aDstRect.Point1.Y;
+  left = (XFloat)aDstRect.Point1.X;
+  right = (XFloat)aDstRect.Point2.X;
+  bottom = (XFloat)aDstRect.Point2.Y;
+
+  if ((((( right - left ) > 4096.0f ) || (( right - left ) < -4096.0f )) || (( bottom 
+      - top ) > 4096.0f )) || (( bottom - top ) < -4096.0f ))
+  {
+    EwTrace( "%s", EwLoadString( &_Const0006 ));
+    return;
+  }
+
+  dstBitmap = _this->Super1.bitmap;
+  srcBitmap = aBitmap->bitmap;
+  dstFrameNo = _this->DstFrameNr;
+  {
+    EwWarpBitmap((XBitmap*)dstBitmap, (XBitmap*)srcBitmap, dstFrameNo, aFrameNr, aClip,
+                  left,  top,    1.0f, right, top,    1.0f,
+                  right, bottom, 1.0f, left,  bottom, 1.0f,
+                  aSrcRect, aColorTL, aColorTR, aColorBR, aColorBL, aBlend, aFilter );
+  }
+}
+
+/* The method CopyBitmap() copies an area of a aBitmap into the canvas. The bitmap 
+   is specified in the parameter aBitmap. In case of a multi-frame bitmap the desired 
+   frame can be selected in the parameter aFrameNr.
+   The area to copy the bitmap is determined by the parameter aDstRect. The optional 
+   aSrcPos parameter determines a displacement of the bitmap within this aDstRect 
+   area. The parameters aColorTL, aColorTR, aColorBL, aColorBR determine the colors 
+   or opacities at the corresponding corners of the aDstRect area.
+   The parameter aClip limits the drawing operation. Pixel lying outside this area 
+   remain unchanged. The last aBlend parameter controls the mode how drawn pixel 
+   are combined with the pixel already existing in the destination bitmap. If aBlend 
+   is 'true', the drawn pixel are alpha-blended with the background, otherwise the 
+   drawn pixel will overwrite the old content. */
+void GraphicsCanvas_CopyBitmap( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
+  aBitmap, XInt32 aFrameNr, XRect aDstRect, XPoint aSrcPos, XColor aColorTL, XColor 
+  aColorTR, XColor aColorBR, XColor aColorBL, XBool aBlend )
+{
+  XHandle dstBitmap;
+  XHandle srcBitmap;
+  XInt32 dstFrameNr;
+
+  if ( _this->Super1.bitmap == 0 )
+    ResourcesBitmap__Update( _this );
+
+  if ( _this->Super1.bitmap == 0 )
+    return;
+
+  if (((( aBitmap == 0 ) || ( aBitmap->bitmap == 0 )) || ( aFrameNr < 0 )) || ( 
+      aFrameNr >= aBitmap->NoOfFrames ))
+    return;
+
+  dstBitmap = _this->Super1.bitmap;
+  srcBitmap = aBitmap->bitmap;
+  dstFrameNr = _this->DstFrameNr;
+  {
+    EwCopyBitmap((XBitmap*)dstBitmap, (XBitmap*)srcBitmap, dstFrameNr, aFrameNr,
+                  aClip, aDstRect, aSrcPos, aColorTL, aColorTR, aColorBR, aColorBL,
+                  aBlend );
   }
 }
 

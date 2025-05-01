@@ -33,6 +33,7 @@
 #include "_ResourcesFont.h"
 #include "_ResourcesFontSet.h"
 #include "_ViewsFrame.h"
+#include "_ViewsImage.h"
 #include "_ViewsRectangle.h"
 #include "_ViewsText.h"
 #include "Core.h"
@@ -49,8 +50,8 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 /* Constant values used in this 'C' module only. */
 static const XColor _Const0000 = { 0xFF, 0xFF, 0xFF, 0xFF };
 static const XPoint _Const0001 = { 0, 0 };
-static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
-static const XRect _Const0003 = {{ 0, 0 }, { 0, 0 }};
+static const XRect _Const0002 = {{ 0, 0 }, { 0, 0 }};
+static const XStringRes _Const0003 = { _StringsDefault0, 0x0003 };
 
 /* Initializer for the class 'Views::Rectangle' */
 void ViewsRectangle__Init( ViewsRectangle _this, XObject aLink, XHandle aArg )
@@ -141,6 +142,7 @@ EW_END_OF_CLASS_VARIANTS( ViewsRectangle )
 /* Virtual Method Table (VMT) for the class : 'Views::Rectangle' */
 EW_DEFINE_CLASS( ViewsRectangle, CoreRectView, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
                  _.VMT, "Views::Rectangle" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   ViewsRectangle_Draw,
   CoreView_GetClipping,
@@ -169,6 +171,8 @@ void ViewsFrame__Init( ViewsFrame _this, XObject aLink, XHandle aArg )
   /* ... and initialize objects, variables, properties, etc. */
   _this->animFrameNumber = -1;
   _this->Color = _Const0000;
+  _this->Edges = GraphicsEdgesBottom | GraphicsEdgesInterior | GraphicsEdgesLeft 
+  | GraphicsEdgesRight | GraphicsEdgesTop;
 }
 
 /* Re-Initializer for the class 'Views::Frame' */
@@ -223,7 +227,9 @@ void ViewsFrame_Draw( ViewsFrame _this, GraphicsCanvas aCanvas, XRect aClip, XPo
   XColor cbl;
   XColor c;
   XInt32 opacity;
+  XSet edges;
   XRect r;
+  XPoint sd;
 
   if ( _this->animFrameNumber >= 0 )
     frameNr = _this->animFrameNumber;
@@ -234,7 +240,9 @@ void ViewsFrame_Draw( ViewsFrame _this, GraphicsCanvas aCanvas, XRect aClip, XPo
   ResourcesBitmap__Update( _this->Bitmap );
   c = _this->Color;
   opacity = ((( aOpacity + 1 ) * 255 ) >> 8 ) + 1;
+  edges = _this->Edges;
   r = EwMoveRectPos( _this->Super1.Bounds, aOffset );
+  sd = EwMovePointNeg( EwGetRectSize( r ), _this->NoEdgesLimit );
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
   ctl = ctr = cbl = cbr = c;
@@ -247,8 +255,95 @@ void ViewsFrame_Draw( ViewsFrame _this, GraphicsCanvas aCanvas, XRect aClip, XPo
     cbl.Alpha = (XUInt8)(( cbl.Alpha * opacity ) >> 8 );
   }
 
-  GraphicsCanvas_DrawBitmapFrame( aCanvas, aClip, _this->Bitmap, frameNr, r, GraphicsEdgesBottom 
-  | GraphicsEdgesInterior | GraphicsEdgesLeft | GraphicsEdgesRight | GraphicsEdgesTop, 
+  if ((( _this->NoEdgesLimit.X > 0 ) && ( sd.X > 0 )) && !(( edges & ( GraphicsEdgesLeft 
+      | GraphicsEdgesRight )) == ( GraphicsEdgesLeft | GraphicsEdgesRight )))
+  {
+    XInt32 d = ( _this->Bitmap->FrameSize.X / 3 ) - sd.X;
+
+    if ((( edges & GraphicsEdgesLeft ) == GraphicsEdgesLeft ))
+    {
+      if ( aClip.Point2.X > r.Point2.X )
+        aClip.Point2.X = r.Point2.X;
+
+      if ( d > 0 )
+        r.Point2.X = ( r.Point2.X + d );
+
+      edges = edges | GraphicsEdgesRight;
+    }
+    else
+      if ((( edges & GraphicsEdgesRight ) == GraphicsEdgesRight ))
+      {
+        if ( aClip.Point1.X < r.Point1.X )
+          aClip.Point1.X = r.Point1.X;
+
+        if ( d > 0 )
+          r.Point1.X = ( r.Point1.X - d );
+
+        edges = edges | GraphicsEdgesLeft;
+      }
+      else
+      {
+        if ( aClip.Point1.X < r.Point1.X )
+          aClip.Point1.X = r.Point1.X;
+
+        if ( aClip.Point2.X > r.Point2.X )
+          aClip.Point2.X = r.Point2.X;
+
+        if ( d > 0 )
+        {
+          r.Point1.X = ( r.Point1.X - ( d / 2 ));
+          r.Point2.X = (( r.Point2.X + d ) - ( d / 2 ));
+        }
+
+        edges = edges | ( GraphicsEdgesLeft | GraphicsEdgesRight );
+      }
+  }
+
+  if ((( _this->NoEdgesLimit.Y > 0 ) && ( sd.Y > 0 )) && !(( edges & ( GraphicsEdgesBottom 
+      | GraphicsEdgesTop )) == ( GraphicsEdgesBottom | GraphicsEdgesTop )))
+  {
+    XInt32 d = ( _this->Bitmap->FrameSize.Y / 3 ) - sd.Y;
+
+    if ((( edges & GraphicsEdgesTop ) == GraphicsEdgesTop ))
+    {
+      if ( aClip.Point2.Y > r.Point2.Y )
+        aClip.Point2.Y = r.Point2.Y;
+
+      if ( d > 0 )
+        r.Point2.Y = ( r.Point2.Y + d );
+
+      edges = edges | GraphicsEdgesBottom;
+    }
+    else
+      if ((( edges & GraphicsEdgesBottom ) == GraphicsEdgesBottom ))
+      {
+        if ( aClip.Point1.Y < r.Point1.Y )
+          aClip.Point1.Y = r.Point1.Y;
+
+        if ( d > 0 )
+          r.Point1.Y = ( r.Point1.Y - d );
+
+        edges = edges | GraphicsEdgesTop;
+      }
+      else
+      {
+        if ( aClip.Point1.Y < r.Point1.Y )
+          aClip.Point1.Y = r.Point1.Y;
+
+        if ( aClip.Point2.Y > r.Point2.Y )
+          aClip.Point2.Y = r.Point2.Y;
+
+        if ( d > 0 )
+        {
+          r.Point1.Y = ( r.Point1.Y - ( d / 2 ));
+          r.Point2.Y = (( r.Point2.Y + d ) - ( d / 2 ));
+        }
+
+        edges = edges | ( GraphicsEdgesBottom | GraphicsEdgesTop );
+      }
+  }
+
+  GraphicsCanvas_DrawBitmapFrame( aCanvas, aClip, _this->Bitmap, frameNr, r, edges, 
   ctl, ctr, cbr, cbl, aBlend );
 }
 
@@ -349,6 +444,19 @@ void ViewsFrame_OnSetAnimated( ViewsFrame _this, XBool value )
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
+/* 'C' function for method : 'Views::Frame.OnSetEdges()' */
+void ViewsFrame_OnSetEdges( ViewsFrame _this, XSet value )
+{
+  if ( value == _this->Edges )
+    return;
+
+  _this->Edges = value;
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
 /* 'C' function for method : 'Views::Frame.OnSetFrameNumber()' */
 void ViewsFrame_OnSetFrameNumber( ViewsFrame _this, XInt32 value )
 {
@@ -396,6 +504,36 @@ void ViewsFrame_OnSetBitmap( ViewsFrame _this, ResourcesBitmap value )
     CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
 }
 
+/* 'C' function for method : 'Views::Frame.OnSetVisible()' */
+void ViewsFrame_OnSetVisible( ViewsFrame _this, XBool value )
+{
+  if ( value )
+    CoreView__ChangeViewState( _this, CoreViewStateVisible, 0 );
+  else
+    CoreView__ChangeViewState( _this, 0, CoreViewStateVisible );
+}
+
+/* 'C' function for method : 'Views::Frame.OnSetNoEdgesLimit()' */
+void ViewsFrame_OnSetNoEdgesLimit( ViewsFrame _this, XPoint value )
+{
+  if ( value.X < 0 )
+    value.X = 0;
+
+  if ( value.Y < 0 )
+    value.Y = 0;
+
+  if ( !EwCompPoint( value, _this->NoEdgesLimit ))
+    return;
+
+  _this->NoEdgesLimit = value;
+
+  if ((( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible )) && !(( _this->Edges & ( GraphicsEdgesBottom | GraphicsEdgesLeft 
+      | GraphicsEdgesRight | GraphicsEdgesTop )) == ( GraphicsEdgesBottom | GraphicsEdgesLeft 
+      | GraphicsEdgesRight | GraphicsEdgesTop )))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
 /* Variants derived from the class : 'Views::Frame' */
 EW_DEFINE_CLASS_VARIANTS( ViewsFrame )
 EW_END_OF_CLASS_VARIANTS( ViewsFrame )
@@ -403,6 +541,7 @@ EW_END_OF_CLASS_VARIANTS( ViewsFrame )
 /* Virtual Method Table (VMT) for the class : 'Views::Frame' */
 EW_DEFINE_CLASS( ViewsFrame, CoreRectView, timer, timer, animFrameNumber, animFrameNumber, 
                  animFrameNumber, animFrameNumber, "Views::Frame" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   ViewsFrame_Draw,
   CoreView_GetClipping,
@@ -415,6 +554,320 @@ EW_DEFINE_CLASS( ViewsFrame, CoreRectView, timer, timer, animFrameNumber, animFr
   CoreView_ChangeViewState,
   CoreRectView_OnSetBounds,
 EW_END_OF_CLASS( ViewsFrame )
+
+/* Initializer for the class 'Views::Image' */
+void ViewsImage__Init( ViewsImage _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  CoreRectView__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( ViewsImage );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( ViewsImage );
+
+  /* ... and initialize objects, variables, properties, etc. */
+  _this->Color = _Const0000;
+}
+
+/* Re-Initializer for the class 'Views::Image' */
+void ViewsImage__ReInit( ViewsImage _this )
+{
+  /* At first re-initialize the super class ... */
+  CoreRectView__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Views::Image' */
+void ViewsImage__Done( ViewsImage _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( CoreRectView );
+
+  /* Don't forget to deinitialize the super class ... */
+  CoreRectView__Done( &_this->_.Super );
+}
+
+/* The method Draw() is invoked automatically if parts of the view should be redrawn 
+   on the screen. This can occur when e.g. the view has been moved or the appearance 
+   of the view has changed before.
+   Draw() is invoked automatically by the framework, you will never need to invoke 
+   this method directly. However you can request an invocation of this method by 
+   calling the method InvalidateArea() of the views @Owner. Usually this is also 
+   unnecessary unless you are developing your own view.
+   The passed parameters determine the drawing destination aCanvas and the area 
+   to redraw aClip in the coordinate space of the canvas. The parameter aOffset 
+   contains the displacement between the origin of the views owner and the origin 
+   of the canvas. You will need it to convert views coordinates into these of the 
+   canvas.
+   The parameter aOpacity contains the opacity descended from this view's @Owner. 
+   It lies in range 0 .. 255. If the view implements its own 'Opacity', 'Color', 
+   etc. properties, the Draw() method should calculate the resulting real opacity 
+   by mixing the values of these properties with the one passed in aOpacity parameter.
+   The parameter aBlend contains the blending mode descended from this view's @Owner. 
+   It determines, whether the view should be drawn with alpha-blending active or 
+   not. If aBlend is false, the outputs of the view should overwrite the corresponding 
+   pixel in the drawing destination aCanvas. If aBlend is true, the outputs should 
+   be mixed with the pixel already stored in aCanvas. For this purpose all Graphics 
+   Engine functions provide a parameter to specify the mode for the respective drawing 
+   operation. If the view implements its own 'Blend' property, the Draw() method 
+   should calculate the resulting real blend mode by using logical AND operation 
+   of the value of the property and the one passed in aBlend parameter. */
+void ViewsImage_Draw( ViewsImage _this, GraphicsCanvas aCanvas, XRect aClip, XPoint 
+  aOffset, XInt32 aOpacity, XBool aBlend )
+{
+  XInt32 frameNr = _this->FrameNumber;
+  XRect area;
+  XPoint size;
+  XColor ctl;
+  XColor ctr;
+  XColor cbr;
+  XColor cbl;
+  XColor c;
+  XInt32 opacity;
+
+  if ( _this->animFrameNumber >= 0 )
+    frameNr = _this->animFrameNumber;
+
+  if (( _this->Bitmap == 0 ) || ( frameNr >= _this->Bitmap->NoOfFrames ))
+    return;
+
+  ResourcesBitmap__Update( _this->Bitmap );
+  area = ViewsImage_GetContentArea( _this );
+  size = _this->Bitmap->FrameSize;
+
+  if ( EwIsRectEmpty( area ))
+    return;
+
+  c = _this->Color;
+  opacity = ((( aOpacity + 1 ) * 255 ) >> 8 ) + 1;
+  aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
+  == CoreViewStateAlphaBlended ));
+  ctl = ctr = cbl = cbr = c;
+
+  if ( opacity < 256 )
+  {
+    ctl.Alpha = (XUInt8)(( ctl.Alpha * opacity ) >> 8 );
+    ctr.Alpha = (XUInt8)(( ctr.Alpha * opacity ) >> 8 );
+    cbr.Alpha = (XUInt8)(( cbr.Alpha * opacity ) >> 8 );
+    cbl.Alpha = (XUInt8)(( cbl.Alpha * opacity ) >> 8 );
+  }
+
+  if ( !EwCompPoint( EwGetRectSize( area ), size ))
+    GraphicsCanvas_CopyBitmap( aCanvas, aClip, _this->Bitmap, frameNr, EwMoveRectPos( 
+    _this->Super1.Bounds, aOffset ), EwMovePointNeg( _this->Super1.Bounds.Point1, 
+    area.Point1 ), ctl, ctr, cbr, cbl, aBlend );
+  else
+    GraphicsCanvas_ScaleBitmap( aCanvas, aClip, _this->Bitmap, frameNr, EwMoveRectPos( 
+    area, aOffset ), EwNewRect2Point( _Const0001, size ), ctl, ctr, cbr, cbl, aBlend, 
+    1 );
+}
+
+/* 'C' function for method : 'Views::Image.observerSlot()' */
+void ViewsImage_observerSlot( ViewsImage _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* 'C' function for method : 'Views::Image.timerSlot()' */
+void ViewsImage_timerSlot( ViewsImage _this, XObject sender )
+{
+  XInt32 frameNr;
+  XInt32 period;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  frameNr = _this->animFrameNumber;
+  period = 0;
+
+  if ( _this->Bitmap != 0 )
+    period = _this->Bitmap->NoOfFrames * _this->Bitmap->FrameDelay;
+
+  if ((( _this->timer != 0 ) && ( _this->animFrameNumber < 0 )) && ( period > 0 ))
+    _this->startTime = _this->timer->Time - ( _this->FrameNumber * _this->Bitmap->FrameDelay );
+
+  if (( _this->timer != 0 ) && ( period > 0 ))
+  {
+    XInt32 time = (XInt32)( _this->timer->Time - _this->startTime );
+    frameNr = time / _this->Bitmap->FrameDelay;
+
+    if ( time >= period )
+    {
+      frameNr = frameNr % _this->Bitmap->NoOfFrames;
+      _this->startTime = _this->timer->Time - ( time % period );
+    }
+  }
+
+  if ((( frameNr != _this->animFrameNumber ) && ( _this->Super2.Owner != 0 )) && 
+      (( _this->Super2.viewState & CoreViewStateVisible ) == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+
+  _this->animFrameNumber = frameNr;
+
+  if (( period == 0 ) && ( _this->timer != 0 ))
+  {
+    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+      0 );
+    _this->timer = 0;
+  }
+}
+
+/* 'C' function for method : 'Views::Image.OnSetColor()' */
+void ViewsImage_OnSetColor( ViewsImage _this, XColor value )
+{
+  if ( !EwCompColor( value, _this->Color ))
+    return;
+
+  _this->Color = value;
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* 'C' function for method : 'Views::Image.OnSetAnimated()' */
+void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value )
+{
+  if ( _this->Animated == value )
+    return;
+
+  _this->Animated = value;
+  _this->animFrameNumber = -1;
+
+  if ( !value && ( _this->timer != 0 ))
+  {
+    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+      0 );
+    _this->timer = 0;
+  }
+
+  if ( value )
+  {
+    _this->timer = ((CoreTimer)EwGetAutoObject( &EffectsEffectTimer, EffectsEffectTimerClass ));
+    EwAttachObjObserver( EwNewSlot( _this, ViewsImage_timerSlot ), (XObject)_this->timer, 
+      0 );
+    EwPostSignal( EwNewSlot( _this, ViewsImage_timerSlot ), ((XObject)_this ));
+  }
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* 'C' function for method : 'Views::Image.OnSetFrameNumber()' */
+void ViewsImage_OnSetFrameNumber( ViewsImage _this, XInt32 value )
+{
+  if ( value < 0 )
+    value = 0;
+
+  if (( value == _this->FrameNumber ) && ( _this->animFrameNumber == -1 ))
+    return;
+
+  _this->FrameNumber = value;
+
+  if ( _this->timer == 0 )
+    _this->animFrameNumber = -1;
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* 'C' function for method : 'Views::Image.OnSetBitmap()' */
+void ViewsImage_OnSetBitmap( ViewsImage _this, ResourcesBitmap value )
+{
+  if ( value == _this->Bitmap )
+    return;
+
+  if (( _this->Bitmap != 0 ) && _this->Bitmap->Mutable )
+    EwDetachObjObserver( EwNewSlot( _this, ViewsImage_observerSlot ), (XObject)_this->Bitmap, 
+      0 );
+
+  _this->Bitmap = value;
+  _this->animFrameNumber = -1;
+
+  if (( value != 0 ) && value->Mutable )
+    EwAttachObjObserver( EwNewSlot( _this, ViewsImage_observerSlot ), (XObject)value, 
+      0 );
+
+  if ( _this->Animated )
+  {
+    ViewsImage_OnSetAnimated( _this, 0 );
+    ViewsImage_OnSetAnimated( _this, 1 );
+  }
+
+  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
+      == CoreViewStateVisible ))
+    CoreGroup__InvalidateArea( _this->Super2.Owner, _this->Super1.Bounds );
+}
+
+/* The method GetContentArea() returns the position and the size of an area where 
+   the view will show the bitmap. This area is expressed in coordinates relative 
+   to the top-left corner of the view's @Owner. The method takes in account all 
+   properties which do affect the position and the alignment of the bitmap, e.g. 
+   @Alignment or @ScrollOffset. */
+XRect ViewsImage_GetContentArea( ViewsImage _this )
+{
+  XPoint size;
+  XRect bounds;
+  XInt32 width;
+  XInt32 height;
+  XRect rd;
+  XRect rs;
+
+  if ( _this->Bitmap == 0 )
+    return _Const0002;
+
+  size = _this->Bitmap->FrameSize;
+  bounds = _this->Super1.Bounds;
+  width = EwGetRectW( bounds );
+  height = EwGetRectH( bounds );
+
+  if (( size.X == 0 ) || ( size.Y == 0 ))
+    return _Const0002;
+
+  rd = EwNewRect( 0, 0, width, height );
+  rs = rd;
+  rs = EwSetRectSize( rs, size );
+
+  if ( EwGetRectW( rs ) != EwGetRectW( rd ))
+    rs = EwSetRectX( rs, ( rd.Point1.X + ( EwGetRectW( rd ) / 2 )) - ( EwGetRectW( 
+    rs ) / 2 ));
+
+  if ( EwGetRectH( rs ) != EwGetRectH( rd ))
+    rs = EwSetRectY( rs, ( rd.Point1.Y + ( EwGetRectH( rd ) / 2 )) - ( EwGetRectH( 
+    rs ) / 2 ));
+
+  rs = EwMoveRectPos( rs, bounds.Point1 );
+  return rs;
+}
+
+/* Variants derived from the class : 'Views::Image' */
+EW_DEFINE_CLASS_VARIANTS( ViewsImage )
+EW_END_OF_CLASS_VARIANTS( ViewsImage )
+
+/* Virtual Method Table (VMT) for the class : 'Views::Image' */
+EW_DEFINE_CLASS( ViewsImage, CoreRectView, timer, timer, startTime, startTime, startTime, 
+                 startTime, "Views::Image" )
+  CoreRectView_initLayoutContext,
+  CoreView_GetRoot,
+  ViewsImage_Draw,
+  CoreView_GetClipping,
+  CoreView_HandleEvent,
+  CoreView_CursorHitTest,
+  CoreView_AdjustDrawingArea,
+  CoreRectView_ArrangeView,
+  CoreRectView_MoveView,
+  CoreRectView_GetExtent,
+  CoreView_ChangeViewState,
+  CoreRectView_OnSetBounds,
+EW_END_OF_CLASS( ViewsImage )
 
 /* Initializer for the class 'Views::Text' */
 void ViewsText__Init( ViewsText _this, XObject aLink, XHandle aArg )
@@ -887,8 +1340,8 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
       if ( clipF )
       {
         XInt32 len = EwGetStringChar( res, inxF );
-        tmp = EwShareString( EwConcatString( EwConcatString( EwLoadString( &_Const0002 ), 
-        EwStringMiddle( res, inxF, len )), EwLoadString( &_Const0002 )));
+        tmp = EwShareString( EwConcatString( EwConcatString( EwLoadString( &_Const0003 ), 
+        EwStringMiddle( res, inxF, len )), EwLoadString( &_Const0003 )));
         tmp = EwSetStringChar( tmp, 0, (XChar)( len + 2 ));
         inxF = inxF + len;
 
@@ -914,7 +1367,7 @@ void ViewsText_reparseSlot( ViewsText _this, XObject sender )
       {
         XInt32 len = EwGetStringChar( res, inxL );
         XString tmp2 = EwShareString( EwConcatString( EwConcatString( EwLoadString( 
-          &_Const0002 ), EwStringMiddle( res, inxL, len )), EwLoadString( &_Const0002 )));
+          &_Const0003 ), EwStringMiddle( res, inxL, len )), EwLoadString( &_Const0003 )));
         tmp2 = EwSetStringChar( tmp2, 0, (XChar)( len + 2 ));
         tmp2 = EwSetStringChar( tmp2, 1, 0xFEFF );
 
@@ -1261,13 +1714,13 @@ XRect ViewsText_GetContentArea( ViewsText _this )
   XRect rs;
 
   if ( !EwCompString( _this->String, 0 ) || ( _this->usedFont == 0 ))
-    return _Const0003;
+    return _Const0002;
 
   if ( !_this->reparsed )
     EwSignal( EwNewSlot( _this, ViewsText_reparseSlot ), ((XObject)_this ));
 
   if ( !EwCompString( _this->flowString, 0 ))
-    return _Const0003;
+    return _Const0002;
 
   leading = _this->usedFont->Leading;
   rh = ( _this->usedFont->Ascent + _this->usedFont->Descent ) + _this->usedFont->Leading;
@@ -1355,6 +1808,7 @@ EW_END_OF_CLASS_VARIANTS( ViewsText )
 /* Virtual Method Table (VMT) for the class : 'Views::Text' */
 EW_DEFINE_CLASS( ViewsText, CoreRectView, usedFont, usedFont, flowString, flowString, 
                  flowString, bidiContext, "Views::Text" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   ViewsText_Draw,
   CoreView_GetClipping,

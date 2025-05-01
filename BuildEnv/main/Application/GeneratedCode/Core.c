@@ -142,6 +142,7 @@ void CoreView__Init( CoreView _this, XObject aLink, XHandle aArg )
 
   /* ... and initialize objects, variables, properties, etc. */
   _this->viewState = CoreViewStateAlphaBlended | CoreViewStateFastReshape | CoreViewStateVisible;
+  _this->Layout = CoreLayoutAlignToLeft | CoreLayoutAlignToTop;
 }
 
 /* Re-Initializer for the class 'Core::View' */
@@ -159,6 +160,21 @@ void CoreView__Done( CoreView _this )
 
   /* Don't forget to deinitialize the super class ... */
   XObject__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Core::View.initLayoutContext()' */
+void CoreView_initLayoutContext( CoreView _this, XRect aBounds, CoreOutline aOutline )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( aOutline );
+  EW_UNUSED_ARG( aBounds );
+}
+
+/* Wrapper function for the virtual method : 'Core::View.initLayoutContext()' */
+void CoreView__initLayoutContext( void* _this, XRect aBounds, CoreOutline aOutline )
+{
+  ((CoreView)_this)->_.VMT->initLayoutContext((CoreView)_this, aBounds, aOutline );
 }
 
 /* 'C' function for method : 'Core::View.OnSetStackingPriority()' */
@@ -190,6 +206,37 @@ void CoreView_OnSetStackingPriority( CoreView _this, XInt32 value )
 
     if ( delta != 0 )
       CoreGroup_Restack( _this->Owner, _this, delta );
+  }
+}
+
+/* 'C' function for method : 'Core::View.OnSetLayout()' */
+void CoreView_OnSetLayout( CoreView _this, XSet value )
+{
+  XSet delta = value ^ _this->Layout;
+
+  if ( !delta )
+    return;
+
+  _this->Layout = value;
+
+  if (( _this->layoutContext != 0 ) && !(( _this->viewState & CoreViewStateEmbedded ) 
+      == CoreViewStateEmbedded ))
+  {
+    _this->Owner->Super2.viewState = _this->Owner->Super2.viewState | ( CoreViewStatePendingLayout 
+    | CoreViewStateUpdateLayout );
+    EwPostSignal( EwNewSlot( _this->Owner, CoreGroup_updateComponentWithDelay ), 
+      ((XObject)_this ));
+    CoreGroup__InvalidateArea( _this->Owner, EwGetRectORect( _this->Owner->Super1.Bounds ));
+  }
+
+  if (( _this->layoutContext != 0 ) && (( _this->viewState & CoreViewStateEmbedded ) 
+      == CoreViewStateEmbedded ))
+  {
+    _this->layoutContext->outline->Super2.viewState = _this->layoutContext->outline->Super2.viewState 
+    | CoreViewStateUpdateLayout;
+    _this->Owner->Super2.viewState = _this->Owner->Super2.viewState | CoreViewStatePendingLayout;
+    EwPostSignal( EwNewSlot( _this->Owner, CoreGroup_updateComponentWithDelay ), 
+      ((XObject)_this ));
   }
 }
 
@@ -577,6 +624,7 @@ EW_END_OF_CLASS_VARIANTS( CoreView )
 /* Virtual Method Table (VMT) for the class : 'Core::View' */
 EW_DEFINE_CLASS( CoreView, XObject, next, next, viewState, viewState, viewState, 
                  viewState, "Core::View" )
+  CoreView_initLayoutContext,
   CoreView_GetRoot,
   CoreView_Draw,
   CoreView_GetClipping,
@@ -621,40 +669,128 @@ void CoreQuadView__Done( CoreQuadView _this )
   CoreView__Done( &_this->_.Super );
 }
 
+/* 'C' function for method : 'Core::QuadView.initLayoutContext()' */
+void CoreQuadView_initLayoutContext( CoreQuadView _this, XRect aBounds, CoreOutline 
+  aOutline )
+{
+  CoreLayoutQuadContext context = EwNewObject( CoreLayoutQuadContext, 0 );
+
+  _this->Super1.layoutContext = 0;
+  context->Super1.extent = CoreView__GetExtent( _this );
+  context->Super1.bounds = aBounds;
+  context->Super1.outline = aOutline;
+  context->point1 = _this->Point1;
+  context->point2 = _this->Point2;
+  context->point3 = _this->Point3;
+  context->point4 = _this->Point4;
+  _this->Super1.layoutContext = ((CoreLayoutContext)context );
+}
+
 /* 'C' function for method : 'Core::QuadView.ArrangeView()' */
 XPoint CoreQuadView_ArrangeView( CoreQuadView _this, XRect aBounds, XEnum aFormation )
 {
+  XSet layout = _this->Super1.Layout;
   CoreLayoutQuadContext context = EwCastObject( _this->Super1.layoutContext, CoreLayoutQuadContext );
-  XInt32 x1 = 0;
-  XInt32 y1 = 0;
-  XInt32 x2 = 0;
-  XInt32 y2 = 0;
+  XInt32 x1 = context->Super1.extent.Point1.X;
+  XInt32 y1 = context->Super1.extent.Point1.Y;
+  XInt32 x2 = context->Super1.extent.Point2.X;
+  XInt32 y2 = context->Super1.extent.Point2.Y;
   XPoint dstSize = EwGetRectSize( aBounds );
-  XInt32 w;
-  XInt32 h;
+  XInt32 w = x2 - x1;
+  XInt32 h = y2 - y1;
+  XInt32 ex;
+  XInt32 ey;
+  XInt32 ew;
+  XInt32 eh;
 
   if ( aFormation == CoreFormationNone )
   {
-    if ( 0 != dstSize.X )
+    XPoint srcSize = EwGetRectSize( context->Super1.bounds );
+    x1 = x1 - context->Super1.bounds.Point1.X;
+    y1 = y1 - context->Super1.bounds.Point1.Y;
+
+    if ( srcSize.X != dstSize.X )
     {
-      x1 = aBounds.Point1.X;
-      x2 = x1;
+      XBool alignToLeft = (( layout & CoreLayoutAlignToLeft ) == CoreLayoutAlignToLeft );
+      XBool alignToRight = (( layout & CoreLayoutAlignToRight ) == CoreLayoutAlignToRight );
+      XBool resizeHorz = (( layout & CoreLayoutResizeHorz ) == CoreLayoutResizeHorz );
+
+      if ( !alignToLeft && ( resizeHorz || !alignToRight ))
+        x1 = ( x1 * dstSize.X ) / srcSize.X;
+
+      if ( !alignToRight && ( resizeHorz || !alignToLeft ))
+      {
+        x2 = x2 - context->Super1.bounds.Point1.X;
+        x2 = ( x2 * dstSize.X ) / srcSize.X;
+        x2 = x2 - dstSize.X;
+      }
+      else
+        x2 = x2 - context->Super1.bounds.Point2.X;
+
+      x1 = x1 + aBounds.Point1.X;
+      x2 = x2 + aBounds.Point2.X;
+
+      if ( !resizeHorz )
+      {
+        if ( alignToLeft && !alignToRight )
+          x2 = x1 + w;
+        else
+          if ( !alignToLeft && alignToRight )
+            x1 = x2 - w;
+          else
+          {
+            x1 = x1 + ((( x2 - x1 ) - w ) / 2 );
+            x2 = x1 + w;
+          }
+      }
     }
     else
     {
-      x1 = aBounds.Point1.X;
-      x2 = aBounds.Point2.X;
+      x2 = x2 - context->Super1.bounds.Point2.X;
+      x1 = x1 + aBounds.Point1.X;
+      x2 = x2 + aBounds.Point2.X;
     }
 
-    if ( 0 != dstSize.Y )
+    if ( srcSize.Y != dstSize.Y )
     {
-      y1 = aBounds.Point1.Y;
-      y2 = y1;
+      XBool alignToTop = (( layout & CoreLayoutAlignToTop ) == CoreLayoutAlignToTop );
+      XBool alignToBottom = (( layout & CoreLayoutAlignToBottom ) == CoreLayoutAlignToBottom );
+      XBool resizeVert = (( layout & CoreLayoutResizeVert ) == CoreLayoutResizeVert );
+
+      if ( !alignToTop && ( resizeVert || !alignToBottom ))
+        y1 = ( y1 * dstSize.Y ) / srcSize.Y;
+
+      if ( !alignToBottom && ( resizeVert || !alignToTop ))
+      {
+        y2 = y2 - context->Super1.bounds.Point1.Y;
+        y2 = ( y2 * dstSize.Y ) / srcSize.Y;
+        y2 = y2 - dstSize.Y;
+      }
+      else
+        y2 = y2 - context->Super1.bounds.Point2.Y;
+
+      y1 = y1 + aBounds.Point1.Y;
+      y2 = y2 + aBounds.Point2.Y;
+
+      if ( !resizeVert )
+      {
+        if ( alignToTop && !alignToBottom )
+          y2 = y1 + h;
+        else
+          if ( !alignToTop && alignToBottom )
+            y1 = y2 - h;
+          else
+          {
+            y1 = y1 + ((( y2 - y1 ) - h ) / 2 );
+            y2 = y1 + h;
+          }
+      }
     }
     else
     {
-      y1 = aBounds.Point1.Y;
-      y2 = aBounds.Point2.Y;
+      y2 = y2 - context->Super1.bounds.Point2.Y;
+      y1 = y1 + aBounds.Point1.Y;
+      y2 = y2 + aBounds.Point2.Y;
     }
   }
   else
@@ -664,28 +800,28 @@ XPoint CoreQuadView_ArrangeView( CoreQuadView _this, XRect aBounds, XEnum aForma
       case CoreFormationLeftToRight :
       {
         x1 = aBounds.Point1.X;
-        x2 = x1;
+        x2 = x1 + w;
       }
       break;
 
       case CoreFormationRightToLeft :
       {
         x2 = aBounds.Point2.X;
-        x1 = x2;
+        x1 = x2 - w;
       }
       break;
 
       case CoreFormationTopToBottom :
       {
         y1 = aBounds.Point1.Y;
-        y2 = y1;
+        y2 = y1 + h;
       }
       break;
 
       case CoreFormationBottomToTop :
       {
         y2 = aBounds.Point2.Y;
-        y1 = y2;
+        y1 = y2 - h;
       }
       break;
 
@@ -694,34 +830,100 @@ XPoint CoreQuadView_ArrangeView( CoreQuadView _this, XRect aBounds, XEnum aForma
 
     if (( aFormation == CoreFormationLeftToRight ) || ( aFormation == CoreFormationRightToLeft ))
     {
-      y1 = aBounds.Point1.Y;
-      y2 = y1;
+      XBool alignToTop = (( layout & CoreLayoutAlignToTop ) == CoreLayoutAlignToTop );
+      XBool alignToBottom = (( layout & CoreLayoutAlignToBottom ) == CoreLayoutAlignToBottom );
+      XBool resizeVert = (( layout & CoreLayoutResizeVert ) == CoreLayoutResizeVert );
+
+      if ( resizeVert )
+      {
+        y1 = aBounds.Point1.Y;
+        y2 = aBounds.Point2.Y;
+      }
+      else
+        if ( alignToTop && !alignToBottom )
+        {
+          y1 = aBounds.Point1.Y;
+          y2 = y1 + h;
+        }
+        else
+          if ( alignToBottom && !alignToTop )
+          {
+            y2 = aBounds.Point2.Y;
+            y1 = y2 - h;
+          }
+          else
+          {
+            y1 = aBounds.Point1.Y + (( EwGetRectH( aBounds ) - h ) / 2 );
+            y2 = y1 + h;
+          }
     }
 
     if (( aFormation == CoreFormationTopToBottom ) || ( aFormation == CoreFormationBottomToTop ))
     {
-      x1 = aBounds.Point1.X;
-      x2 = x1;
+      XBool alignToLeft = (( layout & CoreLayoutAlignToLeft ) == CoreLayoutAlignToLeft );
+      XBool alignToRight = (( layout & CoreLayoutAlignToRight ) == CoreLayoutAlignToRight );
+      XBool resizeHorz = (( layout & CoreLayoutResizeHorz ) == CoreLayoutResizeHorz );
+
+      if ( resizeHorz )
+      {
+        x1 = aBounds.Point1.X;
+        x2 = aBounds.Point2.X;
+      }
+      else
+        if ( alignToLeft && !alignToRight )
+        {
+          x1 = aBounds.Point1.X;
+          x2 = x1 + w;
+        }
+        else
+          if ( alignToRight && !alignToLeft )
+          {
+            x2 = aBounds.Point2.X;
+            x1 = x2 - w;
+          }
+          else
+          {
+            x1 = aBounds.Point1.X + (( EwGetRectW( aBounds ) - w ) / 2 );
+            x2 = x1 + w;
+          }
     }
   }
 
   context->Super1.isEmpty = (XBool)(( x1 >= x2 ) || ( y1 >= y2 ));
   w = ( x2 - x1 ) - 1;
   h = ( y2 - y1 ) - 1;
+  ex = context->Super1.extent.Point1.X;
+  ey = context->Super1.extent.Point1.Y;
+  ew = ( context->Super1.extent.Point2.X - ex ) - 1;
+  eh = ( context->Super1.extent.Point2.Y - ey ) - 1;
+
+  if ( ew == 0 )
+    ew = 1;
+
+  if ( eh == 0 )
+    eh = 1;
 
   if ((( _this->Super1.viewState & CoreViewStateFastReshape ) == CoreViewStateFastReshape ))
   {
-    _this->Point1 = EwNewPoint( x1, y1 );
-    _this->Point2 = EwNewPoint( x1, y1 );
-    _this->Point3 = EwNewPoint( x1, y1 );
-    _this->Point4 = EwNewPoint( x1, y1 );
+    _this->Point1 = EwNewPoint( x1 + ((( context->point1.X - ex ) * w ) / ew ), 
+    y1 + ((( context->point1.Y - ey ) * h ) / eh ));
+    _this->Point2 = EwNewPoint( x1 + ((( context->point2.X - ex ) * w ) / ew ), 
+    y1 + ((( context->point2.Y - ey ) * h ) / eh ));
+    _this->Point3 = EwNewPoint( x1 + ((( context->point3.X - ex ) * w ) / ew ), 
+    y1 + ((( context->point3.Y - ey ) * h ) / eh ));
+    _this->Point4 = EwNewPoint( x1 + ((( context->point4.X - ex ) * w ) / ew ), 
+    y1 + ((( context->point4.Y - ey ) * h ) / eh ));
   }
   else
   {
-    CoreQuadView_OnSetPoint1( _this, EwNewPoint( x1, y1 ));
-    CoreQuadView_OnSetPoint2( _this, EwNewPoint( x1, y1 ));
-    CoreQuadView_OnSetPoint3( _this, EwNewPoint( x1, y1 ));
-    CoreQuadView_OnSetPoint4( _this, EwNewPoint( x1, y1 ));
+    CoreQuadView_OnSetPoint1( _this, EwNewPoint( x1 + ((( context->point1.X - ex ) 
+    * w ) / ew ), y1 + ((( context->point1.Y - ey ) * h ) / eh )));
+    CoreQuadView_OnSetPoint2( _this, EwNewPoint( x1 + ((( context->point2.X - ex ) 
+    * w ) / ew ), y1 + ((( context->point2.Y - ey ) * h ) / eh )));
+    CoreQuadView_OnSetPoint3( _this, EwNewPoint( x1 + ((( context->point3.X - ex ) 
+    * w ) / ew ), y1 + ((( context->point3.Y - ey ) * h ) / eh )));
+    CoreQuadView_OnSetPoint4( _this, EwNewPoint( x1 + ((( context->point4.X - ex ) 
+    * w ) / ew ), y1 + ((( context->point4.Y - ey ) * h ) / eh )));
     _this->Super1.layoutContext = ((CoreLayoutContext)context );
   }
 
@@ -1013,6 +1215,7 @@ EW_END_OF_CLASS_VARIANTS( CoreQuadView )
 /* Virtual Method Table (VMT) for the class : 'Core::QuadView' */
 EW_DEFINE_CLASS( CoreQuadView, CoreView, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
                  "Core::QuadView" )
+  CoreQuadView_initLayoutContext,
   CoreView_GetRoot,
   CoreView_Draw,
   CoreView_GetClipping,
@@ -1057,38 +1260,119 @@ void CoreRectView__Done( CoreRectView _this )
   CoreView__Done( &_this->_.Super );
 }
 
+/* 'C' function for method : 'Core::RectView.initLayoutContext()' */
+void CoreRectView_initLayoutContext( CoreRectView _this, XRect aBounds, CoreOutline 
+  aOutline )
+{
+  CoreLayoutContext context = EwNewObject( CoreLayoutContext, 0 );
+
+  context->extent = _this->Bounds;
+  context->bounds = aBounds;
+  context->outline = aOutline;
+  _this->Super1.layoutContext = context;
+}
+
 /* 'C' function for method : 'Core::RectView.ArrangeView()' */
 XPoint CoreRectView_ArrangeView( CoreRectView _this, XRect aBounds, XEnum aFormation )
 {
+  XSet layout = _this->Super1.Layout;
   CoreLayoutContext context = _this->Super1.layoutContext;
-  XInt32 x1 = 0;
-  XInt32 y1 = 0;
-  XInt32 x2 = 0;
-  XInt32 y2 = 0;
+  XInt32 x1 = context->extent.Point1.X;
+  XInt32 y1 = context->extent.Point1.Y;
+  XInt32 x2 = context->extent.Point2.X;
+  XInt32 y2 = context->extent.Point2.Y;
   XPoint dstSize = EwGetRectSize( aBounds );
+  XInt32 w = x2 - x1;
+  XInt32 h = y2 - y1;
 
   if ( aFormation == CoreFormationNone )
   {
-    if ( 0 != dstSize.X )
+    XPoint srcSize = EwGetRectSize( context->bounds );
+    x1 = x1 - context->bounds.Point1.X;
+    y1 = y1 - context->bounds.Point1.Y;
+
+    if ( srcSize.X != dstSize.X )
     {
-      x1 = aBounds.Point1.X;
-      x2 = x1;
+      XBool alignToLeft = (( layout & CoreLayoutAlignToLeft ) == CoreLayoutAlignToLeft );
+      XBool alignToRight = (( layout & CoreLayoutAlignToRight ) == CoreLayoutAlignToRight );
+      XBool resizeHorz = (( layout & CoreLayoutResizeHorz ) == CoreLayoutResizeHorz );
+
+      if ( !alignToLeft && ( resizeHorz || !alignToRight ))
+        x1 = ( x1 * dstSize.X ) / srcSize.X;
+
+      if ( !alignToRight && ( resizeHorz || !alignToLeft ))
+      {
+        x2 = x2 - context->bounds.Point1.X;
+        x2 = ( x2 * dstSize.X ) / srcSize.X;
+        x2 = x2 - dstSize.X;
+      }
+      else
+        x2 = x2 - context->bounds.Point2.X;
+
+      x1 = x1 + aBounds.Point1.X;
+      x2 = x2 + aBounds.Point2.X;
+
+      if ( !resizeHorz )
+      {
+        if ( alignToLeft && !alignToRight )
+          x2 = x1 + w;
+        else
+          if ( !alignToLeft && alignToRight )
+            x1 = x2 - w;
+          else
+          {
+            x1 = x1 + ((( x2 - x1 ) - w ) / 2 );
+            x2 = x1 + w;
+          }
+      }
     }
     else
     {
-      x1 = aBounds.Point1.X;
-      x2 = aBounds.Point2.X;
+      x2 = x2 - context->bounds.Point2.X;
+      x1 = x1 + aBounds.Point1.X;
+      x2 = x2 + aBounds.Point2.X;
     }
 
-    if ( 0 != dstSize.Y )
+    if ( srcSize.Y != dstSize.Y )
     {
-      y1 = aBounds.Point1.Y;
-      y2 = y1;
+      XBool alignToTop = (( layout & CoreLayoutAlignToTop ) == CoreLayoutAlignToTop );
+      XBool alignToBottom = (( layout & CoreLayoutAlignToBottom ) == CoreLayoutAlignToBottom );
+      XBool resizeVert = (( layout & CoreLayoutResizeVert ) == CoreLayoutResizeVert );
+
+      if ( !alignToTop && ( resizeVert || !alignToBottom ))
+        y1 = ( y1 * dstSize.Y ) / srcSize.Y;
+
+      if ( !alignToBottom && ( resizeVert || !alignToTop ))
+      {
+        y2 = y2 - context->bounds.Point1.Y;
+        y2 = ( y2 * dstSize.Y ) / srcSize.Y;
+        y2 = y2 - dstSize.Y;
+      }
+      else
+        y2 = y2 - context->bounds.Point2.Y;
+
+      y1 = y1 + aBounds.Point1.Y;
+      y2 = y2 + aBounds.Point2.Y;
+
+      if ( !resizeVert )
+      {
+        if ( alignToTop && !alignToBottom )
+          y2 = y1 + h;
+        else
+          if ( !alignToTop && alignToBottom )
+            y1 = y2 - h;
+          else
+          {
+            y1 = y1 + ((( y2 - y1 ) - h ) / 2 );
+            y2 = y1 + h;
+          }
+      }
     }
     else
     {
-      y1 = aBounds.Point1.Y;
-      y2 = aBounds.Point2.Y;
+      y2 = y2 - context->bounds.Point2.Y;
+      y1 = y1 + aBounds.Point1.Y;
+      y2 = y2 + aBounds.Point2.Y;
     }
   }
   else
@@ -1098,28 +1382,28 @@ XPoint CoreRectView_ArrangeView( CoreRectView _this, XRect aBounds, XEnum aForma
       case CoreFormationLeftToRight :
       {
         x1 = aBounds.Point1.X;
-        x2 = x1;
+        x2 = x1 + w;
       }
       break;
 
       case CoreFormationRightToLeft :
       {
         x2 = aBounds.Point2.X;
-        x1 = x2;
+        x1 = x2 - w;
       }
       break;
 
       case CoreFormationTopToBottom :
       {
         y1 = aBounds.Point1.Y;
-        y2 = y1;
+        y2 = y1 + h;
       }
       break;
 
       case CoreFormationBottomToTop :
       {
         y2 = aBounds.Point2.Y;
-        y1 = y2;
+        y1 = y2 - h;
       }
       break;
 
@@ -1128,14 +1412,62 @@ XPoint CoreRectView_ArrangeView( CoreRectView _this, XRect aBounds, XEnum aForma
 
     if (( aFormation == CoreFormationLeftToRight ) || ( aFormation == CoreFormationRightToLeft ))
     {
-      y1 = aBounds.Point1.Y;
-      y2 = y1;
+      XBool alignToTop = (( layout & CoreLayoutAlignToTop ) == CoreLayoutAlignToTop );
+      XBool alignToBottom = (( layout & CoreLayoutAlignToBottom ) == CoreLayoutAlignToBottom );
+      XBool resizeVert = (( layout & CoreLayoutResizeVert ) == CoreLayoutResizeVert );
+
+      if ( resizeVert )
+      {
+        y1 = aBounds.Point1.Y;
+        y2 = aBounds.Point2.Y;
+      }
+      else
+        if ( alignToTop && !alignToBottom )
+        {
+          y1 = aBounds.Point1.Y;
+          y2 = y1 + h;
+        }
+        else
+          if ( alignToBottom && !alignToTop )
+          {
+            y2 = aBounds.Point2.Y;
+            y1 = y2 - h;
+          }
+          else
+          {
+            y1 = aBounds.Point1.Y + (( EwGetRectH( aBounds ) - h ) / 2 );
+            y2 = y1 + h;
+          }
     }
 
     if (( aFormation == CoreFormationTopToBottom ) || ( aFormation == CoreFormationBottomToTop ))
     {
-      x1 = aBounds.Point1.X;
-      x2 = x1;
+      XBool alignToLeft = (( layout & CoreLayoutAlignToLeft ) == CoreLayoutAlignToLeft );
+      XBool alignToRight = (( layout & CoreLayoutAlignToRight ) == CoreLayoutAlignToRight );
+      XBool resizeHorz = (( layout & CoreLayoutResizeHorz ) == CoreLayoutResizeHorz );
+
+      if ( resizeHorz )
+      {
+        x1 = aBounds.Point1.X;
+        x2 = aBounds.Point2.X;
+      }
+      else
+        if ( alignToLeft && !alignToRight )
+        {
+          x1 = aBounds.Point1.X;
+          x2 = x1 + w;
+        }
+        else
+          if ( alignToRight && !alignToLeft )
+          {
+            x2 = aBounds.Point2.X;
+            x1 = x2 - w;
+          }
+          else
+          {
+            x1 = aBounds.Point1.X + (( EwGetRectW( aBounds ) - w ) / 2 );
+            x2 = x1 + w;
+          }
     }
   }
 
@@ -1221,6 +1553,7 @@ EW_END_OF_CLASS_VARIANTS( CoreRectView )
 /* Virtual Method Table (VMT) for the class : 'Core::RectView' */
 EW_DEFINE_CLASS( CoreRectView, CoreView, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
                  "Core::RectView" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreView_Draw,
   CoreView_GetClipping,
@@ -1581,10 +1914,18 @@ void CoreGroup_OnSetBounds( CoreGroup _this, XRect value )
 
   if (( resize && ( oldSize.X > 0 )) && ( oldSize.Y > 0 ))
   {
+    XRect bounds = EwNewRect2Point( _Const0000, oldSize );
     CoreView view = _this->first;
 
     while ( view != 0 )
+    {
+      if ((( view->layoutContext == 0 ) && ( view->Layout != ( CoreLayoutAlignToLeft 
+          | CoreLayoutAlignToTop ))) && !(( view->viewState & CoreViewStateEmbedded ) 
+          == CoreViewStateEmbedded ))
+        CoreView__initLayoutContext( view, bounds, 0 );
+
       view = view->next;
+    }
   }
 
   if ( resize )
@@ -1703,9 +2044,15 @@ void CoreGroup_recalculateLayout( CoreGroup _this )
 
   while ( view != 0 )
   {
-    if ((( view->viewState & CoreViewStateEmbedded ) == CoreViewStateEmbedded ) 
-        && (( view->layoutContext != 0 ) && ( 0 != form )))
-      view->layoutContext = 0;
+    if ((( view->viewState & CoreViewStateEmbedded ) == CoreViewStateEmbedded ))
+    {
+      if (( view->layoutContext != 0 ) && ( view->layoutContext->outline != form ))
+        view->layoutContext = 0;
+
+      if ((( view->layoutContext == 0 ) && formLayout ) && ( view->Layout != ( CoreLayoutAlignToLeft 
+          | CoreLayoutAlignToTop )))
+        CoreView__initLayoutContext( view, formBounds2, form );
+    }
 
     if ( view->layoutContext != 0 )
     {
@@ -2664,6 +3011,7 @@ EW_END_OF_CLASS_VARIANTS( CoreGroup )
 /* Virtual Method Table (VMT) for the class : 'Core::Group' */
 EW_DEFINE_CLASS( CoreGroup, CoreRectView, first, first, extClipLeft, extClipLeft, 
                  extClipLeft, extClipLeft, "Core::Group" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreGroup_Draw,
   CoreGroup_GetClipping,
@@ -3836,6 +4184,48 @@ CoreView CoreRoot_RetargetCursorWithReason( CoreRoot _this, CoreView aNewTarget,
   return 0;
 }
 
+/* The method RetargetCursor() changes the currently active cursor event target 
+   view. Usually, the target view is determined when the user presses the finger 
+   on the touch screen. Once determined, the target view remains active until the 
+   user has released the finger. In the meantime the framework will provide this 
+   target view with all cursor events. This entire cycle is called 'grab cycle'. 
+   The method RetargetCursor() allows you to select a new target view without the 
+   necessity to wait until the user has released the touch screen and thus has finalized 
+   the grab cycle.
+   At first the method asks the new potential target view aNewTarget whether it 
+   or one of its sub-views is willing to handle the cursor events. If successful, 
+   the method hands over the cursor event flow to this determined view. If there 
+   is no view willing to handle these events, the method hands over the event flow 
+   directly to the view specified in the parameter aFallbackTarget. If no willing 
+   view could be found and no fall-back view was given, the current grab cycle is 
+   finalized as if the user had released the touch screen.
+   Unlike the method @DeflectCursor() this RetargetCursor() method performs the 
+   cursor hit test for all views of the new potential target. This is as if the 
+   user had tapped the screen and the framework tries to determine the view affected 
+   by this interaction. This search operation is limited to views at the current 
+   cursor position.
+   The parameter aStartView, if it is not 'null', restricts the operation to be 
+   handled by the specified view or another view lying behind it. In other words, 
+   views found in front of aStartView are not taken in account during the hit-test 
+   operation.
+   When switching the target view, the framework provides the old and the new target 
+   views with cursor events. The old view will receive a Core::CursorEvent with 
+   variables Down == 'false' and AutoDeflected == 'true' - this simulates the release 
+   operations. The new target view will receive a Core::CursorEvent with the variable 
+   Down == 'true' as if it had been just touched by the user.
+   If the application is running within a multi-touch environment, the invocation 
+   of the RetargetCursor() method does affect the event flow corresponding only 
+   to the finger which has lastly generated touch events.
+   The return value of the method identifies the view which becomed the new target 
+   of the events.
+   Please note the alternative version of this method @RetargetCursorWithReason(). */
+CoreView CoreRoot_RetargetCursor( CoreRoot _this, CoreView aNewTarget, CoreView 
+  aFallbackTarget, CoreView aStartView )
+{
+  return CoreRoot_RetargetCursorWithReason( _this, aNewTarget, aFallbackTarget, 
+    aStartView, 0 );
+}
+
 /* The method DeflectCursor() changes the currently active cursor event target view. 
    Usually, the target view is determined when the user presses the finger on the 
    touch screen. Once determined, the target view remains active until the user 
@@ -3941,6 +4331,7 @@ EW_END_OF_CLASS_VARIANTS( CoreRoot )
 /* Virtual Method Table (VMT) for the class : 'Core::Root' */
 EW_DEFINE_CLASS( CoreRoot, CoreGroup, cursorHoldTimer, keyLastTarget, keyLastCode, 
                  keyLastCode, keyLastCode, keyLastCode, "Core::Root" )
+  CoreRectView_initLayoutContext,
   CoreRoot_GetRoot,
   CoreRoot_Draw,
   CoreGroup_GetClipping,
@@ -4702,13 +5093,20 @@ void CoreOutline_OnSetBounds( CoreOutline _this, XRect value )
 
   if (( resize && ( oldSize.X > 0 )) && ( oldSize.Y > 0 ))
   {
+    XRect bounds = _this->Super1.Bounds;
     CoreView view = _this->Super2.next;
 
     while (( view != 0 ) && !(( view->viewState & CoreViewStateIsOutline ) == CoreViewStateIsOutline ))
     {
-      if ((( view->viewState & CoreViewStateEmbedded ) == CoreViewStateEmbedded ) 
-          && (( view->layoutContext != 0 ) && ( 0 != _this )))
-        view->layoutContext = 0;
+      if ((( view->viewState & CoreViewStateEmbedded ) == CoreViewStateEmbedded ))
+      {
+        if (( view->layoutContext != 0 ) && ( view->layoutContext->outline != _this ))
+          view->layoutContext = 0;
+
+        if (( view->layoutContext == 0 ) && ( view->Layout != ( CoreLayoutAlignToLeft 
+            | CoreLayoutAlignToTop )))
+          CoreView__initLayoutContext( view, bounds, _this );
+      }
 
       view = view->next;
     }
@@ -4738,6 +5136,7 @@ EW_END_OF_CLASS_VARIANTS( CoreOutline )
 /* Virtual Method Table (VMT) for the class : 'Core::Outline' */
 EW_DEFINE_CLASS( CoreOutline, CoreRectView, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
                  "Core::Outline" )
+  CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreOutline_Draw,
   CoreOutline_GetClipping,
@@ -4990,6 +5389,9 @@ XObject CoreSimpleTouchHandler_HandleEvent( CoreSimpleTouchHandler _this, CoreEv
 
   down = _this->Down;
 
+  if ( event2 != 0 )
+    EwSignal( _this->OnDrag, ((XObject)_this ));
+
   if ((( event1 != 0 ) && _this->Down ) && ( _this->HoldPeriod == 0 ))
     EwSignal( _this->OnPress, ((XObject)_this ));
 
@@ -5154,8 +5556,9 @@ EW_DEFINE_CLASS_VARIANTS( CoreSimpleTouchHandler )
 EW_END_OF_CLASS_VARIANTS( CoreSimpleTouchHandler )
 
 /* Virtual Method Table (VMT) for the class : 'Core::SimpleTouchHandler' */
-EW_DEFINE_CLASS( CoreSimpleTouchHandler, CoreQuadView, OnLeave, OnLeave, OnLeave, 
-                 state, state, state, "Core::SimpleTouchHandler" )
+EW_DEFINE_CLASS( CoreSimpleTouchHandler, CoreQuadView, OnDrag, OnDrag, OnDrag, state, 
+                 state, state, "Core::SimpleTouchHandler" )
+  CoreQuadView_initLayoutContext,
   CoreView_GetRoot,
   CoreSimpleTouchHandler_Draw,
   CoreView_GetClipping,
@@ -5359,8 +5762,8 @@ EW_DEFINE_CLASS_VARIANTS( CoreLayoutContext )
 EW_END_OF_CLASS_VARIANTS( CoreLayoutContext )
 
 /* Virtual Method Table (VMT) for the class : 'Core::LayoutContext' */
-EW_DEFINE_CLASS( CoreLayoutContext, XObject, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
-                 _.VMT, "Core::LayoutContext" )
+EW_DEFINE_CLASS( CoreLayoutContext, XObject, outline, outline, extent, extent, extent, 
+                 extent, "Core::LayoutContext" )
 EW_END_OF_CLASS( CoreLayoutContext )
 
 /* Initializer for the class 'Core::LayoutQuadContext' */

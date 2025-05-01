@@ -43,8 +43,8 @@ class Application : Core::Root
   {
     preset Bounds = <67,93,217,143>;
     preset OnUpdate = null;
-    preset OnSwitchOn = toggleLightSlot;
-    preset OnSwitchOff = toggleLightSlot;
+    preset OnSwitchOn = LightOnSlot;
+    preset OnSwitchOff = LightOffSlot;
     preset LabelOn = "";
     preset LabelOff = "";
     preset Label = "";
@@ -52,9 +52,9 @@ class Application : Core::Root
   }
 
   $rect <558,35,758,75>
-  slot toggleLightSlot
+  slot LightOnSlot
   {
-    Application::Device.toggleLightMethod();
+    Application::Device.LedSetMethod("on", "true");
   }
 
   // new created Slots for LED Controlls
@@ -62,6 +62,24 @@ class Application : Core::Root
   {
     attr Bounds = <550,-10,850,190>;
   }
+
+  $rect <560,80,760,120>
+  slot LightOffSlot
+  {
+    Application::Device.LedSetMethod("on", "false");
+  }
+
+  // Directives to adapt the order of the above members according to how these members 
+  // where arranged when the project content was stored. In this manner the storage 
+  // and the expected order of the members don't depend. Merging of changes in the 
+  // project files is simplified.
+  $member Bounds
+  $member Note1
+  $member Rectangle
+  $member Note
+  $member toggleLightButton
+  $member LightOnSlot
+  $member LightOffSlot
 }
 
 // To do:
@@ -283,11 +301,13 @@ class DeviceClass : Templates::DeviceClass
   }
 
   $rect <1170,60,1370,100>
-  method void toggleLightMethod()
+  method void LedSetMethod( arg string key, arg string setpoint )
   {
+
+
     native{
-      extern void ew_request_task(void);
-      ew_request_task();
+      extern void LedSet(string key, string setpoint);
+      LedSet(key, setpoint);
     }
   }
 
@@ -308,7 +328,7 @@ class DeviceClass : Templates::DeviceClass
   $member Note2
   $member Note1
   $member Note
-  $member toggleLightMethod
+  $member LedSetMethod
 }
 
 $rect <930,40,1130,80>

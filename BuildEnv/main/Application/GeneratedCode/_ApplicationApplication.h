@@ -45,6 +45,7 @@
 #include "_CoreRoot.h"
 #include "_CoreTimer.h"
 #include "_ViewsRectangle.h"
+#include "_WidgetSetHorizontalSlider.h"
 #include "_WidgetSetToggleButton.h"
 
 /* Forward declaration of the class Application::Application */
@@ -88,10 +89,13 @@
 EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
   EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
+  EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
 EW_DEFINE_METHODS( ApplicationApplication, CoreRoot )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreRoot _this )
   EW_METHOD( Draw,              void )( CoreRoot _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -121,6 +125,10 @@ void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject s
 
 /* 'C' function for method : 'Application::Application.LightOffSlot()' */
 void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject 
+  sender );
+
+/* 'C' function for method : 'Application::Application.BrightnessSlot()' */
+void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
   sender );
 
 #ifdef __cplusplus

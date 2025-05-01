@@ -42,12 +42,24 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
+#include "_WidgetSetHorizontalSlider.h"
+#include "_WidgetSetHorizontalSliderConfig.h"
 #include "_WidgetSetToggleButton.h"
 #include "_WidgetSetToggleButtonConfig.h"
 #include "_WidgetSetWidgetConfig.h"
 
 /* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( WidgetSetHorizontalSliderTrackLarge )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
 EW_DECLARE_BITMAP_RES( WidgetSetSwitchLarge )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( WidgetSetThumbKnobLarge )
+
+/* This autoobject provides the default customization for the 'horizontal slider' 
+   widget (WidgetSet::HorizontalSlider) in its large size variant. */
+EW_DECLARE_AUTOOBJECT( WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig )
 
 /* This autoobject provides one of the default customizations for the 'toggle' widget 
    (WidgetSet::ToggleButton) in its large size variant. With this customization 

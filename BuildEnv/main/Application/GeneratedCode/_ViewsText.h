@@ -148,6 +148,8 @@ EW_END_OF_FIELDS( ViewsText )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Text' */
 EW_DEFINE_METHODS( ViewsText, CoreRectView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( ViewsText _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )

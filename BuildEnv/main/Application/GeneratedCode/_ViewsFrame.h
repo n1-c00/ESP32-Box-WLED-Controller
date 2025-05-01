@@ -130,13 +130,17 @@ EW_DEFINE_FIELDS( ViewsFrame, CoreRectView )
   EW_PROPERTY( Bitmap,          ResourcesBitmap )
   EW_VARIABLE( animFrameNumber, XInt32 )
   EW_PROPERTY( Color,           XColor )
+  EW_PROPERTY( Edges,           XSet )
   EW_PROPERTY( FrameNumber,     XInt32 )
   EW_VARIABLE( startTime,       XUInt32 )
+  EW_PROPERTY( NoEdgesLimit,    XPoint )
   EW_PROPERTY( Animated,        XBool )
 EW_END_OF_FIELDS( ViewsFrame )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Frame' */
 EW_DEFINE_METHODS( ViewsFrame, CoreRectView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( ViewsFrame _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -195,11 +199,20 @@ void ViewsFrame_OnSetColor( ViewsFrame _this, XColor value );
 /* 'C' function for method : 'Views::Frame.OnSetAnimated()' */
 void ViewsFrame_OnSetAnimated( ViewsFrame _this, XBool value );
 
+/* 'C' function for method : 'Views::Frame.OnSetEdges()' */
+void ViewsFrame_OnSetEdges( ViewsFrame _this, XSet value );
+
 /* 'C' function for method : 'Views::Frame.OnSetFrameNumber()' */
 void ViewsFrame_OnSetFrameNumber( ViewsFrame _this, XInt32 value );
 
 /* 'C' function for method : 'Views::Frame.OnSetBitmap()' */
 void ViewsFrame_OnSetBitmap( ViewsFrame _this, ResourcesBitmap value );
+
+/* 'C' function for method : 'Views::Frame.OnSetVisible()' */
+void ViewsFrame_OnSetVisible( ViewsFrame _this, XBool value );
+
+/* 'C' function for method : 'Views::Frame.OnSetNoEdgesLimit()' */
+void ViewsFrame_OnSetNoEdgesLimit( ViewsFrame _this, XPoint value );
 
 #ifdef __cplusplus
   }

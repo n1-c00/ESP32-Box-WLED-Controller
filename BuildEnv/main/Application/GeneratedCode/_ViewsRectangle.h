@@ -96,6 +96,8 @@ EW_END_OF_FIELDS( ViewsRectangle )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Rectangle' */
 EW_DEFINE_METHODS( ViewsRectangle, CoreRectView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( ViewsRectangle _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )

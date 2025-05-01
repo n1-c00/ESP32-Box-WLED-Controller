@@ -1,3 +1,5 @@
 .vscode/
 BuildEnv/.vscode/
 BuildEnv/.metadata/
+GUI/
+BuildEnv/
