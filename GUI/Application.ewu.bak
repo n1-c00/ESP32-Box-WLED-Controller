@@ -41,7 +41,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::ToggleButton toggleLightButton
   {
-    preset Bounds = <67,93,217,143>;
+    preset Bounds = <216,181,320,240>;
     preset OnUpdate = null;
     preset OnSwitchOn = LightOnSlot;
     preset OnSwitchOff = LightOffSlot;
@@ -69,6 +69,23 @@ class Application : Core::Root
     Application::Device.LedSetMethod("on", "false");
   }
 
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalSlider BrightnessSlider
+  {
+    preset Bounds = <0,181,200,240>;
+    preset OnEnd = BrightnessSlot;
+    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
+  }
+
+  $rect <560,130,760,170>
+  slot BrightnessSlot
+  {
+    var int32 brightnessValue = BrightnessSlider.CurrentValue;
+    var string brightnessString = string(brightnessValue);
+    Application::Device.LedSetMethod("bri", brightnessString);
+
+  }
+
   // Directives to adapt the order of the above members according to how these members 
   // where arranged when the project content was stored. In this manner the storage 
   // and the expected order of the members don't depend. Merging of changes in the 
@@ -80,6 +97,8 @@ class Application : Core::Root
   $member toggleLightButton
   $member LightOnSlot
   $member LightOffSlot
+  $member BrightnessSlider
+  $member BrightnessSlot
 }
 
 // To do:
@@ -306,7 +325,7 @@ class DeviceClass : Templates::DeviceClass
 
 
     native{
-      extern void LedSet(string key, string setpoint);
+      extern void LedSet(const char* key, const char* setpoint);
       LedSet(key, setpoint);
     }
   }

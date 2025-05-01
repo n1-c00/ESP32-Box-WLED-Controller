@@ -321,7 +321,7 @@ void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString
 
   {
     extern void LedSet(const char* key, const char* setpoint);
-    LedSet(key, setpoint);
+    LedSet((const char*) key, (const char*) setpoint);
   }
 }
 

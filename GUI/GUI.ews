@@ -1,6 +1,6 @@
 $version 1.0
 
-attr active = Application::Application;
+attr active = Application::DeviceClass;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
 attr currentCodeInspector = Application::DeviceClass.LedSetMethod;
@@ -31,6 +31,7 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-7,-7>;
   attr zoom = 1.0;
@@ -40,15 +41,13 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <665,-46>;
+  attr scrollTo = <665,-94>;
   attr zoom = 1.0;
 }
 
 view class Application::Application
 {
-  attr enableWireMode = false;
   attr scrollTo = <-169,-31>;
   attr zoom = 1.0;
 }
@@ -64,8 +63,8 @@ codeview Application::DeviceClass.LedSetMethod
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <24,2>;
-  attr codeSelStart = <24,2>;
+  attr codeSelEnd = <28,2>;
+  attr codeSelStart = <28,2>;
 }
 
 codeview Application::Application.LightOnSlot

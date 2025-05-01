@@ -322,11 +322,9 @@ class DeviceClass : Templates::DeviceClass
   $rect <1170,60,1370,100>
   method void LedSetMethod( arg string key, arg string setpoint )
   {
-
-
     native{
       extern void LedSet(const char* key, const char* setpoint);
-      LedSet(key, setpoint);
+      LedSet((const char*) key, (const char*) setpoint);
     }
   }
 

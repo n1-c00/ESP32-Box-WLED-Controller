@@ -14,8 +14,8 @@
 
 ---
 
-### GetBasicInfo
-**Parameters:** `key` (string)  
+### GetSystemInfo
+**Parameters:** `infoType` (string)  
 **Returns:** `response` (string)  
 **Description:**  
 - Retrieves basic system information
