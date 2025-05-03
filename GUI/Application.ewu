@@ -101,30 +101,6 @@ class Application : Core::Root
   $member BrightnessSlot
 }
 
-// To do:
-// 
-// - Open the 'Application' component for editing. It represents your entire GUI. \
-// Use widgets, views, event handlers and effects from the Gallery to assemble there \
-// your desired GUI look and feel.
-// 
-// - Create your own GUI components, widgets, panels, etc. The Gallery folder 'Component \
-// Templates' contains for this purpose various templates you can simply add to the \
-// unit and thus start your own component development.
-// 
-// - You can add your own bitmap and font resources to the unit. Use the templates \
-// 'Bitmap Resource' and 'Font Resource' from the Gallery folder 'Resources' for \
-// this purpose.
-// 
-// - You can add here also constants to store e.g. multilingual text fragments. Use \
-// for this purpose the template 'Constant' from the Gallery folder 'Chora'.
-// 
-// - To add an interface for communication with the target device use the template \
-// 'Device Interface' from the Gallery folder 'Device'.
-note legend Note1
-{
-  attr Bounds = <20,80,710,390>;
-}
-
 $rect <230,20,430,60>
 $output false
 resource Resources::Font Font
@@ -141,7 +117,7 @@ resource Resources::Font Font
   attr fontrowdistance RowDistance;
 }
 
-$rect <730,80,930,120>
+$rect <20,100,220,140>
 inline Inline
 {
   /*
@@ -160,7 +136,7 @@ inline Inline
   */
 }
 
-$rect <730,40,930,80>
+$rect <20,60,220,100>
 $output false
 class DeviceClass : Templates::DeviceClass
 {
@@ -323,8 +299,8 @@ class DeviceClass : Templates::DeviceClass
   method void LedSetMethod( arg string key, arg string setpoint )
   {
     native{
-      extern void LedSet(const char* key, const char* setpoint);
-      LedSet((const char*) key, (const char*) setpoint);
+      extern void LedSet(XString key, XString setpoint);
+      LedSet(key, setpoint);
     }
   }
 
@@ -348,7 +324,7 @@ class DeviceClass : Templates::DeviceClass
   $member LedSetMethod
 }
 
-$rect <930,40,1130,80>
+$rect <230,60,430,100>
 autoobject Application::DeviceClass Device;
 
 // The class 'Application::DeviceClass' implements the interface between the GUI \
@@ -367,5 +343,5 @@ autoobject Application::DeviceClass Device;
 // See also: https://doc.embedded-wizard.de/device-class-and-device-driver
 note legend Note
 {
-  attr Bounds = <1140,40,1640,310>;
+  attr Bounds = <440,19,940,289>;
 }

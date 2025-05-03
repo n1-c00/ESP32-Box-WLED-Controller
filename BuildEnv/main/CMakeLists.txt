@@ -86,7 +86,7 @@ INCLUDE_DIRS
 "TargetSpecific"
 
 
-REQUIRES esp-box-3 esp_lcd_touch esp_lcd_touch_gt911 app_update esp_lcd_ili9341 esp_wifi nvs_flash
+REQUIRES esp-box-3 esp_lcd_touch esp_lcd_touch_gt911 app_update esp_lcd_ili9341 esp_wifi nvs_flash json
 )
 
 

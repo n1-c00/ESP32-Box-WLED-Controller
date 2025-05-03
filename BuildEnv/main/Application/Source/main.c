@@ -15,23 +15,39 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "sdkconfig.h"
+#include "cJSON.h"
+
+//Json object aswell as the initial JSON string
+//ToDo: Make a request to the WLED device to get the current JSON object
+static cJSON *gWledJson = NULL;
+
+static const char *json =
+  "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
+  "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
+  "\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},"
+  "\"udpn\":{\"send\":false,\"recv\":true,\"sgrp\":1,\"rgrp\":1},"
+  "\"lor\":0,\"mainseg\":0,"
+  "\"seg\":[{\"id\":0,\"start\":0,\"stop\":3,\"len\":3,\"grp\":1,"
+  "\"spc\":0,\"of\":0,\"on\":true,\"frz\":false,\"bri\":255,"
+  "\"cct\":127,\"set\":0,\"col\":[[255,160,0],[0,0,0],[0,0,0]],"
+  "\"fx\":0,\"sx\":128,\"ix\":128,\"pal\":0,\"c1\":128,\"c2\":128,"
+  "\"c3\":16,\"sel\":true,\"rev\":false,\"mi\":false,\"o1\":false,"
+  "\"o2\":false,\"o3\":false,\"si\":0,\"m12\":0}]}";
 
 
 /*Includes for Embedded Wizard*/
 #include "ewmain.h"
 #include "ewrte.h"
 #include "ew_bsp_system.h"
-#include "main.h" // Add this include
+#include "main.h"
 
 static const char *TAG = "WLED_control";
 
-/* Constants that aren't configurable in menuconfig */
+/* Web path to the WLED host */
 #define WEB_SERVER "192.168.219.164"
 #define WEB_PORT "80"
 #define WEB_PATH "/json/state"
 
-
-char json[1024] = "{\"on\":true,\"bri\":255,\"transition\":7,\"ps\":-1,\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},\"udpn\":{\"send\":false,\"recv\":true,\"sgrp\":1,\"rgrp\":1},\"lor\":0,\"mainseg\":0,\"seg\":[{\"id\":0,\"start\":0,\"stop\":3,\"len\":3,\"grp\":1,\"spc\":0,\"of\":0,\"on\":true,\"frz\":false,\"bri\":255,\"cct\":127,\"set\":0,\"col\":[[255,160,0],[0,0,0],[0,0,0]],\"fx\":0,\"sx\":128,\"ix\":128,\"pal\":0,\"c1\":128,\"c2\":128,\"c3\":16,\"sel\":true,\"rev\":false,\"mi\":false,\"o1\":false,\"o2\":false,\"o3\":false,\"si\":0,\"m12\":0}]}";
 /* Create a queue to send requests from the frontend to the task, aswell as 2 variables that serve as parameters*/
 
 static QueueHandle_t ew_queue;
@@ -90,7 +106,7 @@ static int _http_POST(char *json_string)
         "\r\n"
         "%s",
         strlen(json_string), json_string);
-    ESP_LOGI(TAG, "... request: %s", request);
+    //ESP_LOGI(TAG, "... request: %s", request);
     
     // Initialize the server address structure
     dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
@@ -127,14 +143,44 @@ static int _http_POST(char *json_string)
 /***********************************************************************
 This function is called by the frontend to send a request into the queue
 ************************************************************************/
-void LedSet(char *key, char *value) // Removed static keyword
+void LedSet(XString key, XString value)
 {
     bool trigger = true;
     
+    EwStringToUtf8(key, (unsigned char *) _key, sizeof(_key)); // Convert XString to char array
+    EwStringToUtf8(value, (unsigned char *) _value, sizeof(_value)); // Convert XString to char array
     
-    ESP_LOGI(TAG, "LedSet called! Key: %s, Value: %s", key, value);
+    //ESP_LOGI(TAG, "LedSet called! Key: %s, Value: %s", _key, _value);
 
     xQueueSend(ew_queue, &trigger, portMAX_DELAY);
+}
+
+/***********************************************************************
+Modify the JSON status object with the given key and value. The function
+will search for the key in the JSON object and modify its value.
+************************************************************************/
+static int _LedModify(char *key, char *value)
+{
+    if (strcmp(key, "on") == 0) {
+        bool b = (strcmp(value, "true") == 0);
+        cJSON_ReplaceItemInObject(gWledJson,
+                                  key,
+                                  cJSON_CreateBool(b));
+        return 0;
+    }
+    else if (strcmp(key, "bri") == 0) {
+        // Helligkeit (0–255)
+        int v = atoi(value);
+        if (v < 0) v = 0;
+        if (v > 255) v = 255;
+        cJSON_ReplaceItemInObject(gWledJson,
+                                  key,
+                                  cJSON_CreateNumber(v));
+        return 0;
+    }
+    else {
+        return -1; // Fehler: unbekannter Key
+    }
 }
 
 /************************************************************ 
@@ -148,15 +194,15 @@ static void _wled_api_task(void *pvParameters)
     while(1){
         /* Start if there is sth in the queue*/
         if(xQueueReceive(ew_queue, &trigger, portMAX_DELAY)){
-            // int r = _LedModify(_key, _value);
-            // if (r == 0) {
-            //     ESP_LOGI(TAG, "Sucessfully modified the local JSON object.");
-            //     continue;
-            // } else {
-            //     ESP_LOGE(TAG, "Failed to modify the local JSON object.");
-            // }
+            int r = _LedModify(_key, _value);
+            if (r == 0) {
+                ESP_LOGI(TAG, "Sucessfully modified the local JSON object.");
+            } else {
+                ESP_LOGE(TAG, "Failed to modify the local JSON object.");
+                continue;
+            }
 
-            int r = _http_POST(json); // Send the HTTP request to the WLED device
+            r = _http_POST(cJSON_PrintUnformatted(gWledJson)); // Send the HTTP request to the WLED device
             if (r == 0) {
                 ESP_LOGI(TAG, "HTTP request sent successfully.");
             } else {
@@ -176,10 +222,13 @@ static void _wled_api_task(void *pvParameters)
 void app_main(void)
 {
     /* Set up the flash-storage for the Wi-Fi module*/
-    ESP_ERROR_CHECK( nvs_flash_init() );
+    ESP_ERROR_CHECK(nvs_flash_init() );
     ESP_ERROR_CHECK(esp_netif_init());
     /* Create a event loop where our code will be handled */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+    /* Initialize the JSON object with the default values */
+    gWledJson = cJSON_Parse(json);
 
     /* Create a queue to send requests from the frontend to the task*/
     ew_queue = xQueueCreate(1, sizeof(bool));

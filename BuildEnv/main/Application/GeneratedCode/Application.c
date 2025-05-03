@@ -320,8 +320,8 @@ void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString
   EW_UNUSED_ARG( key );
 
   {
-    extern void LedSet(const char* key, const char* setpoint);
-    LedSet((const char*) key, (const char*) setpoint);
+    extern void LedSet(XString key, XString setpoint);
+    LedSet(key, setpoint);
   }
 }
 
