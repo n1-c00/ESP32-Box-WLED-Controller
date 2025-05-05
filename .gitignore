@@ -1,5 +1,5 @@
+# VS Code settings
 .vscode/
+
+# Build environment files
 BuildEnv/.vscode/
-BuildEnv/.metadata/
-GUI/
-BuildEnv/
