@@ -1,0 +1,15 @@
+Configuring in: C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests\build\default
+cmake -G MinGW Makefiles -DCMAKE_EXPORT_COMPILE_COMMANDS=ON C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests
+Error: build command 'cmake' not found
+Configuring in: C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests\build\default
+cmake -G MinGW Makefiles -DCMAKE_EXPORT_COMPILE_COMMANDS=ON C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests
+Error: build command 'cmake' not found
+Configuring in: C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests\build\default
+cmake -G MinGW Makefiles -DCMAKE_EXPORT_COMPILE_COMMANDS=ON C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests
+Error: build command 'cmake' not found
+Configuring in: C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests\build\default
+cmake -G MinGW Makefiles -DCMAKE_EXPORT_COMPILE_COMMANDS=ON C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests
+Error: build command 'cmake' not found
+Configuring in: C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests\build\default
+cmake -G MinGW Makefiles -DCMAKE_EXPORT_COMPILE_COMMANDS=ON C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\managed_components\lvgl__lvgl\tests
+Error: build command 'cmake' not found

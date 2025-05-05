@@ -1191,6 +1191,7 @@ void WidgetSetHorizontalSlider__Init( WidgetSetHorizontalSlider _this, XObject a
   CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000B );
   CoreSimpleTouchHandler_OnSetRetargetOffset( &_this->TouchHandler, 16 );
   CoreSimpleTouchHandler_OnSetMaxStrikeCount( &_this->TouchHandler, 100 );
+  _this->MaxValue = 100;
   _this->CurrentValue = 50;
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->TouchHandler ), 0 );
   _this->RepetitionTimer.OnTrigger = EwNewSlot( _this, WidgetSetHorizontalSlider_onRepetitionTimer );
@@ -1599,8 +1600,11 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
 
   minPos = marginLeft;
   maxPos = EwGetRectW( area ) - marginRight;
-  newThumbPos = (XInt32)(((XFloat)WidgetSetHorizontalSlider_OnGetCurrentValue( _this ) 
-  * (XFloat)( maxPos - minPos )) / 100.0f ) + minPos;
+  newThumbPos = marginLeft;
+
+  if ( _this->MaxValue != 0 )
+    newThumbPos = (XInt32)(((XFloat)WidgetSetHorizontalSlider_OnGetCurrentValue( 
+    _this ) * (XFloat)( maxPos - minPos )) / (XFloat)_this->MaxValue ) + minPos;
 
   if ( newThumbPos < marginLeft )
     newThumbPos = marginLeft;
@@ -1715,7 +1719,8 @@ void WidgetSetHorizontalSlider_onRepetitionTimer( WidgetSetHorizontalSlider _thi
   newValue = oldValue;
   delta = 1;
 
-  if ( _this->KeyHandlerLeft.Down )
+  if (( _this->KeyHandlerLeft.Down && ( _this->MaxValue > 0 )) || ( _this->KeyHandlerRight.Down 
+      && ( _this->MaxValue < 0 )))
     delta = -1;
 
   if ( oldValue < 0 )
@@ -1772,7 +1777,9 @@ void WidgetSetHorizontalSlider_onPressKey( WidgetSetHorizontalSlider _this, XObj
   newValue = oldValue;
   delta = 1;
 
-  if ( sender == ((XObject)&_this->KeyHandlerLeft ))
+  if ((( sender == ((XObject)&_this->KeyHandlerLeft )) && ( _this->MaxValue > 0 )) 
+      || (( sender == ((XObject)&_this->KeyHandlerRight )) && ( _this->MaxValue 
+      < 0 )))
     delta = -1;
 
   if ( oldValue < 0 )
@@ -1838,8 +1845,8 @@ void WidgetSetHorizontalSlider_onDragTouch( WidgetSetHorizontalSlider _this, XOb
     maxPos = maxPos - EwGetRectW( _this->imageView->Super1.Bounds );
 
   if ( maxPos > minPos )
-    newValue = (XInt32)(((XFloat)delta.X * 100.0f ) / (XFloat)( maxPos - minPos )) 
-    + _this->touchStartValue;
+    newValue = (XInt32)(((XFloat)delta.X * (XFloat)_this->MaxValue ) / (XFloat)( 
+    maxPos - minPos )) + _this->touchStartValue;
 
   WidgetSetHorizontalSlider_OnSetCurrentValue( _this, newValue );
 
@@ -1902,16 +1909,38 @@ void WidgetSetHorizontalSlider_onPressTouch( WidgetSetHorizontalSlider _this, XO
   _this->touchStartValue = WidgetSetHorizontalSlider_OnGetCurrentValue( _this );
 }
 
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetMaxValue()' */
+void WidgetSetHorizontalSlider_OnSetMaxValue( WidgetSetHorizontalSlider _this, XInt32 
+  value )
+{
+  if ( _this->MaxValue == value )
+    return;
+
+  _this->MaxValue = value;
+  CoreGroup_InvalidateViewState((CoreGroup)_this );
+}
+
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.OnGetCurrentValue()' */
 XInt32 WidgetSetHorizontalSlider_OnGetCurrentValue( WidgetSetHorizontalSlider _this )
 {
   XInt32 value = _this->CurrentValue;
 
-  if ( value < 0 )
-    value = 0;
+  if ( 0 > _this->MaxValue )
+  {
+    if ( value < _this->MaxValue )
+      value = _this->MaxValue;
 
-  if ( value > 100 )
-    value = 100;
+    if ( value > 0 )
+      value = 0;
+  }
+  else
+  {
+    if ( value < 0 )
+      value = 0;
+
+    if ( value > _this->MaxValue )
+      value = _this->MaxValue;
+  }
 
   return value;
 }

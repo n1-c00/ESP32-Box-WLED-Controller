@@ -1,8 +1,9 @@
 $version 1.0
 
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.LedSetMethod;
+attr currentCodeInspector = Application::Application.BrightnessSlot;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -32,7 +33,7 @@ view Project
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-7,-7>;
+  attr scrollTo = <-7,-13>;
   attr zoom = 1.0;
 }
 
@@ -42,14 +43,14 @@ view unit Application
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <13,-223>;
+  attr scrollTo = <13,-63>;
   attr zoom = 1.25;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-169,-31>;
+  attr scrollTo = <-169,-15>;
   attr zoom = 1.0;
 }
 
@@ -60,12 +61,26 @@ view class Application::DeviceClass
   attr zoom = 1.0;
 }
 
+view class WidgetSet::HorizontalSlider
+{
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
+}
+
+view profile Profile
+{
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
+}
+
 codeview Application::DeviceClass.LedSetMethod
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <41,1>;
-  attr codeSelStart = <41,1>;
+  attr codeSelEnd = <42,1>;
+  attr codeSelStart = <42,1>;
 }
 
 codeview Application::Application.LightOnSlot
@@ -88,6 +103,6 @@ codeview Application::Application.BrightnessSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <59,0>;
-  attr codeSelStart = <59,0>;
+  attr codeSelEnd = <71,3>;
+  attr codeSelStart = <71,3>;
 }

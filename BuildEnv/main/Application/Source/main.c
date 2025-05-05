@@ -22,7 +22,7 @@
 static cJSON *gWledJson = NULL;
 
 static const char *json =
-  "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
+  "{\"on\":false,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
   "\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},"
   "\"udpn\":{\"send\":false,\"recv\":true,\"sgrp\":1,\"rgrp\":1},"
