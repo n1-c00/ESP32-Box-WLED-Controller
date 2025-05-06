@@ -93,27 +93,24 @@ void LedSet(XString key, XString value)
 Modify the JSON status object with the given key and value. The function
 will search for the key in the JSON object and modify its value.
 ************************************************************************/
-static int _LedModify(char *key, char *value)
+static int _LedModify(char *key, char *value, char *dataType)
 {
-    if (strcmp(key, "on") == 0) {
+    if (strcmp(dataType, "bool") == 0) {
         bool b = (strcmp(value, "true") == 0);
         cJSON_ReplaceItemInObject(gWledJson,
                                   key,
                                   cJSON_CreateBool(b));
         return 0;
     }
-    else if (strcmp(key, "bri") == 0) {
-        // Helligkeit (0–255)
+    else if (strcmp(dataType, "num") == 0) {
         int v = atoi(value);
-        if (v < 0) v = 0;
-        if (v > 255) v = 255;
         cJSON_ReplaceItemInObject(gWledJson,
                                   key,
                                   cJSON_CreateNumber(v));
         return 0;
     }
     else {
-        return -1; // Fehler: unbekannter Key
+        return -1; // error: unknown Key
     }
 }
 
