@@ -23,9 +23,14 @@
 //ToDo: Make a request to the WLED device to get the current JSON object
 static cJSON *gWledJson = NULL;
 
+<<<<<<< HEAD
 static char *json; // Buffer for the JSON string
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
+=======
+static const char *json =
+  "{\"on\":false,\"bri\":40,\"transition\":7,\"ps\":-1,"
+>>>>>>> 7e41905f7edf0a682ee762cfe90d08dd8c5eb8b1
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
   "\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},"
   "\"udpn\":{\"send\":false,\"recv\":true,\"sgrp\":1,\"rgrp\":1},"

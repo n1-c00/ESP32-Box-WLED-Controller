@@ -150,6 +150,10 @@ EW_DEFINE_FIELDS( WidgetSetHorizontalSlider, CoreGroup )
   EW_PROPERTY( Appearance,      WidgetSetHorizontalSliderConfig )
   EW_PROPERTY( OnEnd,           XSlot )
   EW_VARIABLE( touchStartValue, XInt32 )
+<<<<<<< HEAD
+=======
+  EW_PROPERTY( MaxValue,        XInt32 )
+>>>>>>> 7e41905f7edf0a682ee762cfe90d08dd8c5eb8b1
   EW_PROPERTY( CurrentValue,    XInt32 )
   EW_VARIABLE( prevState,       XChar )
   EW_VARIABLE( touchActive,     XBool )
@@ -232,6 +236,13 @@ void WidgetSetHorizontalSlider_onReleaseTouch( WidgetSetHorizontalSlider _this,
 void WidgetSetHorizontalSlider_onPressTouch( WidgetSetHorizontalSlider _this, XObject 
   sender );
 
+<<<<<<< HEAD
+=======
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetMaxValue()' */
+void WidgetSetHorizontalSlider_OnSetMaxValue( WidgetSetHorizontalSlider _this, XInt32 
+  value );
+
+>>>>>>> 7e41905f7edf0a682ee762cfe90d08dd8c5eb8b1
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.OnGetCurrentValue()' */
 XInt32 WidgetSetHorizontalSlider_OnGetCurrentValue( WidgetSetHorizontalSlider _this );
 

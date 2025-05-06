@@ -78,6 +78,8 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
   WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
   CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
+  WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
+  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
