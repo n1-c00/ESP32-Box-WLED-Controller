@@ -41,7 +41,7 @@ $rect <540,70,740,110>
 language Default;
 
 // This unit is intended to contain the application class and other GUI components.
-$rect <290,190,490,230>
+$rect <290,230,490,270>
 unit Application
 {
   attr Directory = .\;
@@ -50,19 +50,19 @@ unit Application
 // Mosaic Framework
 note group Note1
 {
-  attr Bounds = <20,20,260,290>;
+  attr Bounds = <20,20,260,360>;
 }
 
 // Profile Configuration
 note group Note2
 {
-  attr Bounds = <270,20,510,130>;
+  attr Bounds = <270,20,510,180>;
 }
 
 // Languages
 note group Note3
 {
-  attr Bounds = <520,20,760,130>;
+  attr Bounds = <520,20,760,180>;
 }
 
 // To do:
@@ -79,13 +79,13 @@ note group Note3
 // the Gallery folder 'Chora'.
 note legend Note4
 {
-  attr Bounds = <20,450,760,670>;
+  attr Bounds = <20,520,760,740>;
 }
 
 // Project Units
 note group Note5
 {
-  attr Bounds = <270,140,760,290>;
+  attr Bounds = <270,190,760,360>;
 }
 
 // Welcome to Embedded Wizard!
@@ -97,7 +97,7 @@ note group Note5
 // https://doc.embedded-wizard.de
 note legend Note
 {
-  attr Bounds = <20,300,760,440>;
+  attr Bounds = <20,370,760,510>;
 }
 
 // This is a profile member for the project. This profile controls the code generation \

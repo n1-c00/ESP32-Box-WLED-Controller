@@ -15,13 +15,16 @@
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
 #include "sdkconfig.h"
+
 #include "cJSON.h"
+#include "httpTasks/httpTasks.h"
 
 //Json object aswell as the initial JSON string
 //ToDo: Make a request to the WLED device to get the current JSON object
 static cJSON *gWledJson = NULL;
 
-static const char *json =
+static char *json; // Buffer for the JSON string
+static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
   "\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},"
@@ -39,14 +42,8 @@ static const char *json =
 #include "ewmain.h"
 #include "ewrte.h"
 #include "ew_bsp_system.h"
-#include "main.h"
 
 static const char *TAG = "WLED_control";
-
-/* Web path to the WLED host */
-#define WEB_SERVER "192.168.219.164"
-#define WEB_PORT "80"
-#define WEB_PATH "/json/state"
 
 /* Create a queue to send requests from the frontend to the task, aswell as 2 variables that serve as parameters*/
 
@@ -54,91 +51,23 @@ static QueueHandle_t ew_queue;
 char _key[20];
 char _value[20];
 
-
-/**************************************************************************
-  The GUI_Task() function implements the main loop of the Embedded Wizard
-**************************************************************************/
-void _GUI_Task(void *pvParameters)
+void JsonInit()
 {
-  unsigned int stack;
+    char *recv_json;
 
-  /* determine the stack area and provide it to the Runtime Environmnet */
-  EwSetStackAddressArea( &stack, (void*)((unsigned int)&stack - EW_GUI_THREAD_STACK_SIZE ));
+    recv_json = http_GET(); // Get the current JSON object from the WLED device
 
-  /* initialize system */
-  EwBspSystemInit();
-
-  /* initialize Embedded Wizard application */
-  if ( EwInit() == 0 )
-    return;
-
-  EwPrintSystemInfo();
-
-  /* process the Embedded Wizard main loop */
-  while( EwProcess())
-    ;
-
-  /* de-initialize Embedded Wizard application */
-  EwDone();
-
-  /* terminate the system */
-  EwBspSystemDone();
-}
-
-/**************************************************************************
-  This function sends the HTTP POST request to the WLED device with the
-  givel local JSON object. If the response code is 0, the request was
-  successful.
-**************************************************************************/
-static int _http_POST(char *json_string)
-{
-    struct sockaddr_in dest_addr;
-    int s;
-    char request[2048];
-
-    // Create the complete HTTP request with headers and body
-    snprintf(request, sizeof(request),
-        "POST " WEB_PATH " HTTP/1.0\r\n"
-        "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
-        "User-Agent: esp-idf/1.0 esp32\r\n"
-        "Content-Type: application/json\r\n"
-        "Content-Length: %d\r\n"
-        "\r\n"
-        "%s",
-        strlen(json_string), json_string);
-    //ESP_LOGI(TAG, "... request: %s", request);
+    //check if the request was successful
+    if (recv_json == NULL) {
+        ESP_LOGE(TAG, "Failed to get JSON object. Using default JSON.");
+        gWledJson = cJSON_Parse(default_json); // Parse the default JSON string
+        return;
+    }
     
-    // Initialize the server address structure
-    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
-    dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = htons(atoi(WEB_PORT));
-
-    // Create socket
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if(s < 0) {
-        ESP_LOGE(TAG, "... Failed to allocate socket.");
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-    ESP_LOGI(TAG, "... allocated socket");
-    
-    // Connect to the server
-    if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
-       ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
-        close(s);
-        return -1;
-    }
-
-        ESP_LOGI(TAG, "... connected");
-
-    if (write(s, request, strlen(request)) < 0) { // Changed REQUEST to request
-        ESP_LOGE(TAG, "... socket send failed");
-        close(s);
-        return -1;
-    }
-    ESP_LOGI(TAG, "... socket send success");
-    return 0; // Return 0 to indicate success
+    json = strstr(recv_json, "{"); // Find the start of the JSON object
+    gWledJson = cJSON_Parse(json); // Parse the JSON object
+    ESP_LOGI(TAG, "set light state (json) to: %s", json); // Log the JSON object
 }
-
 
 /***********************************************************************
 This function is called by the frontend to send a request into the queue
@@ -202,17 +131,47 @@ static void _wled_api_task(void *pvParameters)
                 continue;
             }
 
-            r = _http_POST(cJSON_PrintUnformatted(gWledJson)); // Send the HTTP request to the WLED device
+            r = http_POST(cJSON_PrintUnformatted(gWledJson)); // Send the HTTP request to the WLED device
             if (r == 0) {
                 ESP_LOGI(TAG, "HTTP request sent successfully.");
             } else {
                 ESP_LOGE(TAG, "Failed to send HTTP request. Response code: %d", r);
                 continue;
             }
-        //ToDo: Add a callback function to the frontend to update the UI
         }
     }
 }
+
+/**************************************************************************
+  The GUI_Task() function implements the main loop of the Embedded Wizard
+**************************************************************************/
+void _GUI_task(void *pvParameters)
+{
+  unsigned int stack;
+
+  /* determine the stack area and provide it to the Runtime Environmnet */
+  EwSetStackAddressArea( &stack, (void*)((unsigned int)&stack - EW_GUI_THREAD_STACK_SIZE ));
+
+  /* initialize system */
+  EwBspSystemInit();
+
+  /* initialize Embedded Wizard application */
+  if ( EwInit() == 0 )
+    return;
+
+  EwPrintSystemInfo();
+
+  /* process the Embedded Wizard main loop */
+  while( EwProcess())
+    ;
+
+  /* de-initialize Embedded Wizard application */
+  EwDone();
+
+  /* terminate the system */
+  EwBspSystemDone();
+}
+
 
 
 /**************************************************************************
@@ -227,15 +186,14 @@ void app_main(void)
     /* Create a event loop where our code will be handled */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    /* Initialize the JSON object with the default values */
-    gWledJson = cJSON_Parse(json);
+    JsonInit(); // Initialize the JSON object
 
     /* Create a queue to send requests from the frontend to the task*/
     ew_queue = xQueueCreate(1, sizeof(bool));
 
     
     /* Start the GUI task */
-    xTaskCreate(&_GUI_Task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
+    xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
 
     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
      * Read "Establishing Wi-Fi or Ethernet Connection" section in

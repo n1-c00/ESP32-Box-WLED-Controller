@@ -5,7 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:/Users/nicoz/esp/**",
-                "C:/Users/nicoz/esp/v5.4/esp-idf"
+                "C:/Users/nicoz/esp/v5.4/esp-idf/**"
             ],
             "defines": [
                 "_DEBUG",

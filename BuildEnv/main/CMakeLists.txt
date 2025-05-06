@@ -66,6 +66,7 @@ idf_component_register(SRCS
 "Application/Source/main.c"
 "Application/Source/ewmain.c"
 "Application/Source/DeviceDriver.c"
+"Application/Source/httpTasks/httpTasks.c"
 ${EMWIFILES}
 ${EMWI_RTE_FILES}
 ${EMWI_GFX_FILES}
@@ -79,10 +80,10 @@ ${EMWI_GFX_FILES}
 
 INCLUDE_DIRS
 "Application/Source"
+"Application/Source/httpTasks"
 "Application/GeneratedCode"
 "PlatformPackage/RTE"
 "PlatformPackage/${EMWI_COLOR_FORMAT}"
-
 "TargetSpecific"
 
 
