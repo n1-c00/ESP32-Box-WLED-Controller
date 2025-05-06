@@ -67,7 +67,7 @@ void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg );
 
 /* 'C' function for method : 'Application::DeviceClass.LedSetMethod()' */
 void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString 
-  key, XString setpoint );
+  key, XString setpoint, XString dataType );
 
 #ifdef __cplusplus
   }

@@ -60,7 +60,7 @@ class Application : Core::Root
   // new created Slots for LED Controlls
   note group Note
   {
-    attr Bounds = <550,-10,850,190>;
+    attr Bounds = <550,-10,850,250>;
   }
 
   $rect <560,80,760,120>
@@ -74,13 +74,15 @@ class Application : Core::Root
   {
     preset Bounds = <0,181,200,240>;
     preset OnEnd = BrightnessSlot;
+    preset MaxValue = 255;
+    preset CurrentValue = 40;
     preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
   }
 
   $rect <560,130,760,170>
   slot BrightnessSlot
   {
-    var uint8 brightnessValue = BrightnessSlider.CurrentValue;
+    var int32 brightnessValue = BrightnessSlider.CurrentValue;
     var string brightnessString = string(brightnessValue);
     Application::Device.LedSetMethod("bri", brightnessString);
 
