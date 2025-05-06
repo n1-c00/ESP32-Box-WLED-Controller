@@ -2,7 +2,7 @@ $version 1.0
 
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.LedSetMethod;
+attr currentCodeInspector = Application::Application.BrightnessSlot;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;

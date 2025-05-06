@@ -55,6 +55,7 @@ static const char *TAG = "WLED_control";
 static QueueHandle_t ew_queue;
 char _key[20];
 char _value[20];
+char _dataType[20];
 
 void JsonInit()
 {
@@ -77,12 +78,13 @@ void JsonInit()
 /***********************************************************************
 This function is called by the frontend to send a request into the queue
 ************************************************************************/
-void LedSet(XString key, XString value)
+void LedSet(XString key, XString value, XString dataType)
 {
     bool trigger = true;
     
     EwStringToUtf8(key, (unsigned char *) _key, sizeof(_key)); // Convert XString to char array
     EwStringToUtf8(value, (unsigned char *) _value, sizeof(_value)); // Convert XString to char array
+    EwStringToUtf8(dataType, (unsigned char *) _dataType, sizeof(_dataType)); // Convert XString to char array
     
     //ESP_LOGI(TAG, "LedSet called! Key: %s, Value: %s", _key, _value);
 
