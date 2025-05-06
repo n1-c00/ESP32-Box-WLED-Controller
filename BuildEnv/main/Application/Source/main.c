@@ -127,7 +127,7 @@ static void _wled_api_task(void *pvParameters)
     while(1){
         /* Start if there is sth in the queue*/
         if(xQueueReceive(ew_queue, &trigger, portMAX_DELAY)){
-            int r = _LedModify(_key, _value);
+            int r = _LedModify(_key, _value, _dataType);
             if (r == 0) {
                 ESP_LOGI(TAG, "Sucessfully modified the local JSON object.");
             } else {
