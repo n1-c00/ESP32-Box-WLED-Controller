@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -170,6 +170,8 @@ EW_END_OF_FIELDS( CoreRoot )
 
 /* Virtual Method Table (VMT) for the class : 'Core::Root' */
 EW_DEFINE_METHODS( CoreRoot, CoreGroup )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreRoot _this )
   EW_METHOD( Draw,              void )( CoreRoot _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -190,6 +192,7 @@ EW_DEFINE_METHODS( CoreRoot, CoreGroup )
   EW_METHOD( DispatchEvent,     XObject )( CoreRoot _this, CoreEvent aEvent )
   EW_METHOD( BroadcastEvent,    XObject )( CoreRoot _this, CoreEvent aEvent, XSet 
     aFilter )
+  EW_METHOD( UpdateViewState,   void )( CoreGroup _this, XSet aState )
   EW_METHOD( InvalidateArea,    void )( CoreRoot _this, XRect aArea )
 EW_END_OF_METHODS( CoreRoot )
 
@@ -557,6 +560,44 @@ XBool CoreRoot__DriveMultiTouchHitting( void* _this, XBool aDown, XInt32 aFinger
    of the events. */
 CoreView CoreRoot_RetargetCursorWithReason( CoreRoot _this, CoreView aNewTarget, 
   CoreView aFallbackTarget, CoreView aStartView, XSet aRetargetReason );
+
+/* The method RetargetCursor() changes the currently active cursor event target 
+   view. Usually, the target view is determined when the user presses the finger 
+   on the touch screen. Once determined, the target view remains active until the 
+   user has released the finger. In the meantime the framework will provide this 
+   target view with all cursor events. This entire cycle is called 'grab cycle'. 
+   The method RetargetCursor() allows you to select a new target view without the 
+   necessity to wait until the user has released the touch screen and thus has finalized 
+   the grab cycle.
+   At first the method asks the new potential target view aNewTarget whether it 
+   or one of its sub-views is willing to handle the cursor events. If successful, 
+   the method hands over the cursor event flow to this determined view. If there 
+   is no view willing to handle these events, the method hands over the event flow 
+   directly to the view specified in the parameter aFallbackTarget. If no willing 
+   view could be found and no fall-back view was given, the current grab cycle is 
+   finalized as if the user had released the touch screen.
+   Unlike the method @DeflectCursor() this RetargetCursor() method performs the 
+   cursor hit test for all views of the new potential target. This is as if the 
+   user had tapped the screen and the framework tries to determine the view affected 
+   by this interaction. This search operation is limited to views at the current 
+   cursor position.
+   The parameter aStartView, if it is not 'null', restricts the operation to be 
+   handled by the specified view or another view lying behind it. In other words, 
+   views found in front of aStartView are not taken in account during the hit-test 
+   operation.
+   When switching the target view, the framework provides the old and the new target 
+   views with cursor events. The old view will receive a Core::CursorEvent with 
+   variables Down == 'false' and AutoDeflected == 'true' - this simulates the release 
+   operations. The new target view will receive a Core::CursorEvent with the variable 
+   Down == 'true' as if it had been just touched by the user.
+   If the application is running within a multi-touch environment, the invocation 
+   of the RetargetCursor() method does affect the event flow corresponding only 
+   to the finger which has lastly generated touch events.
+   The return value of the method identifies the view which becomed the new target 
+   of the events.
+   Please note the alternative version of this method @RetargetCursorWithReason(). */
+CoreView CoreRoot_RetargetCursor( CoreRoot _this, CoreView aNewTarget, CoreView 
+  aFallbackTarget, CoreView aStartView );
 
 /* The method DeflectCursor() changes the currently active cursor event target view. 
    Usually, the target view is determined when the user presses the finger on the 

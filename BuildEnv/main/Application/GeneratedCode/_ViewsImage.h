@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -124,12 +124,15 @@ EW_DEFINE_FIELDS( ViewsImage, CoreRectView )
   EW_PROPERTY( Bitmap,          ResourcesBitmap )
   EW_VARIABLE( startTime,       XUInt32 )
   EW_VARIABLE( animFrameNumber, XInt32 )
-  EW_PROPERTY( AutoSize,        XBool )
+  EW_PROPERTY( Color,           XColor )
+  EW_PROPERTY( FrameNumber,     XInt32 )
   EW_PROPERTY( Animated,        XBool )
 EW_END_OF_FIELDS( ViewsImage )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Image' */
 EW_DEFINE_METHODS( ViewsImage, CoreRectView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( ViewsImage _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -182,11 +185,14 @@ void ViewsImage_observerSlot( ViewsImage _this, XObject sender );
 /* 'C' function for method : 'Views::Image.timerSlot()' */
 void ViewsImage_timerSlot( ViewsImage _this, XObject sender );
 
-/* 'C' function for method : 'Views::Image.OnSetAutoSize()' */
-void ViewsImage_OnSetAutoSize( ViewsImage _this, XBool value );
+/* 'C' function for method : 'Views::Image.OnSetColor()' */
+void ViewsImage_OnSetColor( ViewsImage _this, XColor value );
 
 /* 'C' function for method : 'Views::Image.OnSetAnimated()' */
 void ViewsImage_OnSetAnimated( ViewsImage _this, XBool value );
+
+/* 'C' function for method : 'Views::Image.OnSetFrameNumber()' */
+void ViewsImage_OnSetFrameNumber( ViewsImage _this, XInt32 value );
 
 /* 'C' function for method : 'Views::Image.OnSetBitmap()' */
 void ViewsImage_OnSetBitmap( ViewsImage _this, ResourcesBitmap value );

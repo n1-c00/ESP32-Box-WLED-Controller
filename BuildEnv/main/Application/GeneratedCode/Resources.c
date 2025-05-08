@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -418,6 +418,12 @@ EW_END_OF_CLASS_VARIANTS( ResourcesFont )
 EW_DEFINE_CLASS( ResourcesFont, CoreResource, _.VMT, _.VMT, _.VMT, _.VMT, _.VMT, 
                  _.VMT, "Resources::Font" )
 EW_END_OF_CLASS( ResourcesFont )
+
+/* Include a file containing the font resource : 'Resources::FontLarge' */
+#include "_ResourcesFontLarge.h"
+
+/* Table with links to derived variants of the font resource : 'Resources::FontLarge' */
+EW_RES_WITHOUT_VARIANTS( ResourcesFontLarge )
 
 /* Initializer for the class 'Resources::FontSet' */
 void ResourcesFontSet__Init( ResourcesFontSet _this, XObject aLink, XHandle aArg )

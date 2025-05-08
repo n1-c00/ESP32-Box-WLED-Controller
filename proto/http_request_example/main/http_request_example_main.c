@@ -26,7 +26,7 @@
 static const char *TAG = "WLED_control";
 
 /* Constants that aren't configurable in menuconfig */
-#define WEB_SERVER "192.168.150.164"  // Remove http:// and trailing slash
+#define WEB_SERVER "192.168.150.164"
 #define WEB_PORT "80"
 #define WEB_PATH "/win&T=2"
 

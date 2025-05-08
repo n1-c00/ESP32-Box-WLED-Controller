@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -128,6 +128,9 @@
    the handlers during the design time. */
 EW_DEFINE_FIELDS( CoreSimpleTouchHandler, CoreQuadView )
   EW_PROPERTY( OnDrag,          XSlot )
+  EW_PROPERTY( OnLeave,         XSlot )
+  EW_PROPERTY( OnEnter,         XSlot )
+  EW_PROPERTY( OnRelease,       XSlot )
   EW_PROPERTY( OnPress,         XSlot )
   EW_VARIABLE( state,           XUInt32 )
   EW_VARIABLE( Finger,          XInt32 )
@@ -137,6 +140,8 @@ EW_DEFINE_FIELDS( CoreSimpleTouchHandler, CoreQuadView )
   EW_VARIABLE( Offset,          XPoint )
   EW_VARIABLE( HittingPos,      XPoint )
   EW_VARIABLE( CurrentPos,      XPoint )
+  EW_PROPERTY( RetargetOffset,  XInt32 )
+  EW_PROPERTY( MaxStrikeCount,  XInt32 )
   EW_VARIABLE( multiFingerDelay, XInt16 )
   EW_VARIABLE( entered,         XBool )
   EW_VARIABLE( AutoDeflected,   XBool )
@@ -146,6 +151,8 @@ EW_END_OF_FIELDS( CoreSimpleTouchHandler )
 
 /* Virtual Method Table (VMT) for the class : 'Core::SimpleTouchHandler' */
 EW_DEFINE_METHODS( CoreSimpleTouchHandler, CoreQuadView )
+  EW_METHOD( initLayoutContext, void )( CoreQuadView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( CoreSimpleTouchHandler _this, GraphicsCanvas 
     aCanvas, XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -246,6 +253,17 @@ XObject CoreSimpleTouchHandler_HandleEvent( CoreSimpleTouchHandler _this, CoreEv
 CoreCursorHit CoreSimpleTouchHandler_CursorHitTest( CoreSimpleTouchHandler _this, 
   XRect aArea, XInt32 aFinger, XInt32 aStrikeCount, CoreView aDedicatedView, CoreView 
   aStartView, XSet aRetargetReason );
+
+/* 'C' function for method : 'Core::SimpleTouchHandler.OnSetRetargetOffset()' */
+void CoreSimpleTouchHandler_OnSetRetargetOffset( CoreSimpleTouchHandler _this, XInt32 
+  value );
+
+/* 'C' function for method : 'Core::SimpleTouchHandler.OnSetMaxStrikeCount()' */
+void CoreSimpleTouchHandler_OnSetMaxStrikeCount( CoreSimpleTouchHandler _this, XInt32 
+  value );
+
+/* 'C' function for method : 'Core::SimpleTouchHandler.OnSetEnabled()' */
+void CoreSimpleTouchHandler_OnSetEnabled( CoreSimpleTouchHandler _this, XBool value );
 
 #ifdef __cplusplus
   }

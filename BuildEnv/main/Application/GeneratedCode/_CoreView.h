@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -66,6 +66,12 @@
 #define _CoreLayoutContext_
 #endif
 
+/* Forward declaration of the class Core::Outline */
+#ifndef _CoreOutline_
+  EW_DECLARE_CLASS( CoreOutline )
+#define _CoreOutline_
+#endif
+
 /* Forward declaration of the class Core::Root */
 #ifndef _CoreRoot_
   EW_DECLARE_CLASS( CoreRoot )
@@ -103,10 +109,14 @@ EW_DEFINE_FIELDS( CoreView, XObject )
   EW_VARIABLE( Owner,           CoreGroup )
   EW_VARIABLE( layoutContext,   CoreLayoutContext )
   EW_VARIABLE( viewState,       XSet )
+  EW_PROPERTY( StackingPriority, XInt32 )
+  EW_PROPERTY( Layout,          XSet )
 EW_END_OF_FIELDS( CoreView )
 
 /* Virtual Method Table (VMT) for the class : 'Core::View' */
 EW_DEFINE_METHODS( CoreView, XObject )
+  EW_METHOD( initLayoutContext, void )( CoreView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( CoreView _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -121,6 +131,18 @@ EW_DEFINE_METHODS( CoreView, XObject )
   EW_METHOD( GetExtent,         XRect )( CoreView _this )
   EW_METHOD( ChangeViewState,   void )( CoreView _this, XSet aSetState, XSet aClearState )
 EW_END_OF_METHODS( CoreView )
+
+/* 'C' function for method : 'Core::View.initLayoutContext()' */
+void CoreView_initLayoutContext( CoreView _this, XRect aBounds, CoreOutline aOutline );
+
+/* Wrapper function for the virtual method : 'Core::View.initLayoutContext()' */
+void CoreView__initLayoutContext( void* _this, XRect aBounds, CoreOutline aOutline );
+
+/* 'C' function for method : 'Core::View.OnSetStackingPriority()' */
+void CoreView_OnSetStackingPriority( CoreView _this, XInt32 value );
+
+/* 'C' function for method : 'Core::View.OnSetLayout()' */
+void CoreView_OnSetLayout( CoreView _this, XSet value );
 
 /* The method GetRoot() delivers the application object, this view belongs to. The 
    application object represents the entire screen of the GUI application. Thus 

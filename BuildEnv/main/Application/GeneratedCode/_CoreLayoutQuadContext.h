@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -50,9 +50,19 @@
 #define _CoreLayoutQuadContext_
 #endif
 
+/* Forward declaration of the class Core::Outline */
+#ifndef _CoreOutline_
+  EW_DECLARE_CLASS( CoreOutline )
+#define _CoreOutline_
+#endif
+
 
 /* Deklaration of class : 'Core::LayoutQuadContext' */
 EW_DEFINE_FIELDS( CoreLayoutQuadContext, CoreLayoutContext )
+  EW_VARIABLE( point4,          XPoint )
+  EW_VARIABLE( point3,          XPoint )
+  EW_VARIABLE( point2,          XPoint )
+  EW_VARIABLE( point1,          XPoint )
 EW_END_OF_FIELDS( CoreLayoutQuadContext )
 
 /* Virtual Method Table (VMT) for the class : 'Core::LayoutQuadContext' */

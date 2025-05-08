@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -92,11 +92,12 @@
    within the GUI component itself. Very useful for any kind of scrollable lists, 
    menus, etc. */
 EW_DEFINE_FIELDS( ViewsRectangle, CoreRectView )
-  EW_PROPERTY( Color,           XColor )
 EW_END_OF_FIELDS( ViewsRectangle )
 
 /* Virtual Method Table (VMT) for the class : 'Views::Rectangle' */
 EW_DEFINE_METHODS( ViewsRectangle, CoreRectView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( ViewsRectangle _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -142,9 +143,6 @@ EW_END_OF_METHODS( ViewsRectangle )
    of the value of the property and the one passed in aBlend parameter. */
 void ViewsRectangle_Draw( ViewsRectangle _this, GraphicsCanvas aCanvas, XRect aClip, 
   XPoint aOffset, XInt32 aOpacity, XBool aBlend );
-
-/* 'C' function for method : 'Views::Rectangle.OnSetColor()' */
-void ViewsRectangle_OnSetColor( ViewsRectangle _this, XColor value );
 
 #ifdef __cplusplus
   }

@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -56,6 +56,12 @@
 #define _CoreLayoutContext_
 #endif
 
+/* Forward declaration of the class Core::Outline */
+#ifndef _CoreOutline_
+  EW_DECLARE_CLASS( CoreOutline )
+#define _CoreOutline_
+#endif
+
 /* Forward declaration of the class Core::RectView */
 #ifndef _CoreRectView_
   EW_DECLARE_CLASS( CoreRectView )
@@ -74,6 +80,8 @@ EW_END_OF_FIELDS( CoreRectView )
 
 /* Virtual Method Table (VMT) for the class : 'Core::RectView' */
 EW_DEFINE_METHODS( CoreRectView, CoreView )
+  EW_METHOD( initLayoutContext, void )( CoreRectView _this, XRect aBounds, CoreOutline 
+    aOutline )
   EW_METHOD( GetRoot,           CoreRoot )( CoreView _this )
   EW_METHOD( Draw,              void )( CoreView _this, GraphicsCanvas aCanvas, 
     XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
@@ -91,6 +99,10 @@ EW_DEFINE_METHODS( CoreRectView, CoreView )
   EW_METHOD( ChangeViewState,   void )( CoreView _this, XSet aSetState, XSet aClearState )
   EW_METHOD( OnSetBounds,       void )( CoreRectView _this, XRect value )
 EW_END_OF_METHODS( CoreRectView )
+
+/* 'C' function for method : 'Core::RectView.initLayoutContext()' */
+void CoreRectView_initLayoutContext( CoreRectView _this, XRect aBounds, CoreOutline 
+  aOutline );
 
 /* 'C' function for method : 'Core::RectView.ArrangeView()' */
 XPoint CoreRectView_ArrangeView( CoreRectView _this, XRect aBounds, XEnum aFormation );

@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -43,15 +43,10 @@
 #endif
 
 #include "_ApplicationApplication.h"
+#include "_ApplicationDeviceClass.h"
 
-/* Font resource for large font - used for the caption text items. */
-EW_DECLARE_FONT_RES( ApplicationFontLarge )
-
-/* Bitmap resource for the Embedded Wizard logo. */
-EW_DECLARE_BITMAP_RES( ApplicationLogo )
-
-/* Font resource for small font - used for the description text items. */
-EW_DECLARE_FONT_RES( ApplicationFontSmall )
+/* User defined auto object: 'Application::Device' */
+EW_DECLARE_AUTOOBJECT( ApplicationDevice, ApplicationDeviceClass )
 
 #ifdef __cplusplus
   }

@@ -19,7 +19,7 @@
 * the original template file!
 *
 * Version  : 14.02
-* Profile  : ESP32
+* Profile  : Profile
 * Platform : Espressif.ESP32.RGB565
 *
 *******************************************************************************/
@@ -334,6 +334,65 @@ void GraphicsCanvas_DrawText( GraphicsCanvas _this, XRect aClip, ResourcesFont a
     EwDrawText((XBitmap*)dstBitmap, (XFont*)srcFont, aString + aOffset, aCount,
                 dstFrameNo, tempRect, aDstRect, aSrcPos, aMinWidth, orient, aColorTL, aColorTR,
                 aColorBR, aColorBL, aBlend );
+  }
+}
+
+/* The method DrawBitmapFrame() draws a free scalable frame by composing it of bitmap 
+   segments. These segments are used to draw the frame's corners, to fill its edges 
+   and to fill its interior area. The bitmap has thus to contain nine equal segments 
+   arranged in three rows and three columns. The top-left segment e.g. is used to 
+   draw the top-left corner of the frame. In contrast, the top-middle segment corresponds 
+   to the frame's top edge. If the edge is wider than the segment, multiple copies 
+   of the segment are used to fill the entire edge. In this manner the entire frame 
+   is composed by simply copying bitmap segments.
+   The bitmap is specified in the parameter aBitmap. In case of a multi-frame bitmap 
+   the desired frame can be selected in the parameter aFrameNr. The resulting size 
+   of the drawn frame is specified by aDstRect parameter. The parameter aEdges control 
+   which edges are drawn and which are omitted. Optionally the copied pixel can 
+   be modulated by a color gradient specified by the four parameters aColorTL .. 
+   aColorBL.
+   An additional clipping area aClip limits the operation. All pixel lying outside 
+   this area will not be drawn. The last aBlend parameter controls the mode how 
+   drawn pixel are combined with the pixel already existing in the destination bitmap. 
+   If aBlend is 'true', the drawn pixel are alpha-blended with the background, otherwise 
+   the drawn pixel will overwrite the old content. */
+void GraphicsCanvas_DrawBitmapFrame( GraphicsCanvas _this, XRect aClip, ResourcesBitmap 
+  aBitmap, XInt32 aFrameNr, XRect aDstRect, XSet aEdges, XColor aColorTL, XColor 
+  aColorTR, XColor aColorBR, XColor aColorBL, XBool aBlend )
+{
+  XHandle dstBitmap;
+  XHandle srcBitmap;
+  XInt32 dstFrameNo;
+  XRect srcRect;
+  XBool left;
+  XBool top;
+  XBool right;
+  XBool bottom;
+  XBool interior;
+
+  if ( _this->Super1.bitmap == 0 )
+    ResourcesBitmap__Update( _this );
+
+  if ( _this->Super1.bitmap == 0 )
+    return;
+
+  if ((((( aBitmap == 0 ) || ( aBitmap->bitmap == 0 )) || !aEdges ) || ( aFrameNr 
+      < 0 )) || ( aFrameNr >= aBitmap->NoOfFrames ))
+    return;
+
+  dstBitmap = _this->Super1.bitmap;
+  srcBitmap = aBitmap->bitmap;
+  dstFrameNo = _this->DstFrameNr;
+  srcRect = EwNewRect2Point( _Const0000, aBitmap->FrameSize );
+  left = (( aEdges & GraphicsEdgesLeft ) == GraphicsEdgesLeft );
+  top = (( aEdges & GraphicsEdgesTop ) == GraphicsEdgesTop );
+  right = (( aEdges & GraphicsEdgesRight ) == GraphicsEdgesRight );
+  bottom = (( aEdges & GraphicsEdgesBottom ) == GraphicsEdgesBottom );
+  interior = (( aEdges & GraphicsEdgesInterior ) == GraphicsEdgesInterior );
+  {
+    EwDrawBitmapFrame((XBitmap*)dstBitmap, (XBitmap*)srcBitmap, dstFrameNo, aFrameNr,
+                       aClip, aDstRect, srcRect, left, top, right, bottom,
+                       interior, aColorTL, aColorTR, aColorBR, aColorBL, aBlend );
   }
 }
 

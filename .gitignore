@@ -1,2 +1,11 @@
-./.vscode
-./BuildEnv/.vscode
+# VS Code settings
+.vscode/
+<<<<<<< HEAD
+BuildEnv/.vscode/
+BuildEnv/.metadata/
+BuildEnv/build/
+=======
+
+# Build environment files
+BuildEnv/.vscode/
+>>>>>>> 7e41905f7edf0a682ee762cfe90d08dd8c5eb8b1
