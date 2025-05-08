@@ -54,7 +54,7 @@ class Application : Core::Root
   $rect <558,35,758,75>
   slot LightOnSlot
   {
-    Application::Device.LedSetMethod("on", "true");
+    Application::Device.LedSetMethod("on", "true", "bool");
   }
 
   // new created Slots for LED Controlls
@@ -66,7 +66,7 @@ class Application : Core::Root
   $rect <560,80,760,120>
   slot LightOffSlot
   {
-    Application::Device.LedSetMethod("on", "false");
+    Application::Device.LedSetMethod("on", "false", "bool");
   }
 
   $rect <20,20,160,60>
@@ -84,8 +84,7 @@ class Application : Core::Root
   {
     var int32 brightnessValue = BrightnessSlider.CurrentValue;
     var string brightnessString = string(brightnessValue);
-    Application::Device.LedSetMethod("bri", brightnessString);
-
+    Application::Device.LedSetMethod("bri", brightnessString, "int");
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -298,11 +297,11 @@ class DeviceClass : Templates::DeviceClass
   }
 
   $rect <1170,60,1370,100>
-  method void LedSetMethod( arg string key, arg string setpoint )
+  method void LedSetMethod( arg string key, arg string setpoint, arg string dataType )
   {
     native{
-      extern void LedSet(XString key, XString setpoint);
-      LedSet(key, setpoint);
+      extern void LedSet(XString key, XString setpoint, XString dataType);
+      LedSet(key, setpoint, dataType);
     }
   }
 

@@ -41,7 +41,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::ToggleButton toggleLightButton
   {
-    preset Bounds = <216,181,320,240>;
+    preset Bounds = <108,43,212,102>;
     preset OnUpdate = null;
     preset OnSwitchOn = LightOnSlot;
     preset OnSwitchOff = LightOffSlot;
@@ -72,7 +72,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::HorizontalSlider BrightnessSlider
   {
-    preset Bounds = <0,181,200,240>;
+    preset Bounds = <60,135,260,195>;
     preset OnEnd = BrightnessSlot;
     preset MaxValue = 255;
     preset CurrentValue = 40;
@@ -308,7 +308,71 @@ class DeviceClass : Templates::DeviceClass
   // new created Methods for LED Controlls
   note group Note
   {
-    attr Bounds = <1160,0,1470,300>;
+    attr Bounds = <1160,0,1580,300>;
+  }
+
+  $rect <1370,119,1570,159>
+  object Core::SystemEvent SystemEvent;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about a particular system event.
+  $rect <1170,119,1370,159>
+  $output true
+  method void TriggerEvent()
+  {
+    // Just trigger the system event. All associated system event handler
+    // will then be notified automatically.
+    SystemEvent.Trigger( null, false );
+
+    /*
+       HINT 1:
+
+       When triggering the event you can pass an optional 'context' object.
+       With it additional event specific data can be attached at the event
+       and dispatched with it. All notified system event handler can thus
+       evaluate this 'context' information.
+
+       To do this, you will need to define a particular 'context' class
+       suitable to store the event specific information. Then create an
+       instance of the class, initialize it with all the specific context
+       data and finally pass the instance in the first parameter of the
+       Trigger() method:
+
+
+       var YourUnit::ContextClass context = new YourUnit::ContextClass;
+
+       context.SomeData1 = ...
+       context.SomeData2 = ...
+
+       SystemEvent.Trigger( context, false );
+
+
+       You can add parameters to the method in order to simply receive
+       values from the device.
+    */
+
+    /*
+       HINT 2:
+
+       When triggering a system event you can determine its priority. Per
+       default system events are delivered strictly in the order in which
+       they have been triggered. When you pass 'true' in the last parameter
+       of Trigger() you can force the event to be dispatched early:
+
+       SystemEvent.Trigger( null, true );
+    */
+  }
+
+  // The object 'SystemEvent' represents an individual system event. When the system \
+  // event is triggered all associated system event handler are notified automatically.
+  // 
+  // The method 'TriggerEvent' method is intended to be called by the device to notify \
+  // the GUI application about the particular system event represented by the object \
+  // 'SystemEvent'. This method exists for your convenience only and is optional. \
+  // See inline documentation inside the method.
+  note legend Note5
+  {
+    attr Bounds = <1590,119,2090,299>;
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -323,6 +387,9 @@ class DeviceClass : Templates::DeviceClass
   $member Note1
   $member Note
   $member LedSetMethod
+  $member SystemEvent
+  $member TriggerEvent
+  $member Note5
 }
 
 $rect <230,60,430,100>

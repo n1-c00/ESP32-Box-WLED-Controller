@@ -1,5 +1,6 @@
 $version 1.0
 
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
 attr currentCodeInspector = Application::Application.BrightnessSlot;
@@ -30,9 +31,8 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-7,-13>;
+  attr scrollTo = <-39,-25>;
   attr zoom = 1.0;
 }
 
@@ -40,65 +40,36 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <13,-63>;
-  attr zoom = 1.25;
+  attr scrollTo = <-32,-2>;
+  attr zoom = 1.75;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <103,33>;
-  attr zoom = 1.0;
+  attr scrollTo = <-53,-34>;
+  attr zoom = 0.75;
 }
 
 view class Application::DeviceClass
 {
-  attr scrollTo = <1325,-39>;
-  attr zoom = 1.0;
+  attr scrollTo = <943,-88>;
+  attr zoom = 0.75;
 }
 
-view class WidgetSet::HorizontalSlider
-{
-  attr scrollTo = <-7,-7>;
-  attr zoom = 1.0;
-}
-
-view profile Profile
-{
-  attr scrollTo = <-7,-7>;
-  attr zoom = 1.0;
-}
-
-codeview Application::DeviceClass.LedSetMethod
+codeview Application::DeviceClass.TriggerEvent
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <32,2>;
-  attr codeSelStart = <32,2>;
-}
-
-codeview Application::Application.LightOnSlot
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <52,0>;
-  attr codeSelStart = <52,0>;
-}
-
-codeview Application::Application.LightOffSlot
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <49,0>;
-  attr codeSelStart = <49,0>;
+  attr codeSelEnd = <35,40>;
+  attr codeSelStart = <35,40>;
 }
 
 codeview Application::Application.BrightnessSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <65,2>;
-  attr codeSelStart = <65,2>;
+  attr codeSelEnd = <62,2>;
+  attr codeSelStart = <62,2>;
 }

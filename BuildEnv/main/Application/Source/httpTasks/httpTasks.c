@@ -32,7 +32,7 @@ int http_POST(char *json_string)
         return -1;
     }
     ESP_LOGI(TAG, "... allocated socket");
-    
+
     // Connect to the server
     if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
        ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
@@ -65,11 +65,13 @@ char * http_GET()
     dest_addr.sin_family = AF_INET;
     dest_addr.sin_port = htons(atoi(WEB_PORT));
     
-    char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n" \
-                    "Host: " WEB_SERVER ":" WEB_PORT "\r\n" \
-                    "User-Agent: esp-idf/1.0 esp32\r\n" \
-                    "\r\n";
+    /* Create a suitable HTTP-GET request out of from the URL*/
+    static char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n"
+        "Host: "WEB_SERVER":"WEB_PORT"\r\n"
+        "User-Agent: esp-idf/1.0 esp32\r\n"
+        "\r\n";
 
+    ESP_LOGI(TAG, "... request: %s", REQUEST);
 
     // Create socket
     s = socket(AF_INET, SOCK_STREAM, 0);

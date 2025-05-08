@@ -23,14 +23,9 @@
 //ToDo: Make a request to the WLED device to get the current JSON object
 static cJSON *gWledJson = NULL;
 
-<<<<<<< HEAD
 static char *json; // Buffer for the JSON string
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
-=======
-static const char *json =
-  "{\"on\":false,\"bri\":40,\"transition\":7,\"ps\":-1,"
->>>>>>> 7e41905f7edf0a682ee762cfe90d08dd8c5eb8b1
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
   "\"nl\":{\"on\":false,\"dur\":60,\"mode\":1,\"tbri\":0,\"rem\":-1},"
   "\"udpn\":{\"send\":false,\"recv\":true,\"sgrp\":1,\"rgrp\":1},"
@@ -61,18 +56,18 @@ void JsonInit()
 {
     char *recv_json;
 
-    recv_json = http_GET(); // Get the current JSON object from the WLED device
+    //recv_json = http_GET(); // Get the current JSON object from the WLED device
 
     //check if the request was successful
-    if (recv_json == NULL) {
-        ESP_LOGE(TAG, "Failed to get JSON object. Using default JSON.");
+    //if (recv_json == NULL) {
+    //    ESP_LOGE(TAG, "Failed to get JSON object. Using default JSON.");
         gWledJson = cJSON_Parse(default_json); // Parse the default JSON string
         return;
-    }
+    //}
     
-    json = strstr(recv_json, "{"); // Find the start of the JSON object
-    gWledJson = cJSON_Parse(json); // Parse the JSON object
-    ESP_LOGI(TAG, "set light state (json) to: %s", json); // Log the JSON object
+    //json = strstr(recv_json, "{"); // Find the start of the JSON object
+    //gWledJson = cJSON_Parse(json); // Parse the JSON object
+    //ESP_LOGI(TAG, "set light state (json) to: %s", json); // Log the JSON object
 }
 
 /***********************************************************************
@@ -104,7 +99,7 @@ static int _LedModify(char *key, char *value, char *dataType)
                                   cJSON_CreateBool(b));
         return 0;
     }
-    else if (strcmp(dataType, "num") == 0) {
+    else if (strcmp(dataType, "int") == 0) {
         int v = atoi(value);
         cJSON_ReplaceItemInObject(gWledJson,
                                   key,
@@ -189,6 +184,11 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     /* Create a event loop where our code will be handled */
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+        /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
+     * Read "Establishing Wi-Fi or Ethernet Connection" section in
+     * examples/protocols/README.md for more information about this function.
+     */
+    ESP_ERROR_CHECK(example_connect());
 
     JsonInit(); // Initialize the JSON object
 
@@ -198,12 +198,6 @@ void app_main(void)
     
     /* Start the GUI task */
     xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
-
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-    ESP_ERROR_CHECK(example_connect());
 
     /* Put the wled task into the event-loop*/
     xTaskCreate(&_wled_api_task, "wled_http_GET", 4096, NULL, 5, NULL);
