@@ -23,7 +23,7 @@
 //ToDo: Make a request to the WLED device to get the current JSON object
 static cJSON *gWledJson = NULL;
 
-static char *json; // Buffer for the JSON string
+static char json[1024]; // Buffer for the JSON string
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
@@ -54,20 +54,37 @@ char _dataType[20];
 
 void JsonInit()
 {
-    char *recv_json;
+    int h;
+    h = http_GET((char *)json, sizeof(json));
 
-    //recv_json = http_GET(); // Get the current JSON object from the WLED device
-
-    //check if the request was successful
-    //if (recv_json == NULL) {
-    //    ESP_LOGE(TAG, "Failed to get JSON object. Using default JSON.");
-        gWledJson = cJSON_Parse(default_json); // Parse the default JSON string
+    if (h != 200) {
+        ESP_LOGE(TAG, "Failed to get JSON object. Using default JSON.");
+        gWledJson = cJSON_Parse(default_json);
         return;
-    //}
-    
-    //json = strstr(recv_json, "{"); // Find the start of the JSON object
-    //gWledJson = cJSON_Parse(json); // Parse the JSON object
-    //ESP_LOGI(TAG, "set light state (json) to: %s", json); // Log the JSON object
+    }
+
+    // Find the start of the JSON object (after the headers)
+    char *json_start = strstr(json, "\r\n\r\n");
+    if (json_start != NULL) {
+        json_start += 4; // Skip the \r\n\r\n separator
+    } else {
+        json_start = strstr(json, "{"); // Fallback: look for first {
+    }
+
+    if (json_start == NULL) {
+        ESP_LOGE(TAG, "Could not find JSON data in response. Using default.");
+        gWledJson = cJSON_Parse(default_json);
+        return;
+    }
+
+    gWledJson = cJSON_Parse(json_start);
+    if (gWledJson == NULL) {
+        ESP_LOGE(TAG, "Failed to parse JSON. Using default.");
+        gWledJson = cJSON_Parse(default_json);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Set light state to: %s", json_start);
 }
 
 /***********************************************************************

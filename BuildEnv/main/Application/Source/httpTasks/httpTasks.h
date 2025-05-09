@@ -34,8 +34,7 @@
 *
 * DESCRIPTION:
 *   http_POST() sends a HTTP POST request to the Web path defined in "httpTasks.h"
-*   with the given JSON string as body. The function will return the response code
-    0 if the request was successful, otherwise it will return the response code -1.
+*   with the given JSON string as body. 
 *
 * ARGUMENTS:
 *   json_string - The JSON string to be sent in the body of the POST request.
@@ -59,4 +58,4 @@ int http_POST(char *json_string);
 *   if the request was successful, a pointer to the array recv_buffer will be returned. Otherwise 0. 
 *
 *******************************************************************************/
-char * http_GET();
+int http_GET(char *buffer, int size);
