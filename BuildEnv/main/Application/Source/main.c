@@ -20,8 +20,9 @@
 #include "httpTasks/httpTasks.h"
 
 //Json object aswell as the initial JSON string
-//ToDo: Make a request to the WLED device to get the current JSON object
 static cJSON *gWledJson = NULL;
+static cJSON *nWledJson = NULL;
+
 
 static char json[1024]; // Buffer for the JSON string
 static const char *default_json =
@@ -52,6 +53,11 @@ char _key[20];
 char _value[20];
 char _dataType[20];
 
+
+/***********************************************************************
+Initialize the JSON object at startup with a HTTP request or a default JSON
+object.
+************************************************************************/
 void JsonInit()
 {
     int h;
@@ -158,6 +164,58 @@ static void _wled_send_task(void *pvParameters)
     }
 }
 
+static void _wled_getStatus_task(void *pvParameters)
+{
+    char incoming_json[1024];
+
+    // ***Send the HTTP request to the WLED device***
+    while(1){
+        int r = http_GET(incoming_json, sizeof(incoming_json));
+        if (r != 200) {
+            ESP_LOGE(TAG, "Failed to get JSON object.");
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+            continue;
+        }
+
+        // ***Format the response***
+        char *json_start = strstr(json, "\r\n\r\n");
+        if (json_start != NULL) {
+            json_start += 4; // Skip the \r\n\r\n separator
+        } else {
+            json_start = strstr(json, "{"); // Fallback: look for first {
+        }
+
+        if (json_start == NULL) {
+            ESP_LOGE(TAG, "Could not find JSON data in response.");
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+            continue;
+        }
+        nWledJson = cJSON_Parse(json_start);
+        
+        //***Compare "bri" parameter***
+        cJSON *bri_gWled = cJSON_GetObjectItem(gWledJson, "bri");
+        cJSON *bri_nWled = cJSON_GetObjectItem(nWledJson, "bri");
+        if (bri_gWled && bri_nWled && bri_gWled->valueint != bri_nWled->valueint) {
+            ESP_LOGI(TAG, "Brightness changed: gWledJson=%d, nWledJson=%d", bri_gWled->valueint, bri_nWled->valueint);
+            EWSUpdateSlider( (int) nWledJson->valueint); // Update the slider in the GUI
+        }
+
+        // ***Compare "on" parameter***
+        cJSON *on_gWled = cJSON_GetObjectItem(gWledJson, "on");
+        cJSON *on_nWled = cJSON_GetObjectItem(nWledJson, "on");
+        if (on_gWled && on_nWled && cJSON_IsTrue(on_gWled) != cJSON_IsTrue(on_nWled)) {
+            ESP_LOGI(TAG, "On state changed: gWledJson=%s, nWledJson=%s", cJSON_IsTrue(on_gWled) ? "true" : "false", 
+                                                                          cJSON_IsTrue(on_nWled) ? "true" : "false");
+            EWSUpdateButton(cJSON_IsTrue(on_nWled)); // Update the switch in the GUI
+        }
+
+        // Free the parsed JSON object
+        cJSON_Delete(nWledJson);
+        
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
+        }
+}
+
 /**************************************************************************
   The GUI_Task() function implements the main loop of the Embedded Wizard
 **************************************************************************/
@@ -218,4 +276,5 @@ void app_main(void)
 
     /* Put the wled task into the event-loop*/
     xTaskCreate(&_wled_send_task, "wled_send_task", 4096, NULL, 5, NULL);
+    xTaskCreate(&_wled_getStatus_task, "wled_update_frontedn", 4096, NULL, 5, NULL);
 }
