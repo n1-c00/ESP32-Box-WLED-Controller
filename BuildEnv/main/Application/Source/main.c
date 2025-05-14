@@ -132,7 +132,7 @@ static int _LedModify(char *key, char *value, char *dataType)
     This is the task that handels the queue from the frontend.
     It will run in the FreeRTOS event loop.
 ************************************************************/
-static void _wled_api_task(void *pvParameters)
+static void _wled_send_task(void *pvParameters)
 {
     bool trigger;
 
@@ -217,5 +217,5 @@ void app_main(void)
     xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
 
     /* Put the wled task into the event-loop*/
-    xTaskCreate(&_wled_api_task, "wled_http_GET", 4096, NULL, 5, NULL);
+    xTaskCreate(&_wled_send_task, "wled_send_task", 4096, NULL, 5, NULL);
 }

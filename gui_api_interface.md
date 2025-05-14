@@ -15,7 +15,21 @@
 - `LedSet("fx", "0", "int")` -> Sets effect to Solid
 ---
 
-### GetSystemInfo
+### EWUpdateSlider
+**Parameters:** `value` (int)
+**Returns:** None
+**Description:**
+- update the brightness slider on the Display. 
+- This function will be called whenever the ingoing state is different from the local state of the Light.
+
+### EWUpdateButton
+**Parameters:** `value` (bool)
+**Returns:** None
+**Description:**
+- update the toggle button on the Display. 
+- This function will be called whenever the ingoing state is different from the local state of the Light.
+
+### GetSystemInfo (on hold)
 **Parameters:** `infoType` (string)  
 **Returns:** `response` (string)  
 **Description:**  
