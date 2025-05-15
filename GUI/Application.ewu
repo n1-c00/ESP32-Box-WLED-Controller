@@ -57,7 +57,7 @@ class Application : Core::Root
     Application::Device.LedSetMethod("on", "true", "bool");
   }
 
-  // new created Slots for LED Controlls
+  // LedSet
   note group Note
   {
     attr Bounds = <550,-10,850,250>;
@@ -87,6 +87,76 @@ class Application : Core::Root
     Application::Device.LedSetMethod("bri", brightnessString, "int");
   }
 
+  $rect <1110,10,1310,50>
+  property int32 brightnessValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <910,10,1110,50>
+  $output true
+  method void EWUpdateSlider( arg int32 aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure brightnessValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure brightnessValue = aNewValue;
+
+      // Notify all associated property observers.
+      notifyobservers ^brightnessValue;
+    }
+  }
+
+  $rect <920,61,1120,101>
+  object Core::PropertyObserver PropertyObserver
+  {
+    preset OnEvent = EWUpdateSliderSlot;
+    preset Outlet = ^brightnessValue;
+  }
+
+  // This slot method is executed when the associated property observer 'PropertyObserver' \
+  // is notified.
+  $rect <1120,61,1320,101>
+  slot EWUpdateSliderSlot
+  {
+    BrightnessSlider.CurrentValue = brightnessValue;
+  }
+
+  $rect <1110,129,1310,169>
+  property bool SwitchValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <910,129,1110,169>
+  $output true
+  method void EWUpdateButton( arg bool aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure SwitchValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure SwitchValue = aNewValue;
+
+      // Notify all associated property observers.
+      notifyobservers ^SwitchValue;
+    }
+  }
+
+  $rect <920,180,1120,220>
+  object Core::PropertyObserver PropertyObserver1
+  {
+    preset OnEvent = EWUpdateButtonSlot;
+    preset Outlet = ^SwitchValue;
+  }
+
+  // This slot method is executed when the associated property observer 'PropertyObserver' \
+  // is notified.
+  $rect <1120,180,1320,220>
+  slot EWUpdateButtonSlot
+  {
+    toggleLightButton.Checked = SwitchValue;
+  }
+
   // Directives to adapt the order of the above members according to how these members 
   // where arranged when the project content was stored. In this manner the storage 
   // and the expected order of the members don't depend. Merging of changes in the 
@@ -100,6 +170,14 @@ class Application : Core::Root
   $member LightOffSlot
   $member BrightnessSlider
   $member BrightnessSlot
+  $member brightnessValue
+  $member EWUpdateSlider
+  $member PropertyObserver
+  $member EWUpdateSliderSlot
+  $member SwitchValue
+  $member EWUpdateButton
+  $member PropertyObserver1
+  $member EWUpdateButtonSlot
 }
 
 $rect <230,20,430,60>
@@ -308,71 +386,7 @@ class DeviceClass : Templates::DeviceClass
   // new created Methods for LED Controlls
   note group Note
   {
-    attr Bounds = <1160,0,1580,300>;
-  }
-
-  $rect <1370,119,1570,159>
-  object Core::SystemEvent SystemEvent;
-
-  // This method is intended to be called by the device to notify the GUI application \
-  // about a particular system event.
-  $rect <1170,119,1370,159>
-  $output true
-  method void TriggerEvent()
-  {
-    // Just trigger the system event. All associated system event handler
-    // will then be notified automatically.
-    SystemEvent.Trigger( null, false );
-
-    /*
-       HINT 1:
-
-       When triggering the event you can pass an optional 'context' object.
-       With it additional event specific data can be attached at the event
-       and dispatched with it. All notified system event handler can thus
-       evaluate this 'context' information.
-
-       To do this, you will need to define a particular 'context' class
-       suitable to store the event specific information. Then create an
-       instance of the class, initialize it with all the specific context
-       data and finally pass the instance in the first parameter of the
-       Trigger() method:
-
-
-       var YourUnit::ContextClass context = new YourUnit::ContextClass;
-
-       context.SomeData1 = ...
-       context.SomeData2 = ...
-
-       SystemEvent.Trigger( context, false );
-
-
-       You can add parameters to the method in order to simply receive
-       values from the device.
-    */
-
-    /*
-       HINT 2:
-
-       When triggering a system event you can determine its priority. Per
-       default system events are delivered strictly in the order in which
-       they have been triggered. When you pass 'true' in the last parameter
-       of Trigger() you can force the event to be dispatched early:
-
-       SystemEvent.Trigger( null, true );
-    */
-  }
-
-  // The object 'SystemEvent' represents an individual system event. When the system \
-  // event is triggered all associated system event handler are notified automatically.
-  // 
-  // The method 'TriggerEvent' method is intended to be called by the device to notify \
-  // the GUI application about the particular system event represented by the object \
-  // 'SystemEvent'. This method exists for your convenience only and is optional. \
-  // See inline documentation inside the method.
-  note legend Note5
-  {
-    attr Bounds = <1590,119,2090,299>;
+    attr Bounds = <1160,0,1710,300>;
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -387,9 +401,6 @@ class DeviceClass : Templates::DeviceClass
   $member Note1
   $member Note
   $member LedSetMethod
-  $member SystemEvent
-  $member TriggerEvent
-  $member Note5
 }
 
 $rect <230,60,430,100>

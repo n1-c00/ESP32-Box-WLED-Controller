@@ -37,6 +37,7 @@
 #include "_CoreLayoutContext.h"
 #include "_CoreLayoutQuadContext.h"
 #include "_CoreOutline.h"
+#include "_CorePropertyObserver.h"
 #include "_CoreQuadView.h"
 #include "_CoreRectView.h"
 #include "_CoreResource.h"
@@ -6063,6 +6064,73 @@ EW_DEFINE_CLASS( CoreTimer, XObject, OnTrigger, OnTrigger, OnTrigger, timer, tim
                  timer, "Core::Timer" )
   CoreTimer_Trigger,
 EW_END_OF_CLASS( CoreTimer )
+
+/* Initializer for the class 'Core::PropertyObserver' */
+void CorePropertyObserver__Init( CorePropertyObserver _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  XObject__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CorePropertyObserver );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( CorePropertyObserver );
+
+  /* ... and initialize objects, variables, properties, etc. */
+}
+
+/* Re-Initializer for the class 'Core::PropertyObserver' */
+void CorePropertyObserver__ReInit( CorePropertyObserver _this )
+{
+  /* At first re-initialize the super class ... */
+  XObject__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Core::PropertyObserver' */
+void CorePropertyObserver__Done( CorePropertyObserver _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( XObject );
+
+  /* Don't forget to deinitialize the super class ... */
+  XObject__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Core::PropertyObserver.onEvent()' */
+void CorePropertyObserver_onEvent( CorePropertyObserver _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  EwSignal( _this->OnEvent, ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Core::PropertyObserver.OnSetOutlet()' */
+void CorePropertyObserver_OnSetOutlet( CorePropertyObserver _this, XRef value )
+{
+  if ( !EwCompRef( _this->Outlet, value ))
+    return;
+
+  if ( _this->Outlet.Object != 0 )
+    EwDetachRefObserver( EwNewSlot( _this, CorePropertyObserver_onEvent ), _this->Outlet, 
+      0 );
+
+  _this->Outlet = value;
+
+  if ( _this->Outlet.Object != 0 )
+    EwAttachRefObserver( EwNewSlot( _this, CorePropertyObserver_onEvent ), _this->Outlet, 
+      0 );
+}
+
+/* Variants derived from the class : 'Core::PropertyObserver' */
+EW_DEFINE_CLASS_VARIANTS( CorePropertyObserver )
+EW_END_OF_CLASS_VARIANTS( CorePropertyObserver )
+
+/* Virtual Method Table (VMT) for the class : 'Core::PropertyObserver' */
+EW_DEFINE_CLASS( CorePropertyObserver, XObject, OnEvent, OnEvent, OnEvent, Outlet, 
+                 _.VMT, _.VMT, "Core::PropertyObserver" )
+EW_END_OF_CLASS( CorePropertyObserver )
 
 /* Checksum to test compatibility of BLOB files. */
 const unsigned long EwBlobChecksum[] = { 0x00000000, 0x00000000 };
