@@ -117,7 +117,7 @@ profile Profile : Espressif.ESP32.RGB565
   attr StorageOfConstants = Code;
   attr ModeOfBitmapResources = DirectAccess;
   attr ModeOfStringConstants = DirectAccess;
-  attr OutputDirectory = C:\Users\nicoz\esp\ESP32-Box-WLED-Controller\BuildEnv\main\Application\GeneratedCode;
+  attr OutputDirectory = C:\FSST\ESP32-Box-WLED-Controller\BuildEnv\main\Application\GeneratedCode;
 
   $rect <10,10,154,50>
   macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";

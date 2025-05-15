@@ -27,7 +27,8 @@
 #include "ewlocale.h"
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
-#include "_CorePropertyObserver.h"
+#include "_CoreSystemEvent.h"
+#include "_CoreSystemEventHandler.h"
 #include "_CoreView.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -70,8 +71,8 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
   WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
   WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
-  CorePropertyObserver__Init( &_this->PropertyObserver, &_this->_.XObject, 0 );
-  CorePropertyObserver__Init( &_this->PropertyObserver1, &_this->_.XObject, 0 );
+  CoreSystemEvent__Init( &_this->UpdateSliderEvent, &_this->_.XObject, 0 );
+  CoreSystemEventHandler__Init( &_this->UpdateSliderEventHandler, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -96,12 +97,8 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
-  _this->PropertyObserver.OnEvent = EwNewSlot( _this, ApplicationApplication_EWUpdateSliderSlot );
-  CorePropertyObserver_OnSetOutlet( &_this->PropertyObserver, EwNewRef( _this, ApplicationApplication_OnGetbrightnessValue, 
-  ApplicationApplication_OnSetbrightnessValue ));
-  _this->PropertyObserver1.OnEvent = EwNewSlot( _this, ApplicationApplication_EWUpdateButtonSlot );
-  CorePropertyObserver_OnSetOutlet( &_this->PropertyObserver1, EwNewRef( _this, 
-  ApplicationApplication_OnGetSwitchValue, ApplicationApplication_OnSetSwitchValue ));
+  _this->UpdateSliderEventHandler.OnEvent = EwNewSlot( _this, ApplicationApplication_onEvent );
+  CoreSystemEventHandler_OnSetEvent( &_this->UpdateSliderEventHandler, &_this->UpdateSliderEvent );
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -114,8 +111,8 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   ViewsRectangle__ReInit( &_this->Rectangle );
   WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
-  CorePropertyObserver__ReInit( &_this->PropertyObserver );
-  CorePropertyObserver__ReInit( &_this->PropertyObserver1 );
+  CoreSystemEvent__ReInit( &_this->UpdateSliderEvent );
+  CoreSystemEventHandler__ReInit( &_this->UpdateSliderEventHandler );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -128,8 +125,8 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   ViewsRectangle__Done( &_this->Rectangle );
   WidgetSetToggleButton__Done( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
-  CorePropertyObserver__Done( &_this->PropertyObserver );
-  CorePropertyObserver__Done( &_this->PropertyObserver1 );
+  CoreSystemEvent__Done( &_this->UpdateSliderEvent );
+  CoreSystemEventHandler__Done( &_this->UpdateSliderEventHandler );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -162,41 +159,38 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
 void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
   sender )
 {
-  XInt32 brightnessValue;
+  XInt32 brightnessVal;
   XString brightnessString;
 
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  brightnessValue = WidgetSetHorizontalSlider_OnGetCurrentValue( &_this->BrightnessSlider );
-  brightnessString = EwNewStringInt( brightnessValue, 0, 10 );
+  brightnessVal = WidgetSetHorizontalSlider_OnGetCurrentValue( &_this->BrightnessSlider );
+  brightnessString = EwNewStringInt( brightnessVal, 0, 10 );
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
   EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
 }
 
 /* This method is intended to be called by the device to notify the GUI application 
-   about an alternation of its setting or state value. */
+   about a particular system event. */
 void ApplicationApplication_EWUpdateSlider( ApplicationApplication _this, XInt32 
-  aNewValue )
+  newVal )
 {
-  if ( aNewValue != _this->brightnessValue )
-  {
-    _this->brightnessValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationApplication_OnGetbrightnessValue, 
-      ApplicationApplication_OnSetbrightnessValue ), 0 );
-  }
+  ApplicationApplication context = EwNewObject( ApplicationApplication, 0 );
+
+  ApplicationApplication_OnSetbrightnessValue( context, newVal );
+  CoreSystemEvent_Trigger( &_this->UpdateSliderEvent, ((XObject)context ), 0 );
 }
 
 /* Wrapper function for the non virtual method : 'Application::Application.EWUpdateSlider()' */
-void ApplicationApplication__EWUpdateSlider( void* _this, XInt32 aNewValue )
+void ApplicationApplication__EWUpdateSlider( void* _this, XInt32 newVal )
 {
-  ApplicationApplication_EWUpdateSlider((ApplicationApplication)_this, aNewValue );
+  ApplicationApplication_EWUpdateSlider((ApplicationApplication)_this, newVal );
 }
 
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_EWUpdateSliderSlot( ApplicationApplication _this, XObject 
-  sender )
+/* This slot method is executed when the associated system event handler 'SystemEventHandler' 
+   receives an event. */
+void ApplicationApplication_onEvent( ApplicationApplication _this, XObject sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
@@ -204,60 +198,14 @@ void ApplicationApplication_EWUpdateSliderSlot( ApplicationApplication _this, XO
   WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, _this->brightnessValue );
 }
 
-/* This method is intended to be called by the device to notify the GUI application 
-   about an alternation of its setting or state value. */
-void ApplicationApplication_EWUpdateButton( ApplicationApplication _this, XBool 
-  aNewValue )
-{
-  if ( aNewValue != _this->SwitchValue )
-  {
-    _this->SwitchValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationApplication_OnGetSwitchValue, 
-      ApplicationApplication_OnSetSwitchValue ), 0 );
-  }
-}
-
-/* Wrapper function for the non virtual method : 'Application::Application.EWUpdateButton()' */
-void ApplicationApplication__EWUpdateButton( void* _this, XBool aNewValue )
-{
-  ApplicationApplication_EWUpdateButton((ApplicationApplication)_this, aNewValue );
-}
-
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_EWUpdateButtonSlot( ApplicationApplication _this, XObject 
-  sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  WidgetSetToggleButton_OnSetChecked( &_this->toggleLightButton, _this->SwitchValue );
-}
-
-/* Default onget method for the property 'brightnessValue' */
-XInt32 ApplicationApplication_OnGetbrightnessValue( ApplicationApplication _this )
-{
-  return _this->brightnessValue;
-}
-
-/* Default onset method for the property 'brightnessValue' */
+/* 'C' function for method : 'Application::Application.OnSetbrightnessValue()' */
 void ApplicationApplication_OnSetbrightnessValue( ApplicationApplication _this, 
   XInt32 value )
 {
+  if ( _this->brightnessValue == value )
+    return;
+
   _this->brightnessValue = value;
-}
-
-/* Default onget method for the property 'SwitchValue' */
-XBool ApplicationApplication_OnGetSwitchValue( ApplicationApplication _this )
-{
-  return _this->SwitchValue;
-}
-
-/* Default onset method for the property 'SwitchValue' */
-void ApplicationApplication_OnSetSwitchValue( ApplicationApplication _this, XBool 
-  value )
-{
-  _this->SwitchValue = value;
 }
 
 /* Variants derived from the class : 'Application::Application' */

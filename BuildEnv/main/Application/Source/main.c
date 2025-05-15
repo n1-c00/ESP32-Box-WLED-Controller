@@ -24,7 +24,7 @@ static cJSON *gWledJson = NULL;
 static cJSON *nWledJson = NULL;
 
 
-static char json[1024]; // Buffer for the JSON string
+char json[1024]; // Buffer for the JSON string
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
@@ -43,6 +43,7 @@ static const char *default_json =
 #include "ewmain.h"
 #include "ewrte.h"
 #include "ew_bsp_system.h"
+
 
 static const char *TAG = "WLED_control";
 
@@ -178,11 +179,11 @@ static void _wled_getStatus_task(void *pvParameters)
         }
 
         // ***Format the response***
-        char *json_start = strstr(json, "\r\n\r\n");
+        char *json_start = strstr(incoming_json, "\r\n\r\n");  // Use incoming_json instead of json
         if (json_start != NULL) {
             json_start += 4; // Skip the \r\n\r\n separator
         } else {
-            json_start = strstr(json, "{"); // Fallback: look for first {
+            json_start = strstr(incoming_json, "{"); // Fallback: look for first {
         }
 
         if (json_start == NULL) {
@@ -190,30 +191,42 @@ static void _wled_getStatus_task(void *pvParameters)
             vTaskDelay(3000 / portTICK_PERIOD_MS);
             continue;
         }
+        
         nWledJson = cJSON_Parse(json_start);
+        if (nWledJson == NULL) {
+            ESP_LOGE(TAG, "Failed to parse incoming JSON.");
+            vTaskDelay(3000 / portTICK_PERIOD_MS);
+            continue;
+        }
         
         //***Compare "bri" parameter***
         cJSON *bri_gWled = cJSON_GetObjectItem(gWledJson, "bri");
         cJSON *bri_nWled = cJSON_GetObjectItem(nWledJson, "bri");
         if (bri_gWled && bri_nWled && bri_gWled->valueint != bri_nWled->valueint) {
             ESP_LOGI(TAG, "Brightness changed: gWledJson=%d, nWledJson=%d", bri_gWled->valueint, bri_nWled->valueint);
-            EWSUpdateSlider( (int) nWledJson->valueint); // Update the slider in the GUI
+            // Update the local JSON object with the new brightness value
+            cJSON_ReplaceItemInObject(gWledJson, "bri", cJSON_CreateNumber(bri_nWled->valueint));
+            //EWUpdateSlider(cJSON_CreateNumber(bri_nWled->valueint));
         }
 
         // ***Compare "on" parameter***
         cJSON *on_gWled = cJSON_GetObjectItem(gWledJson, "on");
         cJSON *on_nWled = cJSON_GetObjectItem(nWledJson, "on");
         if (on_gWled && on_nWled && cJSON_IsTrue(on_gWled) != cJSON_IsTrue(on_nWled)) {
-            ESP_LOGI(TAG, "On state changed: gWledJson=%s, nWledJson=%s", cJSON_IsTrue(on_gWled) ? "true" : "false", 
-                                                                          cJSON_IsTrue(on_nWled) ? "true" : "false");
-            EWSUpdateButton(cJSON_IsTrue(on_nWled)); // Update the switch in the GUI
+            ESP_LOGI(TAG, "On state changed: gWledJson=%s, nWledJson=%s", 
+                    cJSON_IsTrue(on_gWled) ? "true" : "false", 
+                    cJSON_IsTrue(on_nWled) ? "true" : "false");
+            
+            // Update the local JSON object with the new on/off state
+            cJSON_ReplaceItemInObject(gWledJson, "on", cJSON_CreateBool(cJSON_IsTrue(on_nWled)));
+            
         }
 
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
         
         vTaskDelay(3000 / portTICK_PERIOD_MS);
-        }
+    }
 }
 
 /**************************************************************************

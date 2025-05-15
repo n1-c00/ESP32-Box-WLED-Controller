@@ -53,12 +53,16 @@
 #include "_CoreLayoutContext.h"
 #include "_CoreLayoutQuadContext.h"
 #include "_CoreOutline.h"
-#include "_CorePropertyObserver.h"
 #include "_CoreQuadView.h"
 #include "_CoreRectView.h"
 #include "_CoreResource.h"
 #include "_CoreRoot.h"
 #include "_CoreSimpleTouchHandler.h"
+#include "_CoreSystemEvent.h"
+#include "_CoreSystemEventHandler.h"
+#include "_CoreSystemEventTask.h"
+#include "_CoreTask.h"
+#include "_CoreTaskQueue.h"
 #include "_CoreTimer.h"
 #include "_CoreView.h"
 
@@ -70,6 +74,9 @@ extern const XClass EwApplicationClass;
 
 /* Global constant containing the user defined application title. */
 extern const char* EwApplicationTitle;
+
+/* User defined auto object: 'Core::SystemEventQueue' */
+EW_DECLARE_AUTOOBJECT( CoreSystemEventQueue, CoreTaskQueue )
 
 /* The definition Core::ViewState determines the set of possible states, a Core::View 
    can assume at its lifetime. These states are used internally by all GUI components. 

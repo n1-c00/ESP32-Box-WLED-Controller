@@ -42,8 +42,9 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
-#include "_CorePropertyObserver.h"
 #include "_CoreRoot.h"
+#include "_CoreSystemEvent.h"
+#include "_CoreSystemEventHandler.h"
 #include "_CoreTimer.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -91,10 +92,9 @@ EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
   EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
   EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
-  EW_OBJECT  ( PropertyObserver, CorePropertyObserver )
-  EW_OBJECT  ( PropertyObserver1, CorePropertyObserver )
+  EW_OBJECT  ( UpdateSliderEvent, CoreSystemEvent )
+  EW_OBJECT  ( UpdateSliderEventHandler, CoreSystemEventHandler )
   EW_PROPERTY( brightnessValue, XInt32 )
-  EW_PROPERTY( SwitchValue,     XBool )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -137,50 +137,23 @@ void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObjec
   sender );
 
 /* This method is intended to be called by the device to notify the GUI application 
-   about an alternation of its setting or state value. */
+   about a particular system event. */
 void ApplicationApplication_EWUpdateSlider( ApplicationApplication _this, XInt32 
-  aNewValue );
+  newVal );
 
 /* Wrapper function for the non virtual method : 'Application::Application.EWUpdateSlider()' */
-void ApplicationApplication__EWUpdateSlider( void* _this, XInt32 aNewValue );
+void ApplicationApplication__EWUpdateSlider( void* _this, XInt32 newVal );
 
 /* The following define announces the presence of the method Application::Application.EWUpdateSlider(). */
 #define _ApplicationApplication__EWUpdateSlider_
 
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_EWUpdateSliderSlot( ApplicationApplication _this, XObject 
-  sender );
+/* This slot method is executed when the associated system event handler 'SystemEventHandler' 
+   receives an event. */
+void ApplicationApplication_onEvent( ApplicationApplication _this, XObject sender );
 
-/* This method is intended to be called by the device to notify the GUI application 
-   about an alternation of its setting or state value. */
-void ApplicationApplication_EWUpdateButton( ApplicationApplication _this, XBool 
-  aNewValue );
-
-/* Wrapper function for the non virtual method : 'Application::Application.EWUpdateButton()' */
-void ApplicationApplication__EWUpdateButton( void* _this, XBool aNewValue );
-
-/* The following define announces the presence of the method Application::Application.EWUpdateButton(). */
-#define _ApplicationApplication__EWUpdateButton_
-
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_EWUpdateButtonSlot( ApplicationApplication _this, XObject 
-  sender );
-
-/* Default onget method for the property 'brightnessValue' */
-XInt32 ApplicationApplication_OnGetbrightnessValue( ApplicationApplication _this );
-
-/* Default onset method for the property 'brightnessValue' */
+/* 'C' function for method : 'Application::Application.OnSetbrightnessValue()' */
 void ApplicationApplication_OnSetbrightnessValue( ApplicationApplication _this, 
   XInt32 value );
-
-/* Default onget method for the property 'SwitchValue' */
-XBool ApplicationApplication_OnGetSwitchValue( ApplicationApplication _this );
-
-/* Default onset method for the property 'SwitchValue' */
-void ApplicationApplication_OnSetSwitchValue( ApplicationApplication _this, XBool 
-  value );
 
 #ifdef __cplusplus
   }

@@ -1,9 +1,8 @@
 $version 1.0
 
-attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.EWUpdateButton;
+attr currentCodeInspector = Application::Application.EWUpdateSlider;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -31,6 +30,7 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-142,-25>;
   attr zoom = 0.75;
@@ -49,32 +49,8 @@ view unit Application
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <1065,-7>;
-  attr zoom = 1.0;
-}
-
-codeview Application::Application.EWUpdateSliderSlot
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <44,0>;
-  attr codeSelStart = <44,0>;
-}
-
-codeview Application::Application.EWUpdateSlider
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <0,0>;
-}
-
-codeview Application::Application.EWUpdateButtonSlot
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <45,0>;
-  attr codeSelStart = <45,0>;
+  attr scrollTo = <1215,-72>;
+  attr zoom = 1.25;
 }
 
 codeview WidgetSet::ToggleButton.OnSetAppearance
@@ -85,10 +61,18 @@ codeview WidgetSet::ToggleButton.OnSetAppearance
   attr codeSelStart = <0,0>;
 }
 
-codeview Application::Application.EWUpdateButton
+codeview Application::Application.EWUpdateSlider
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <19,3>;
-  attr codeSelStart = <19,3>;
+  attr codeSelEnd = <11,2>;
+  attr codeSelStart = <11,2>;
+}
+
+codeview Core::SystemEvent.Trigger
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
 }

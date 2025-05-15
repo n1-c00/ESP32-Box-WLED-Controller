@@ -37,12 +37,16 @@
 #include "_CoreLayoutContext.h"
 #include "_CoreLayoutQuadContext.h"
 #include "_CoreOutline.h"
-#include "_CorePropertyObserver.h"
 #include "_CoreQuadView.h"
 #include "_CoreRectView.h"
 #include "_CoreResource.h"
 #include "_CoreRoot.h"
 #include "_CoreSimpleTouchHandler.h"
+#include "_CoreSystemEvent.h"
+#include "_CoreSystemEventHandler.h"
+#include "_CoreSystemEventTask.h"
+#include "_CoreTask.h"
+#include "_CoreTaskQueue.h"
 #include "_CoreTimer.h"
 #include "_CoreView.h"
 #include "_GraphicsCanvas.h"
@@ -79,7 +83,16 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
   0x006F, 0x0074, 0x0020, 0x0062, 0x0065, 0x0069, 0x006E, 0x0067, 0x0020, 0x0064,
   0x0065, 0x0072, 0x0069, 0x0076, 0x0065, 0x0064, 0x0020, 0x0066, 0x0072, 0x006F,
   0x006D, 0x0020, 0x0043, 0x006F, 0x0072, 0x0065, 0x003A, 0x003A, 0x0047, 0x0072,
-  0x006F, 0x0075, 0x0070, 0x002E, 0x0000
+  0x006F, 0x0075, 0x0070, 0x002E, 0x0000, 0xC557, 0x0054, 0x0072, 0x0079, 0x0069,
+  0x006E, 0x0067, 0x0020, 0x0074, 0x006F, 0x0020, 0x0063, 0x0061, 0x006E, 0x0063,
+  0x0065, 0x006C, 0x0020, 0x0061, 0x0020, 0x0074, 0x0061, 0x0073, 0x006B, 0x0020,
+  0x006E, 0x006F, 0x0074, 0x0020, 0x0062, 0x0065, 0x006C, 0x006F, 0x006E, 0x0067,
+  0x0069, 0x006E, 0x0067, 0x0020, 0x0074, 0x006F, 0x0020, 0x0074, 0x0068, 0x0069,
+  0x0073, 0x0020, 0x0071, 0x0075, 0x0065, 0x0075, 0x0065, 0x0021, 0x0000, 0xC557,
+  0x0054, 0x0072, 0x0079, 0x0069, 0x006E, 0x0067, 0x0020, 0x0074, 0x006F, 0x0020,
+  0x0065, 0x006E, 0x0071, 0x0075, 0x0065, 0x0075, 0x0065, 0x0020, 0x0061, 0x0020,
+  0x0074, 0x0061, 0x0073, 0x006B, 0x0020, 0x0074, 0x0077, 0x0069, 0x0063, 0x0065,
+  0x0021, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -97,6 +110,8 @@ static const XStringRes _Const000A = { _StringsDefault0, 0x0096 };
 static const XRect _Const000B = {{ -8, -8 }, { 9, 9 }};
 static const XRect _Const000C = {{ 0, 0 }, { 1, 1 }};
 static const XStringRes _Const000D = { _StringsDefault0, 0x00C8 };
+static const XStringRes _Const000E = { _StringsDefault0, 0x011E };
+static const XStringRes _Const000F = { _StringsDefault0, 0x0154 };
 
 #ifndef EW_DONT_CHECK_INDEX
   /* This function is used to check the indices when accessing an array.
@@ -5806,6 +5821,432 @@ EW_DEFINE_CLASS( CoreLayoutQuadContext, CoreLayoutContext, _.VMT, _.VMT, _.VMT,
                  _.VMT, _.VMT, _.VMT, "Core::LayoutQuadContext" )
 EW_END_OF_CLASS( CoreLayoutQuadContext )
 
+/* Initializer for the class 'Core::TaskQueue' */
+void CoreTaskQueue__Init( CoreTaskQueue _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  XObject__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreTaskQueue );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( CoreTaskQueue );
+}
+
+/* Re-Initializer for the class 'Core::TaskQueue' */
+void CoreTaskQueue__ReInit( CoreTaskQueue _this )
+{
+  /* At first re-initialize the super class ... */
+  XObject__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Core::TaskQueue' */
+void CoreTaskQueue__Done( CoreTaskQueue _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( XObject );
+
+  /* Don't forget to deinitialize the super class ... */
+  XObject__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Core::TaskQueue.completeTask()' */
+void CoreTaskQueue_completeTask( CoreTaskQueue _this )
+{
+  CoreTask task;
+
+  if ( _this->current == 0 )
+    return;
+
+  task = _this->current;
+  _this->current->queue = 0;
+  _this->current = 0;
+  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
+  CoreTask_OnComplete( task, _this );
+}
+
+/* 'C' function for method : 'Core::TaskQueue.onDispatchNext()' */
+void CoreTaskQueue_onDispatchNext( CoreTaskQueue _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  if ( _this->current != 0 )
+    return;
+
+  if ( _this->first == 0 )
+    return;
+
+  _this->current = _this->first;
+  _this->first = _this->first->next;
+
+  if ( _this->first != 0 )
+    _this->first->prev = 0;
+  else
+    _this->last = 0;
+
+  _this->current->next = 0;
+  _this->isInOnStart = 1;
+  CoreTask__OnStart( _this->current, _this );
+  _this->isInOnStart = 0;
+}
+
+/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext3()' */
+void CoreTaskQueue_onPreDispatchNext3( CoreTaskQueue _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onDispatchNext ), ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext2()' */
+void CoreTaskQueue_onPreDispatchNext2( CoreTaskQueue _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext3 ), ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext1()' */
+void CoreTaskQueue_onPreDispatchNext1( CoreTaskQueue _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext2 ), ((XObject)_this ));
+}
+
+/* The method CancelTask() allows the application to remove a previously registered 
+   task from the task queue. The affected task is determined by the parameter aTask.
+   If the affected task is currently executed, the task is notified to immediately 
+   finalize its work. Afterwards the queue starts the next available task. The method 
+   will throw an error if you try to cancel a task not belonging to this queue. */
+void CoreTaskQueue_CancelTask( CoreTaskQueue _this, CoreTask aTask )
+{
+  XBool wasStarted;
+
+  if (( aTask == 0 ) || ( aTask->queue == 0 ))
+    return;
+
+  if ( aTask->queue != _this )
+  {
+    EwThrow( EwLoadString( &_Const000E ));
+    return;
+  }
+
+  wasStarted = 0;
+
+  if ( _this->current == aTask )
+  {
+    _this->current = 0;
+    wasStarted = 1;
+    EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
+  }
+  else
+  {
+    if ( aTask->next != 0 )
+      aTask->next->prev = aTask->prev;
+    else
+      _this->last = aTask->prev;
+
+    if ( aTask->prev != 0 )
+      aTask->prev->next = aTask->next;
+    else
+      _this->first = aTask->next;
+
+    aTask->prev = 0;
+    aTask->next = 0;
+  }
+
+  aTask->queue = 0;
+
+  if ( wasStarted )
+    CoreTask_OnCancel( aTask, _this );
+}
+
+/* The method ScheduleTask() registers the task passed in the parameter aTask for 
+   later execution.
+   The tasks are executed in the order in which they have been previously scheduled. 
+   If the parameter aWithPriority is false, the new task will be arranged at the 
+   end of the list with waiting tasks. If the parameter is true, the task is enqueued 
+   in front of all waiting tasks.
+   The method will throw an error if you try to schedule the same task twice. */
+void CoreTaskQueue_ScheduleTask( CoreTaskQueue _this, CoreTask aTask, XBool aWithPriority )
+{
+  if ( aTask == 0 )
+    return;
+
+  if ( aTask->queue != 0 )
+  {
+    EwThrow( EwLoadString( &_Const000F ));
+    return;
+  }
+
+  aTask->queue = _this;
+
+  if ( aWithPriority )
+  {
+    aTask->next = _this->first;
+
+    if ( _this->first != 0 )
+      _this->first->prev = aTask;
+    else
+      _this->last = aTask;
+
+    _this->first = aTask;
+  }
+  else
+  {
+    aTask->prev = _this->last;
+
+    if ( _this->last != 0 )
+      _this->last->next = aTask;
+    else
+      _this->first = aTask;
+
+    _this->last = aTask;
+  }
+
+  if ( _this->current == 0 )
+    EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
+}
+
+/* Variants derived from the class : 'Core::TaskQueue' */
+EW_DEFINE_CLASS_VARIANTS( CoreTaskQueue )
+EW_END_OF_CLASS_VARIANTS( CoreTaskQueue )
+
+/* Virtual Method Table (VMT) for the class : 'Core::TaskQueue' */
+EW_DEFINE_CLASS( CoreTaskQueue, XObject, current, current, isInOnStart, isInOnStart, 
+                 isInOnStart, isInOnStart, "Core::TaskQueue" )
+EW_END_OF_CLASS( CoreTaskQueue )
+
+/* Initializer for the class 'Core::Task' */
+void CoreTask__Init( CoreTask _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  XObject__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreTask );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( CoreTask );
+}
+
+/* Re-Initializer for the class 'Core::Task' */
+void CoreTask__ReInit( CoreTask _this )
+{
+  /* At first re-initialize the super class ... */
+  XObject__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Core::Task' */
+void CoreTask__Done( CoreTask _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( XObject );
+
+  /* Don't forget to deinitialize the super class ... */
+  XObject__Done( &_this->_.Super );
+}
+
+/* The method OnComplete() is called when the task is done with its work. The default 
+   implementation of this method does nothing. You can override this method in derived 
+   task classes and implement what to do when the task is finished. For example, 
+   you can release resources used temporarily during animations.
+   To complete a task you should call explicitly the method @Complete(). The parameter 
+   aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
+   again a task to the same queue, etc. */
+void CoreTask_OnComplete( CoreTask _this, CoreTaskQueue aQueue )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( aQueue );
+}
+
+/* The method OnCancel() is called when the task is canceled after being started. 
+   The default implementation of this method does nothing. You can override this 
+   method in derived task classes and implement what to do when the task is prematurely 
+   aborted. For example, you can stop running timers and effects started in the 
+   preceding @OnStart() method.
+   To cancel a task you should call explicitly the method @Cancel(). The parameter 
+   aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
+   again a task to the same queue, etc. */
+void CoreTask_OnCancel( CoreTask _this, CoreTaskQueue aQueue )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( aQueue );
+}
+
+/* The method OnStart() is called at the begin of the execution of this task. The 
+   default implementation of the method simply cancels the task causing the next 
+   available task in the task queue to be started. You should override this method 
+   in derived task classes to implement what the task should do.
+   There are three typical application cases how to implement the OnStart() method:
+   - In its simplest case the entire task algorithm is implemented in the OnStart() 
+   method. In this case the method @Complete() should be called before leaving OnStart().
+   - If the task does take long time for execution by using timers or effects, you 
+   should put in OnStart() the code necessary to start the timers/effects. Don't 
+   forget to call @Complete() when all timers/effects are done.
+   - If the task is divided in many small execution steps, the OnStart() method 
+   should call @Continue() to request the @OnContinue() method to be executed after 
+   a short delay (usually after the next screen update). In @OnContinue() you can 
+   perform the next step of the task. If necessary, @OnContinue() can also request 
+   to be called again after a short delay. At the end of the task, after the last 
+   step is terminated, don't forget to call @Complete().
+   The parameter aQueue refers to the queue this task belongs to. It can be used 
+   to schedule more task to execute later. */
+void CoreTask_OnStart( CoreTask _this, CoreTaskQueue aQueue )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( aQueue );
+
+  CoreTask_Cancel( _this );
+}
+
+/* Wrapper function for the virtual method : 'Core::Task.OnStart()' */
+void CoreTask__OnStart( void* _this, CoreTaskQueue aQueue )
+{
+  ((CoreTask)_this)->_.VMT->OnStart((CoreTask)_this, aQueue );
+}
+
+/* The method Complete() informs the task queue about the completion of this task. 
+   Thereupon the next available task in the queue can be executed. This method is 
+   usually called in context of the @OnStart() or @OnContinue() method when the 
+   task has finalized its work. Calling the method for a not current task has no 
+   effect. */
+void CoreTask_Complete( CoreTask _this )
+{
+  if (( _this->queue != 0 ) && ( _this->queue->current == _this ))
+    CoreTaskQueue_completeTask( _this->queue );
+}
+
+/* The method Cancel() removes this task from the task queue where the task has 
+   been previously scheduled. In the case the task is already in progress, the queue 
+   will advise the task to abort its work immediately before the task is removed 
+   from the queue (see @OnCancel()).
+   Whether a task is waiting for execution can be determined by @IsScheduled(). 
+   Whether a task is in progress can be determined by @IsCurrent().
+   Canceling a running task will cause the task queue to start the next available 
+   task. */
+void CoreTask_Cancel( CoreTask _this )
+{
+  if ( _this->queue != 0 )
+    CoreTaskQueue_CancelTask( _this->queue, _this );
+}
+
+/* Variants derived from the class : 'Core::Task' */
+EW_DEFINE_CLASS_VARIANTS( CoreTask )
+EW_END_OF_CLASS_VARIANTS( CoreTask )
+
+/* Virtual Method Table (VMT) for the class : 'Core::Task' */
+EW_DEFINE_CLASS( CoreTask, XObject, queue, queue, _.VMT, _.VMT, _.VMT, _.VMT, "Core::Task" )
+  CoreTask_OnStart,
+EW_END_OF_CLASS( CoreTask )
+
+/* Initializer for the class 'Core::SystemEventTask' */
+void CoreSystemEventTask__Init( CoreSystemEventTask _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  CoreTask__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreSystemEventTask );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( CoreSystemEventTask );
+}
+
+/* Re-Initializer for the class 'Core::SystemEventTask' */
+void CoreSystemEventTask__ReInit( CoreSystemEventTask _this )
+{
+  /* At first re-initialize the super class ... */
+  CoreTask__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Core::SystemEventTask' */
+void CoreSystemEventTask__Done( CoreSystemEventTask _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( CoreTask );
+
+  /* Don't forget to deinitialize the super class ... */
+  CoreTask__Done( &_this->_.Super );
+}
+
+/* The method OnStart() is called at the begin of the execution of this task. The 
+   default implementation of the method simply cancels the task causing the next 
+   available task in the task queue to be started. You should override this method 
+   in derived task classes to implement what the task should do.
+   There are three typical application cases how to implement the OnStart() method:
+   - In its simplest case the entire task algorithm is implemented in the OnStart() 
+   method. In this case the method @Complete() should be called before leaving OnStart().
+   - If the task does take long time for execution by using timers or effects, you 
+   should put in OnStart() the code necessary to start the timers/effects. Don't 
+   forget to call @Complete() when all timers/effects are done.
+   - If the task is divided in many small execution steps, the OnStart() method 
+   should call @Continue() to request the @OnContinue() method to be executed after 
+   a short delay (usually after the next screen update). In @OnContinue() you can 
+   perform the next step of the task. If necessary, @OnContinue() can also request 
+   to be called again after a short delay. At the end of the task, after the last 
+   step is terminated, don't forget to call @Complete().
+   The parameter aQueue refers to the queue this task belongs to. It can be used 
+   to schedule more task to execute later. */
+void CoreSystemEventTask_OnStart( CoreSystemEventTask _this, CoreTaskQueue aQueue )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( aQueue );
+
+  _this->target->context = _this->context;
+  EwNotifyObjObservers((XObject)_this->target, 0 );
+  EwPostSignal( EwNewSlot( _this, CoreSystemEventTask_onDelivered ), ((XObject)_this ));
+}
+
+/* 'C' function for method : 'Core::SystemEventTask.onDelivered()' */
+void CoreSystemEventTask_onDelivered( CoreSystemEventTask _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  _this->target->context = 0;
+  _this->target = 0;
+  _this->context = 0;
+  CoreTask_Complete((CoreTask)_this );
+}
+
+/* Variants derived from the class : 'Core::SystemEventTask' */
+EW_DEFINE_CLASS_VARIANTS( CoreSystemEventTask )
+EW_END_OF_CLASS_VARIANTS( CoreSystemEventTask )
+
+/* Virtual Method Table (VMT) for the class : 'Core::SystemEventTask' */
+EW_DEFINE_CLASS( CoreSystemEventTask, CoreTask, context, context, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, "Core::SystemEventTask" )
+  CoreSystemEventTask_OnStart,
+EW_END_OF_CLASS( CoreSystemEventTask )
+
+/* User defined auto object: 'Core::SystemEventQueue' */
+EW_DEFINE_AUTOOBJECT( CoreSystemEventQueue, CoreTaskQueue )
+
+/* Initializer for the auto object 'Core::SystemEventQueue' */
+void CoreSystemEventQueue__Init( CoreTaskQueue _this )
+{
+  EW_UNUSED_ARG( _this );
+}
+
+/* Re-Initializer for the auto object 'Core::SystemEventQueue' */
+void CoreSystemEventQueue__ReInit( CoreTaskQueue _this )
+{
+  EW_UNUSED_ARG( _this );
+}
+
+/* Table with links to derived variants of the auto object : 'Core::SystemEventQueue' */
+EW_DEFINE_AUTOOBJECT_VARIANTS( CoreSystemEventQueue )
+EW_END_OF_AUTOOBJECT_VARIANTS( CoreSystemEventQueue )
+
 /* Initializer for the class 'Core::Resource' */
 void CoreResource__Init( CoreResource _this, XObject aLink, XHandle aArg )
 {
@@ -6065,30 +6506,31 @@ EW_DEFINE_CLASS( CoreTimer, XObject, OnTrigger, OnTrigger, OnTrigger, timer, tim
   CoreTimer_Trigger,
 EW_END_OF_CLASS( CoreTimer )
 
-/* Initializer for the class 'Core::PropertyObserver' */
-void CorePropertyObserver__Init( CorePropertyObserver _this, XObject aLink, XHandle aArg )
+/* Initializer for the class 'Core::SystemEvent' */
+void CoreSystemEvent__Init( CoreSystemEvent _this, XObject aLink, XHandle aArg )
 {
   /* At first initialize the super class ... */
   XObject__Init( &_this->_.Super, aLink, aArg );
 
   /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( CorePropertyObserver );
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreSystemEvent );
 
   /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( CorePropertyObserver );
+  _this->_.VMT = EW_CLASS( CoreSystemEvent );
 
   /* ... and initialize objects, variables, properties, etc. */
+  _this->queue = EwGetAutoObject( &CoreSystemEventQueue, CoreTaskQueue );
 }
 
-/* Re-Initializer for the class 'Core::PropertyObserver' */
-void CorePropertyObserver__ReInit( CorePropertyObserver _this )
+/* Re-Initializer for the class 'Core::SystemEvent' */
+void CoreSystemEvent__ReInit( CoreSystemEvent _this )
 {
   /* At first re-initialize the super class ... */
   XObject__ReInit( &_this->_.Super );
 }
 
-/* Finalizer method for the class 'Core::PropertyObserver' */
-void CorePropertyObserver__Done( CorePropertyObserver _this )
+/* Finalizer method for the class 'Core::SystemEvent' */
+void CoreSystemEvent__Done( CoreSystemEvent _this )
 {
   /* Finalize this class */
   _this->_.Super._.VMT = EW_CLASS( XObject );
@@ -6097,40 +6539,104 @@ void CorePropertyObserver__Done( CorePropertyObserver _this )
   XObject__Done( &_this->_.Super );
 }
 
-/* 'C' function for method : 'Core::PropertyObserver.onEvent()' */
-void CorePropertyObserver_onEvent( CorePropertyObserver _this, XObject sender )
+/* The method Trigger() enqueues this event for delivery. The delivery occurs asynchronously 
+   in the order in which the events are triggered. If the parameter aWithPriority 
+   is false, the new event will be arranged at the end of a common system event 
+   queue. If the parameter is true, the event is enqueued in front of all waiting 
+   events causing it to be delivered early.
+   When the event is delivered all associated Core::SystemEventHandler components 
+   are notified to handle the event. Here the system event handler can access and 
+   evaluate the optional context data passed in the parameter aContext. */
+void CoreSystemEvent_Trigger( CoreSystemEvent _this, XObject aContext, XBool aWithPriority )
+{
+  CoreSystemEventTask task = EwNewObject( CoreSystemEventTask, 0 );
+
+  task->target = _this;
+  task->context = aContext;
+  CoreTaskQueue_ScheduleTask( _this->queue, ((CoreTask)task ), aWithPriority );
+}
+
+/* Variants derived from the class : 'Core::SystemEvent' */
+EW_DEFINE_CLASS_VARIANTS( CoreSystemEvent )
+EW_END_OF_CLASS_VARIANTS( CoreSystemEvent )
+
+/* Virtual Method Table (VMT) for the class : 'Core::SystemEvent' */
+EW_DEFINE_CLASS( CoreSystemEvent, XObject, context, context, _.VMT, _.VMT, _.VMT, 
+                 _.VMT, "Core::SystemEvent" )
+EW_END_OF_CLASS( CoreSystemEvent )
+
+/* Initializer for the class 'Core::SystemEventHandler' */
+void CoreSystemEventHandler__Init( CoreSystemEventHandler _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  XObject__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreSystemEventHandler );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( CoreSystemEventHandler );
+
+  /* ... and initialize objects, variables, properties, etc. */
+}
+
+/* Re-Initializer for the class 'Core::SystemEventHandler' */
+void CoreSystemEventHandler__ReInit( CoreSystemEventHandler _this )
+{
+  /* At first re-initialize the super class ... */
+  XObject__ReInit( &_this->_.Super );
+}
+
+/* Finalizer method for the class 'Core::SystemEventHandler' */
+void CoreSystemEventHandler__Done( CoreSystemEventHandler _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( XObject );
+
+  /* Don't forget to deinitialize the super class ... */
+  XObject__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Core::SystemEventHandler.onEvent()' */
+void CoreSystemEventHandler_onEvent( CoreSystemEventHandler _this, XObject sender )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  EwSignal( _this->OnEvent, ((XObject)_this ));
-}
-
-/* 'C' function for method : 'Core::PropertyObserver.OnSetOutlet()' */
-void CorePropertyObserver_OnSetOutlet( CorePropertyObserver _this, XRef value )
-{
-  if ( !EwCompRef( _this->Outlet, value ))
+  if ( _this->Event == 0 )
     return;
 
-  if ( _this->Outlet.Object != 0 )
-    EwDetachRefObserver( EwNewSlot( _this, CorePropertyObserver_onEvent ), _this->Outlet, 
+  _this->Context = _this->Event->context;
+  EwSignal( _this->OnEvent, ((XObject)_this ));
+  _this->Context = 0;
+}
+
+/* 'C' function for method : 'Core::SystemEventHandler.OnSetEvent()' */
+void CoreSystemEventHandler_OnSetEvent( CoreSystemEventHandler _this, CoreSystemEvent 
+  value )
+{
+  if ( _this->Event == value )
+    return;
+
+  if ( _this->Event != 0 )
+    EwDetachObjObserver( EwNewSlot( _this, CoreSystemEventHandler_onEvent ), (XObject)_this->Event, 
       0 );
 
-  _this->Outlet = value;
+  _this->Event = value;
 
-  if ( _this->Outlet.Object != 0 )
-    EwAttachRefObserver( EwNewSlot( _this, CorePropertyObserver_onEvent ), _this->Outlet, 
+  if ( _this->Event != 0 )
+    EwAttachObjObserver( EwNewSlot( _this, CoreSystemEventHandler_onEvent ), (XObject)_this->Event, 
       0 );
 }
 
-/* Variants derived from the class : 'Core::PropertyObserver' */
-EW_DEFINE_CLASS_VARIANTS( CorePropertyObserver )
-EW_END_OF_CLASS_VARIANTS( CorePropertyObserver )
+/* Variants derived from the class : 'Core::SystemEventHandler' */
+EW_DEFINE_CLASS_VARIANTS( CoreSystemEventHandler )
+EW_END_OF_CLASS_VARIANTS( CoreSystemEventHandler )
 
-/* Virtual Method Table (VMT) for the class : 'Core::PropertyObserver' */
-EW_DEFINE_CLASS( CorePropertyObserver, XObject, OnEvent, OnEvent, OnEvent, Outlet, 
-                 _.VMT, _.VMT, "Core::PropertyObserver" )
-EW_END_OF_CLASS( CorePropertyObserver )
+/* Virtual Method Table (VMT) for the class : 'Core::SystemEventHandler' */
+EW_DEFINE_CLASS( CoreSystemEventHandler, XObject, Context, Context, OnEvent, _.VMT, 
+                 _.VMT, _.VMT, "Core::SystemEventHandler" )
+EW_END_OF_CLASS( CoreSystemEventHandler )
 
 /* Checksum to test compatibility of BLOB files. */
 const unsigned long EwBlobChecksum[] = { 0x00000000, 0x00000000 };
