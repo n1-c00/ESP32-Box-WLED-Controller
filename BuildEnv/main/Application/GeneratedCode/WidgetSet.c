@@ -1704,6 +1704,17 @@ void WidgetSetHorizontalSlider_onConfigChanged( WidgetSetHorizontalSlider _this,
   CoreGroup_InvalidateViewState((CoreGroup)_this );
 }
 
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.onOutlet()' */
+void WidgetSetHorizontalSlider_onOutlet( WidgetSetHorizontalSlider _this, XObject 
+  sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  if ( _this->Outlet.Object != 0 )
+    WidgetSetHorizontalSlider_OnSetCurrentValue( _this, EwOnGetInt32( _this->Outlet ));
+}
+
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onRepetitionTimer()' */
 void WidgetSetHorizontalSlider_onRepetitionTimer( WidgetSetHorizontalSlider _this, 
   XObject sender )
@@ -1747,6 +1758,12 @@ void WidgetSetHorizontalSlider_onRepetitionTimer( WidgetSetHorizontalSlider _thi
 
   if ( oldValue == WidgetSetHorizontalSlider_OnGetCurrentValue( _this ))
     return;
+
+  if ( _this->Outlet.Object != 0 )
+  {
+    EwOnSetInt32( _this->Outlet, WidgetSetHorizontalSlider_OnGetCurrentValue( _this ));
+    EwNotifyRefObservers( _this->Outlet, 0 );
+  }
 }
 
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onReleaseKey()' */
@@ -1806,6 +1823,12 @@ void WidgetSetHorizontalSlider_onPressKey( WidgetSetHorizontalSlider _this, XObj
 
   if ( oldValue == WidgetSetHorizontalSlider_OnGetCurrentValue( _this ))
     return;
+
+  if ( _this->Outlet.Object != 0 )
+  {
+    EwOnSetInt32( _this->Outlet, WidgetSetHorizontalSlider_OnGetCurrentValue( _this ));
+    EwNotifyRefObservers( _this->Outlet, 0 );
+  }
 }
 
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onDragTouch()' */
@@ -1852,6 +1875,12 @@ void WidgetSetHorizontalSlider_onDragTouch( WidgetSetHorizontalSlider _this, XOb
 
   if ( oldValue == WidgetSetHorizontalSlider_OnGetCurrentValue( _this ))
     return;
+
+  if ( _this->Outlet.Object != 0 )
+  {
+    EwOnSetInt32( _this->Outlet, WidgetSetHorizontalSlider_OnGetCurrentValue( _this ));
+    EwNotifyRefObservers( _this->Outlet, 0 );
+  }
 }
 
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onReleaseTouch()' */
@@ -1907,6 +1936,27 @@ void WidgetSetHorizontalSlider_onPressTouch( WidgetSetHorizontalSlider _this, XO
   _this->KeyHandlerLeft.Enabled = 0;
   CoreGroup_InvalidateViewState((CoreGroup)_this );
   _this->touchStartValue = WidgetSetHorizontalSlider_OnGetCurrentValue( _this );
+}
+
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetOutlet()' */
+void WidgetSetHorizontalSlider_OnSetOutlet( WidgetSetHorizontalSlider _this, XRef 
+  value )
+{
+  if ( !EwCompRef( _this->Outlet, value ))
+    return;
+
+  if ( _this->Outlet.Object != 0 )
+    EwDetachRefObserver( EwNewSlot( _this, WidgetSetHorizontalSlider_onOutlet ), 
+      _this->Outlet, 0 );
+
+  _this->Outlet = value;
+
+  if ( value.Object != 0 )
+    EwAttachRefObserver( EwNewSlot( _this, WidgetSetHorizontalSlider_onOutlet ), 
+      value, 0 );
+
+  if ( value.Object != 0 )
+    EwSignal( EwNewSlot( _this, WidgetSetHorizontalSlider_onOutlet ), ((XObject)_this ));
 }
 
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetMaxValue()' */
@@ -1982,7 +2032,7 @@ EW_END_OF_CLASS_VARIANTS( WidgetSetHorizontalSlider )
 
 /* Virtual Method Table (VMT) for the class : 'WidgetSet::HorizontalSlider' */
 EW_DEFINE_CLASS( WidgetSetHorizontalSlider, CoreGroup, RepetitionTimer, imageView, 
-                 OnEnd, touchStartValue, touchStartValue, touchStartValue, "WidgetSet::HorizontalSlider" )
+                 OnEnd, Outlet, touchStartValue, touchStartValue, "WidgetSet::HorizontalSlider" )
   CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreGroup_Draw,
@@ -2456,6 +2506,16 @@ void WidgetSetToggleButton_onConfigChanged( WidgetSetToggleButton _this, XObject
   CoreGroup_InvalidateViewState((CoreGroup)_this );
 }
 
+/* 'C' function for method : 'WidgetSet::ToggleButton.onOutlet()' */
+void WidgetSetToggleButton_onOutlet( WidgetSetToggleButton _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  if ( _this->Outlet.Object != 0 )
+    WidgetSetToggleButton_OnSetChecked( _this, EwOnGetBool( _this->Outlet ));
+}
+
 /* 'C' function for method : 'WidgetSet::ToggleButton.onFlashTimer()' */
 void WidgetSetToggleButton_onFlashTimer( WidgetSetToggleButton _this, XObject sender )
 {
@@ -2469,6 +2529,12 @@ void WidgetSetToggleButton_onFlashTimer( WidgetSetToggleButton _this, XObject se
     EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
   else
     EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+
+  if ( _this->Outlet.Object != 0 )
+  {
+    EwOnSetBool( _this->Outlet, _this->Checked );
+    EwNotifyRefObservers( _this->Outlet, 0 );
+  }
 }
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.onReleaseKey()' */
@@ -2495,6 +2561,12 @@ void WidgetSetToggleButton_onReleaseKey( WidgetSetToggleButton _this, XObject se
       EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
     else
       EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+
+    if ( _this->Outlet.Object != 0 )
+    {
+      EwOnSetBool( _this->Outlet, _this->Checked );
+      EwNotifyRefObservers( _this->Outlet, 0 );
+    }
   }
   else
   {
@@ -2522,6 +2594,12 @@ void WidgetSetToggleButton_onPressKey( WidgetSetToggleButton _this, XObject send
       EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
     else
       EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+
+    if ( _this->Outlet.Object != 0 )
+    {
+      EwOnSetBool( _this->Outlet, _this->Checked );
+      EwNotifyRefObservers( _this->Outlet, 0 );
+    }
   }
 
   _this->onPressKeyTime = _this->KeyHandler.Time;
@@ -2575,6 +2653,12 @@ void WidgetSetToggleButton_onReleaseTouch( WidgetSetToggleButton _this, XObject
       EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
     else
       EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+
+    if ( _this->Outlet.Object != 0 )
+    {
+      EwOnSetBool( _this->Outlet, _this->Checked );
+      EwNotifyRefObservers( _this->Outlet, 0 );
+    }
   }
   else
   {
@@ -2600,7 +2684,33 @@ void WidgetSetToggleButton_onPressTouch( WidgetSetToggleButton _this, XObject se
       EwPostSignal( _this->OnSwitchOn, ((XObject)_this ));
     else
       EwPostSignal( _this->OnSwitchOff, ((XObject)_this ));
+
+    if ( _this->Outlet.Object != 0 )
+    {
+      EwOnSetBool( _this->Outlet, _this->Checked );
+      EwNotifyRefObservers( _this->Outlet, 0 );
+    }
   }
+}
+
+/* 'C' function for method : 'WidgetSet::ToggleButton.OnSetOutlet()' */
+void WidgetSetToggleButton_OnSetOutlet( WidgetSetToggleButton _this, XRef value )
+{
+  if ( !EwCompRef( _this->Outlet, value ))
+    return;
+
+  if ( _this->Outlet.Object != 0 )
+    EwDetachRefObserver( EwNewSlot( _this, WidgetSetToggleButton_onOutlet ), _this->Outlet, 
+      0 );
+
+  _this->Outlet = value;
+
+  if ( value.Object != 0 )
+    EwAttachRefObserver( EwNewSlot( _this, WidgetSetToggleButton_onOutlet ), value, 
+      0 );
+
+  if ( value.Object != 0 )
+    EwSignal( EwNewSlot( _this, WidgetSetToggleButton_onOutlet ), ((XObject)_this ));
 }
 
 /* 'C' function for method : 'WidgetSet::ToggleButton.OnSetChecked()' */
@@ -2670,7 +2780,7 @@ EW_END_OF_CLASS_VARIANTS( WidgetSetToggleButton )
 
 /* Virtual Method Table (VMT) for the class : 'WidgetSet::ToggleButton' */
 EW_DEFINE_CLASS( WidgetSetToggleButton, CoreGroup, FlashTimer, textView, OnSwitchOn, 
-                 LabelOn, LabelOn, onPressKeyTime, "WidgetSet::ToggleButton" )
+                 Outlet, LabelOn, onPressKeyTime, "WidgetSet::ToggleButton" )
   CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreGroup_Draw,

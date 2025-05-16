@@ -52,11 +52,10 @@ int http_POST(char *json_string)
 }
 
 
-char * http_GET()
+int http_GET(char *buffer, int size)
 {
     struct sockaddr_in dest_addr;
-    int s, size;
-    char recv_buf[64];
+    int s, r;
     char responsecode[4];
     int ret_responsecode;
     
@@ -108,25 +107,16 @@ char * http_GET()
     ESP_LOGI(TAG, "... set socket receiving timeout success");
 
     /* Fetch the first line of the HTTP response */
-    bzero(recv_buf, sizeof(recv_buf));              //clear the buffer
-    size = read(s, recv_buf, sizeof(recv_buf)-1);
+    bzero(buffer, size);              //clear the buffer
+    r = read(s, buffer, size-1);
     
     /*extract the response code out of the first line of response*/
-    sscanf(recv_buf, "HTTP/%*s %3s", responsecode);
+    sscanf(buffer, "HTTP/%*s %3s", responsecode);
     ret_responsecode = atoi(responsecode);
     ESP_LOGI(TAG, "Response code: %d", ret_responsecode);
 
-    /* Read HTTP response */
-    do {
-        bzero(recv_buf, sizeof(recv_buf));
-        size = read(s, recv_buf, sizeof(recv_buf)-1);
-        for(int i = 0; i < size; i++) {
-            putchar(recv_buf[i]);
-        }
-    } while(size > 0);
-
     //close the socket and return the response
-    ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d.", size, errno);
+    ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d.", r, errno);
     close(s);
-    return recv_buf;
+    return ret_responsecode;
 }

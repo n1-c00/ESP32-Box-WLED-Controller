@@ -3,7 +3,7 @@ $version 1.0
 attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.BrightnessSlot;
+attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -31,45 +31,70 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-39,-25>;
-  attr zoom = 1.0;
+  attr scrollTo = <162,-25>;
+  attr zoom = 0.75;
 }
 
 view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-32,-2>;
-  attr zoom = 1.75;
+  attr scrollTo = <-127,-62>;
+  attr zoom = 1.25;
+}
+
+view class Application::DeviceClass
+{
+  attr enableWireMode = false;
+  attr scrollTo = <977,-15>;
+  attr zoom = 0.75;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-53,-34>;
-  attr zoom = 0.75;
+  attr scrollTo = <17,-8>;
+  attr zoom = 1.0;
 }
 
-view class Application::DeviceClass
+view profile Profile
 {
-  attr scrollTo = <943,-88>;
-  attr zoom = 0.75;
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
 }
 
-codeview Application::DeviceClass.TriggerEvent
+view class WidgetSet::ToggleButton
 {
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <35,40>;
-  attr codeSelStart = <35,40>;
+  attr enableWireMode = false;
+  attr scrollTo = <185,617>;
+  attr zoom = 1.0;
 }
 
 codeview Application::Application.BrightnessSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <62,2>;
-  attr codeSelStart = <62,2>;
+  attr codeSelEnd = <66,0>;
+  attr codeSelStart = <66,0>;
+}
+
+codeview Application::DeviceClass.EWUpdateButton
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <33,1>;
+  attr codeSelStart = <33,1>;
+}
+
+codeview Application::DeviceClass.EWUpdateSlider
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,2>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
 }

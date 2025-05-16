@@ -47,8 +47,8 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 
 /* Constant values used in this 'C' module only. */
 static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
-static const XRect _Const0001 = {{ 216, 181 }, { 320, 240 }};
-static const XRect _Const0002 = {{ 0, 181 }, { 200, 240 }};
+static const XRect _Const0001 = {{ 108, 43 }, { 212, 102 }};
+static const XRect _Const0002 = {{ 60, 135 }, { 260, 195 }};
 static const XStringRes _Const0003 = { _StringsDefault0, 0x0003 };
 static const XStringRes _Const0004 = { _StringsDefault0, 0x0007 };
 static const XStringRes _Const0005 = { _StringsDefault0, 0x000D };
@@ -86,11 +86,16 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
+  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
+  ApplicationDeviceClass_OnSetbuttonValue ));
   _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
   _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( &_this->BrightnessSlider, 
+  WidgetSetHorizontalSlider_OnGetCurrentValue, WidgetSetHorizontalSlider_OnSetCurrentValue ));
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
 }
@@ -149,14 +154,13 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
 void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
   sender )
 {
-  XInt32 brightnessValue;
   XString brightnessString;
 
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  brightnessValue = WidgetSetHorizontalSlider_OnGetCurrentValue( &_this->BrightnessSlider );
-  brightnessString = EwNewStringInt( brightnessValue, 0, 10 );
+  brightnessString = EwNewStringInt( WidgetSetHorizontalSlider_OnGetCurrentValue( 
+  &_this->BrightnessSlider ), 0, 10 );
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
   EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
 }
@@ -329,6 +333,70 @@ void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString
     extern void LedSet(XString key, XString setpoint, XString dataType);
     LedSet(key, setpoint, dataType);
   }
+}
+
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32 
+  aNewValue )
+{
+  if ( aNewValue != _this->brightnessValue )
+  {
+    _this->brightnessValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
+      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
+  }
+}
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
+void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 aNewValue )
+{
+  ApplicationDeviceClass_EWUpdateSlider((ApplicationDeviceClass)_this, aNewValue );
+}
+
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool 
+  aNewValue )
+{
+  if ( aNewValue != _this->buttonValue )
+  {
+    _this->buttonValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
+      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
+  }
+}
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */
+void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue )
+{
+  ApplicationDeviceClass_EWUpdateButton((ApplicationDeviceClass)_this, aNewValue );
+}
+
+/* Default onget method for the property 'brightnessValue' */
+XInt32 ApplicationDeviceClass_OnGetbrightnessValue( ApplicationDeviceClass _this )
+{
+  return _this->brightnessValue;
+}
+
+/* Default onset method for the property 'brightnessValue' */
+void ApplicationDeviceClass_OnSetbrightnessValue( ApplicationDeviceClass _this, 
+  XInt32 value )
+{
+  _this->brightnessValue = value;
+}
+
+/* Default onget method for the property 'buttonValue' */
+XBool ApplicationDeviceClass_OnGetbuttonValue( ApplicationDeviceClass _this )
+{
+  return _this->buttonValue;
+}
+
+/* Default onset method for the property 'buttonValue' */
+void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBool 
+  value )
+{
+  _this->buttonValue = value;
 }
 
 /* Variants derived from the class : 'Application::DeviceClass' */

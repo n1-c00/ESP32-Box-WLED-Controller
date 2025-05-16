@@ -149,6 +149,7 @@ EW_DEFINE_FIELDS( WidgetSetHorizontalSlider, CoreGroup )
   EW_VARIABLE( frameView2,      ViewsFrame )
   EW_PROPERTY( Appearance,      WidgetSetHorizontalSliderConfig )
   EW_PROPERTY( OnEnd,           XSlot )
+  EW_PROPERTY( Outlet,          XRef )
   EW_VARIABLE( touchStartValue, XInt32 )
   EW_PROPERTY( MaxValue,        XInt32 )
   EW_PROPERTY( CurrentValue,    XInt32 )
@@ -209,6 +210,10 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
 void WidgetSetHorizontalSlider_onConfigChanged( WidgetSetHorizontalSlider _this, 
   XObject sender );
 
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.onOutlet()' */
+void WidgetSetHorizontalSlider_onOutlet( WidgetSetHorizontalSlider _this, XObject 
+  sender );
+
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onRepetitionTimer()' */
 void WidgetSetHorizontalSlider_onRepetitionTimer( WidgetSetHorizontalSlider _this, 
   XObject sender );
@@ -232,6 +237,10 @@ void WidgetSetHorizontalSlider_onReleaseTouch( WidgetSetHorizontalSlider _this,
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.onPressTouch()' */
 void WidgetSetHorizontalSlider_onPressTouch( WidgetSetHorizontalSlider _this, XObject 
   sender );
+
+/* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetOutlet()' */
+void WidgetSetHorizontalSlider_OnSetOutlet( WidgetSetHorizontalSlider _this, XRef 
+  value );
 
 /* 'C' function for method : 'WidgetSet::HorizontalSlider.OnSetMaxValue()' */
 void WidgetSetHorizontalSlider_OnSetMaxValue( WidgetSetHorizontalSlider _this, XInt32 

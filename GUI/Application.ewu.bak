@@ -41,7 +41,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::ToggleButton toggleLightButton
   {
-    preset Bounds = <216,181,320,240>;
+    preset Bounds = <108,43,212,102>;
     preset OnUpdate = null;
     preset OnSwitchOn = LightOnSlot;
     preset OnSwitchOff = LightOffSlot;
@@ -57,7 +57,7 @@ class Application : Core::Root
     Application::Device.LedSetMethod("on", "true", "bool");
   }
 
-  // new created Slots for LED Controlls
+  // LedSet
   note group Note
   {
     attr Bounds = <550,-10,850,250>;
@@ -72,7 +72,7 @@ class Application : Core::Root
   $rect <20,20,160,60>
   object WidgetSet::HorizontalSlider BrightnessSlider
   {
-    preset Bounds = <0,181,200,240>;
+    preset Bounds = <60,135,260,195>;
     preset OnEnd = BrightnessSlot;
     preset MaxValue = 255;
     preset CurrentValue = 40;
@@ -82,9 +82,66 @@ class Application : Core::Root
   $rect <560,130,760,170>
   slot BrightnessSlot
   {
-    var int32 brightnessValue = BrightnessSlider.CurrentValue;
-    var string brightnessString = string(brightnessValue);
+    var string brightnessString = string(BrightnessSlider.CurrentValue);
     Application::Device.LedSetMethod("bri", brightnessString, "int");
+  }
+
+  $rect <870,20,1070,60>
+  object Core::PropertyObserver brightnessValueObserver
+  {
+    preset OnEvent = setbrightnessValue;
+    preset Outlet = ^Application::Device.brightnessValue;
+  }
+
+  // This slot method is executed when the associated property observer 'PropertyObserver' \
+  // is notified.
+  $rect <1070,20,1270,60>
+  slot setbrightnessValue
+  {
+    BrightnessSlider.CurrentValue = Application::Device.brightnessValue;
+    /*
+       HINT 1:
+
+       You can evaluate the 'sender' parameter. It refers to the observer
+       this method has been called from. This is very useful if multiple
+       property observer are connected to one and the same 'onEvent'
+       method:
+
+       if ( sender == Observer1 )
+         trace "The event comes from the Observer1";
+
+       if ( sender == Observer2 )
+         trace "... or from the Observer2";
+    */
+  }
+
+  $rect <870,70,1070,110>
+  object Core::PropertyObserver buttonValueObserver
+  {
+    preset OnEvent = setButtonValue;
+    preset Outlet = ^Application::Device.buttonValue;
+  }
+
+  // This slot method is executed when the associated property observer 'PropertyObserver' \
+  // is notified.
+  $rect <1070,70,1270,110>
+  slot setButtonValue
+  {
+    toggleLightButton.Checked = Application::Device.buttonValue;
+    /*
+       HINT 1:
+
+       You can evaluate the 'sender' parameter. It refers to the observer
+       this method has been called from. This is very useful if multiple
+       property observer are connected to one and the same 'onEvent'
+       method:
+
+       if ( sender == Observer1 )
+         trace "The event comes from the Observer1";
+
+       if ( sender == Observer2 )
+         trace "... or from the Observer2";
+    */
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -100,6 +157,10 @@ class Application : Core::Root
   $member LightOffSlot
   $member BrightnessSlider
   $member BrightnessSlot
+  $member brightnessValueObserver
+  $member setbrightnessValue
+  $member buttonValueObserver
+  $member setButtonValue
 }
 
 $rect <230,20,430,60>
@@ -284,12 +345,6 @@ class DeviceClass : Templates::DeviceClass
     attr Bounds = <320,0,1100,220>;
   }
 
-  note arrow Note2
-  {
-    attr Point1 = <250,50>;
-    attr Point2 = <320,50>;
-  }
-
   // Constructor and Destructor
   note group Note1
   {
@@ -308,7 +363,74 @@ class DeviceClass : Templates::DeviceClass
   // new created Methods for LED Controlls
   note group Note
   {
-    attr Bounds = <1160,0,1470,300>;
+    attr Bounds = <1160,0,1710,400>;
+  }
+
+  // The object 'SystemEvent' represents an individual system event. When the system \
+  // event is triggered all associated system event handler are notified automatically.
+  // 
+  // The method 'TriggerEvent' method is intended to be called by the device to notify \
+  // the GUI application about the particular system event represented by the object \
+  // 'SystemEvent'. This method exists for your convenience only and is optional. \
+  // See inline documentation inside the method.
+  note legend Note2
+  {
+    attr Bounds = <1190,410,1690,590>;
+  }
+
+  // The object 'SystemEventHandler' is a handler of a particular system event. When \
+  // the system event is triggered, the handler calls the associated slot method \
+  // 'onEvent' automatically. Within the 'onEvent' method you can react to the event. \
+  // The method 'onEvent' exists for your convenience only. You can remove it and \
+  // connect the system event handler with another slot method. See inline documentation \
+  // inside the method.
+  // 
+  // Don't forget to connect the handler with the system event of interest. To do \
+  // this set the property 'Event' of the handler to refer to the correct system \
+  // event object.
+  note legend Note5
+  {
+    attr Bounds = <1190,600,1690,820>;
+  }
+
+  $rect <1370,110,1570,150>
+  property int32 brightnessValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,110,1370,150>
+  $output true
+  method void EWUpdateSlider( arg int32 aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure brightnessValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure brightnessValue = aNewValue;
+
+      // Notify all associated property observers.
+      notifyobservers ^brightnessValue;
+    }
+  }
+
+  $rect <1370,160,1570,200>
+  property bool buttonValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,160,1370,200>
+  $output true
+  method void EWUpdateButton( arg bool aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure buttonValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure buttonValue = aNewValue;
+
+      // Notify all associated property observers.
+      notifyobservers ^buttonValue;
+    }
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -319,10 +441,15 @@ class DeviceClass : Templates::DeviceClass
   $member Init
   $member Note4
   $member Note3
-  $member Note2
   $member Note1
   $member Note
   $member LedSetMethod
+  $member Note2
+  $member Note5
+  $member brightnessValue
+  $member EWUpdateSlider
+  $member buttonValue
+  $member EWUpdateButton
 }
 
 $rect <230,60,430,100>
