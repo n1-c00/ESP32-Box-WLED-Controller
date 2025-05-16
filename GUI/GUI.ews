@@ -1,8 +1,9 @@
 $version 1.0
 
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.setButtonValue;
+attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -32,7 +33,7 @@ view Project
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-142,-25>;
+  attr scrollTo = <162,-25>;
   attr zoom = 0.75;
 }
 
@@ -42,21 +43,21 @@ view unit Application
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-52,-92>;
-  attr zoom = 1.0;
+  attr scrollTo = <-127,-62>;
+  attr zoom = 1.25;
 }
 
 view class Application::DeviceClass
 {
   attr enableWireMode = false;
-  attr scrollTo = <113,-15>;
+  attr scrollTo = <977,-15>;
   attr zoom = 0.75;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <643,-22>;
+  attr scrollTo = <17,-8>;
   attr zoom = 1.0;
 }
 
@@ -74,14 +75,6 @@ view class WidgetSet::ToggleButton
   attr zoom = 1.0;
 }
 
-codeview Application::Application.setbrightnessValue
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <67,0>;
-  attr codeSelStart = <67,0>;
-}
-
 codeview Application::Application.BrightnessSlot
 {
   attr codeColSelect = false;
@@ -90,10 +83,18 @@ codeview Application::Application.BrightnessSlot
   attr codeSelStart = <66,0>;
 }
 
-codeview Application::Application.setButtonValue
+codeview Application::DeviceClass.EWUpdateButton
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <25,0>;
-  attr codeSelStart = <25,0>;
+  attr codeSelEnd = <33,1>;
+  attr codeSelStart = <33,1>;
+}
+
+codeview Application::DeviceClass.EWUpdateSlider
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,2>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
 }

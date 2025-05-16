@@ -43,6 +43,7 @@ class Application : Core::Root
   {
     preset Bounds = <108,43,212,102>;
     preset OnUpdate = null;
+    preset Outlet = ^Application::Device.buttonValue;
     preset OnSwitchOn = LightOnSlot;
     preset OnSwitchOff = LightOffSlot;
     preset LabelOn = "";
@@ -74,6 +75,7 @@ class Application : Core::Root
   {
     preset Bounds = <60,135,260,195>;
     preset OnEnd = BrightnessSlot;
+    preset Outlet = ^BrightnessSlider.CurrentValue;
     preset MaxValue = 255;
     preset CurrentValue = 40;
     preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
@@ -84,64 +86,6 @@ class Application : Core::Root
   {
     var string brightnessString = string(BrightnessSlider.CurrentValue);
     Application::Device.LedSetMethod("bri", brightnessString, "int");
-  }
-
-  $rect <900,170,1100,210>
-  object Core::PropertyObserver brightnessValueObserver
-  {
-    preset OnEvent = setbrightnessValue;
-    preset Outlet = ^Application::Device.brightnessValue;
-  }
-
-  // This slot method is executed when the associated property observer 'PropertyObserver' \
-  // is notified.
-  $rect <1100,170,1300,210>
-  slot setbrightnessValue
-  {
-    BrightnessSlider.CurrentValue = Application::Device.brightnessValue;
-    /*
-       HINT 1:
-
-       You can evaluate the 'sender' parameter. It refers to the observer
-       this method has been called from. This is very useful if multiple
-       property observer are connected to one and the same 'onEvent'
-       method:
-
-       if ( sender == Observer1 )
-         trace "The event comes from the Observer1";
-
-       if ( sender == Observer2 )
-         trace "... or from the Observer2";
-    */
-  }
-
-  $rect <900,220,1100,260>
-  object Core::PropertyObserver buttonValueObserver
-  {
-    preset OnEvent = setButtonValue;
-    preset Outlet = ^Application::Device.buttonValue;
-  }
-
-  // This slot method is executed when the associated property observer 'PropertyObserver' \
-  // is notified.
-  $rect <1100,220,1300,260>
-  slot setButtonValue
-  {
-    toggleLightButton.Checked = Application::Device.buttonValue;
-    /*
-       HINT 1:
-
-       You can evaluate the 'sender' parameter. It refers to the observer
-       this method has been called from. This is very useful if multiple
-       property observer are connected to one and the same 'onEvent'
-       method:
-
-       if ( sender == Observer1 )
-         trace "The event comes from the Observer1";
-
-       if ( sender == Observer2 )
-         trace "... or from the Observer2";
-    */
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -157,10 +101,6 @@ class Application : Core::Root
   $member LightOffSlot
   $member BrightnessSlider
   $member BrightnessSlot
-  $member brightnessValueObserver
-  $member setbrightnessValue
-  $member buttonValueObserver
-  $member setButtonValue
 }
 
 $rect <230,20,430,60>

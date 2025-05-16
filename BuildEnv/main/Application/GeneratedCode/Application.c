@@ -27,7 +27,6 @@
 #include "ewlocale.h"
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
-#include "_CorePropertyObserver.h"
 #include "_CoreView.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -70,8 +69,6 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
   WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
   WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
-  CorePropertyObserver__Init( &_this->brightnessValueObserver, &_this->_.XObject, 0 );
-  CorePropertyObserver__Init( &_this->buttonValueObserver, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -89,21 +86,18 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
+  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
+  ApplicationDeviceClass_OnSetbuttonValue ));
   _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
   _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( &_this->BrightnessSlider, 
+  WidgetSetHorizontalSlider_OnGetCurrentValue, WidgetSetHorizontalSlider_OnSetCurrentValue ));
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
-  _this->brightnessValueObserver.OnEvent = EwNewSlot( _this, ApplicationApplication_setbrightnessValue );
-  CorePropertyObserver_OnSetOutlet( &_this->brightnessValueObserver, EwNewRef( EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
-  ApplicationDeviceClass_OnSetbrightnessValue ));
-  _this->buttonValueObserver.OnEvent = EwNewSlot( _this, ApplicationApplication_setButtonValue );
-  CorePropertyObserver_OnSetOutlet( &_this->buttonValueObserver, EwNewRef( EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
-  ApplicationDeviceClass_OnSetbuttonValue ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -116,8 +110,6 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   ViewsRectangle__ReInit( &_this->Rectangle );
   WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
-  CorePropertyObserver__ReInit( &_this->brightnessValueObserver );
-  CorePropertyObserver__ReInit( &_this->buttonValueObserver );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -130,8 +122,6 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   ViewsRectangle__Done( &_this->Rectangle );
   WidgetSetToggleButton__Done( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
-  CorePropertyObserver__Done( &_this->brightnessValueObserver );
-  CorePropertyObserver__Done( &_this->buttonValueObserver );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -173,30 +163,6 @@ void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObjec
   &_this->BrightnessSlider ), 0, 10 );
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
   EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
-}
-
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_setbrightnessValue( ApplicationApplication _this, XObject 
-  sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass )->brightnessValue );
-}
-
-/* This slot method is executed when the associated property observer 'PropertyObserver' 
-   is notified. */
-void ApplicationApplication_setButtonValue( ApplicationApplication _this, XObject 
-  sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  WidgetSetToggleButton_OnSetChecked( &_this->toggleLightButton, EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass )->buttonValue );
 }
 
 /* Variants derived from the class : 'Application::Application' */

@@ -53,7 +53,6 @@
 #include "_CoreLayoutContext.h"
 #include "_CoreLayoutQuadContext.h"
 #include "_CoreOutline.h"
-#include "_CorePropertyObserver.h"
 #include "_CoreQuadView.h"
 #include "_CoreRectView.h"
 #include "_CoreResource.h"
