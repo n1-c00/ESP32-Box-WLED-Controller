@@ -92,6 +92,7 @@ EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
   EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
   EW_OBJECT  ( brightnessValueObserver, CorePropertyObserver )
+  EW_OBJECT  ( buttonValueObserver, CorePropertyObserver )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -136,6 +137,11 @@ void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObjec
 /* This slot method is executed when the associated property observer 'PropertyObserver' 
    is notified. */
 void ApplicationApplication_setbrightnessValue( ApplicationApplication _this, XObject 
+  sender );
+
+/* This slot method is executed when the associated property observer 'PropertyObserver' 
+   is notified. */
+void ApplicationApplication_setButtonValue( ApplicationApplication _this, XObject 
   sender );
 
 #ifdef __cplusplus

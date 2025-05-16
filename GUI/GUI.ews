@@ -1,9 +1,8 @@
 $version 1.0
 
-attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.setbrightnessValue;
+attr currentCodeInspector = Application::Application.setButtonValue;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -50,14 +49,14 @@ view unit Application
 view class Application::DeviceClass
 {
   attr enableWireMode = false;
-  attr scrollTo = <849,-15>;
+  attr scrollTo = <113,-15>;
   attr zoom = 0.75;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <899,-118>;
+  attr scrollTo = <643,-22>;
   attr zoom = 1.0;
 }
 
@@ -68,10 +67,10 @@ view profile Profile
   attr zoom = 1.0;
 }
 
-view class Core::PropertyObserver
+view class WidgetSet::ToggleButton
 {
   attr enableWireMode = false;
-  attr scrollTo = <-7,-7>;
+  attr scrollTo = <185,617>;
   attr zoom = 1.0;
 }
 
@@ -79,8 +78,8 @@ codeview Application::Application.setbrightnessValue
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <57,0>;
-  attr codeSelStart = <57,0>;
+  attr codeSelEnd = <67,0>;
+  attr codeSelStart = <67,0>;
 }
 
 codeview Application::Application.BrightnessSlot
@@ -89,4 +88,12 @@ codeview Application::Application.BrightnessSlot
   attr codeFirstPos = <0,0>;
   attr codeSelEnd = <66,0>;
   attr codeSelStart = <66,0>;
+}
+
+codeview Application::Application.setButtonValue
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <25,0>;
+  attr codeSelStart = <25,0>;
 }

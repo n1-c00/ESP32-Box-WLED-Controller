@@ -54,6 +54,7 @@
 /* Deklaration of class : 'Application::DeviceClass' */
 EW_DEFINE_FIELDS( ApplicationDeviceClass, TemplatesDeviceClass )
   EW_PROPERTY( brightnessValue, XInt32 )
+  EW_PROPERTY( buttonValue,     XBool )
 EW_END_OF_FIELDS( ApplicationDeviceClass )
 
 /* Virtual Method Table (VMT) for the class : 'Application::DeviceClass' */
@@ -81,12 +82,30 @@ void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 aNewValue );
 /* The following define announces the presence of the method Application::DeviceClass.EWUpdateSlider(). */
 #define _ApplicationDeviceClass__EWUpdateSlider_
 
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool 
+  aNewValue );
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */
+void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue );
+
+/* The following define announces the presence of the method Application::DeviceClass.EWUpdateButton(). */
+#define _ApplicationDeviceClass__EWUpdateButton_
+
 /* Default onget method for the property 'brightnessValue' */
 XInt32 ApplicationDeviceClass_OnGetbrightnessValue( ApplicationDeviceClass _this );
 
 /* Default onset method for the property 'brightnessValue' */
 void ApplicationDeviceClass_OnSetbrightnessValue( ApplicationDeviceClass _this, 
   XInt32 value );
+
+/* Default onget method for the property 'buttonValue' */
+XBool ApplicationDeviceClass_OnGetbuttonValue( ApplicationDeviceClass _this );
+
+/* Default onset method for the property 'buttonValue' */
+void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBool 
+  value );
 
 #ifdef __cplusplus
   }

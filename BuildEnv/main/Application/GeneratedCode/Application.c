@@ -71,6 +71,7 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
   WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
   CorePropertyObserver__Init( &_this->brightnessValueObserver, &_this->_.XObject, 0 );
+  CorePropertyObserver__Init( &_this->buttonValueObserver, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -99,6 +100,10 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   CorePropertyObserver_OnSetOutlet( &_this->brightnessValueObserver, EwNewRef( EwGetAutoObject( 
   &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
   ApplicationDeviceClass_OnSetbrightnessValue ));
+  _this->buttonValueObserver.OnEvent = EwNewSlot( _this, ApplicationApplication_setButtonValue );
+  CorePropertyObserver_OnSetOutlet( &_this->buttonValueObserver, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
+  ApplicationDeviceClass_OnSetbuttonValue ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -112,6 +117,7 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
   CorePropertyObserver__ReInit( &_this->brightnessValueObserver );
+  CorePropertyObserver__ReInit( &_this->buttonValueObserver );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -125,6 +131,7 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   WidgetSetToggleButton__Done( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
   CorePropertyObserver__Done( &_this->brightnessValueObserver );
+  CorePropertyObserver__Done( &_this->buttonValueObserver );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -178,6 +185,18 @@ void ApplicationApplication_setbrightnessValue( ApplicationApplication _this, XO
 
   WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, EwGetAutoObject( 
   &ApplicationDevice, ApplicationDeviceClass )->brightnessValue );
+}
+
+/* This slot method is executed when the associated property observer 'PropertyObserver' 
+   is notified. */
+void ApplicationApplication_setButtonValue( ApplicationApplication _this, XObject 
+  sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  WidgetSetToggleButton_OnSetChecked( &_this->toggleLightButton, EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass )->buttonValue );
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -369,6 +388,25 @@ void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 aNewValue )
   ApplicationDeviceClass_EWUpdateSlider((ApplicationDeviceClass)_this, aNewValue );
 }
 
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool 
+  aNewValue )
+{
+  if ( aNewValue != _this->buttonValue )
+  {
+    _this->buttonValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
+      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
+  }
+}
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */
+void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue )
+{
+  ApplicationDeviceClass_EWUpdateButton((ApplicationDeviceClass)_this, aNewValue );
+}
+
 /* Default onget method for the property 'brightnessValue' */
 XInt32 ApplicationDeviceClass_OnGetbrightnessValue( ApplicationDeviceClass _this )
 {
@@ -380,6 +418,19 @@ void ApplicationDeviceClass_OnSetbrightnessValue( ApplicationDeviceClass _this,
   XInt32 value )
 {
   _this->brightnessValue = value;
+}
+
+/* Default onget method for the property 'buttonValue' */
+XBool ApplicationDeviceClass_OnGetbuttonValue( ApplicationDeviceClass _this )
+{
+  return _this->buttonValue;
+}
+
+/* Default onset method for the property 'buttonValue' */
+void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBool 
+  value )
+{
+  _this->buttonValue = value;
 }
 
 /* Variants derived from the class : 'Application::DeviceClass' */
