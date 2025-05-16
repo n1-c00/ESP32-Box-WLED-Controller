@@ -75,7 +75,7 @@ class Application : Core::Root
   {
     preset Bounds = <60,135,260,195>;
     preset OnEnd = BrightnessSlot;
-    preset Outlet = ^BrightnessSlider.CurrentValue;
+    preset Outlet = ^Application::Device.brightnessValue;
     preset MaxValue = 255;
     preset CurrentValue = 40;
     preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
@@ -347,9 +347,6 @@ class DeviceClass : Templates::DeviceClass
     {
       // Remember the new value in the internal memory of the property.
       pure brightnessValue = aNewValue;
-
-      // Notify all associated property observers.
-      notifyobservers ^brightnessValue;
     }
   }
 
@@ -367,9 +364,6 @@ class DeviceClass : Templates::DeviceClass
     {
       // Remember the new value in the internal memory of the property.
       pure buttonValue = aNewValue;
-
-      // Notify all associated property observers.
-      notifyobservers ^buttonValue;
     }
   }
 

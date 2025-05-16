@@ -1,6 +1,5 @@
 $version 1.0
 
-attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
 attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
@@ -33,7 +32,7 @@ view Project
   attr enableGrid = true;
   attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <162,-25>;
+  attr scrollTo = <-29,-25>;
   attr zoom = 0.75;
 }
 
@@ -50,28 +49,14 @@ view unit Application
 view class Application::DeviceClass
 {
   attr enableWireMode = false;
-  attr scrollTo = <977,-15>;
+  attr scrollTo = <568,33>;
   attr zoom = 0.75;
 }
 
 view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <17,-8>;
-  attr zoom = 1.0;
-}
-
-view profile Profile
-{
-  attr enableWireMode = false;
-  attr scrollTo = <-7,-7>;
-  attr zoom = 1.0;
-}
-
-view class WidgetSet::ToggleButton
-{
-  attr enableWireMode = false;
-  attr scrollTo = <185,617>;
+  attr scrollTo = <14,-56>;
   attr zoom = 1.0;
 }
 
@@ -87,14 +72,14 @@ codeview Application::DeviceClass.EWUpdateButton
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <33,1>;
-  attr codeSelStart = <33,1>;
+  attr codeSelEnd = <31,4>;
+  attr codeSelStart = <31,4>;
 }
 
 codeview Application::DeviceClass.EWUpdateSlider
 {
   attr codeColSelect = false;
-  attr codeFirstPos = <0,2>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <0,0>;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <35,4>;
+  attr codeSelStart = <35,4>;
 }

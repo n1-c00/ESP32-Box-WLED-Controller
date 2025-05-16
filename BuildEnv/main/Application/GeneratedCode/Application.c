@@ -94,8 +94,9 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
-  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( &_this->BrightnessSlider, 
-  WidgetSetHorizontalSlider_OnGetCurrentValue, WidgetSetHorizontalSlider_OnSetCurrentValue ));
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
+  ApplicationDeviceClass_OnSetbrightnessValue ));
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
 }
@@ -341,11 +342,7 @@ void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32
   aNewValue )
 {
   if ( aNewValue != _this->brightnessValue )
-  {
     _this->brightnessValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
-      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
@@ -360,11 +357,7 @@ void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool
   aNewValue )
 {
   if ( aNewValue != _this->buttonValue )
-  {
     _this->buttonValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
-      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */

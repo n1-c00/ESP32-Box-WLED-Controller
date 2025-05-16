@@ -68,6 +68,18 @@ void _EWUpdateSliderPROC()
     /* Invoke the function to trigger the event */
     ApplicationDeviceClass__EWUpdateSlider( device, bri->valueint );
 }
+void _EWUpdateButtonPROC()
+{
+
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the "bri" parameter from the JSON object */
+    cJSON *on = cJSON_GetObjectItem(gWledJson, "on");
+    /* Invoke the function to trigger the event */
+    ApplicationDeviceClass__EWUpdateButton( device, cJSON_IsTrue(on) );
+}
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default JSON
 object.
@@ -105,6 +117,8 @@ void JsonInit()
     }
 
     ESP_LOGI(TAG, "Set light state to: %s", json_start);
+    EwInvoke(_EWUpdateSliderPROC, 0); // Call the function to update the slider
+    EwInvoke(_EWUpdateButtonPROC, 0); // Call the function to update the slider
 }
 
 /***********************************************************************
@@ -235,9 +249,8 @@ static void _wled_getStatus_task(void *pvParameters)
             
             // Update the local JSON object with the new on/off state
             cJSON_ReplaceItemInObject(gWledJson, "on", cJSON_CreateBool(cJSON_IsTrue(on_nWled)));
-            
+            EwInvoke(_EWUpdateButtonPROC, 0);
         }
-
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
         
