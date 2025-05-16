@@ -92,7 +92,7 @@ class Application : Core::Root
   $rect <860,30,1060,70>
   slot onEvent
   {
-    BrightnessSlider.CurrentValue = brightnessValue;
+    BrightnessSlider.CurrentValue = 10;
 
     /*
        HINT 1:
@@ -133,7 +133,7 @@ class Application : Core::Root
   object Core::SystemEventHandler UpdateSliderEventHandler
   {
     preset OnEvent;
-    preset Event = UpdateSliderEvent;
+    preset Event = Application::Device.UpdateSliderEvent;
   }
 
   $rect <1060,100,1260,140>
@@ -396,7 +396,7 @@ class DeviceClass : Templates::DeviceClass
 
        context.brightnessValue = newVal; 
 
-       UpdateSliderEvent.Trigger( app, false );
+       UpdateSliderEvent.Trigger( context, false );
 
     /*
        HINT 1:
@@ -464,6 +464,30 @@ class DeviceClass : Templates::DeviceClass
     attr Bounds = <1190,600,1690,820>;
   }
 
+  $rect <1170,160,1370,200>
+  property int32 brightnessValue;
+
+  $rect <1170,200,1370,240>
+  onset brightnessValue
+  {
+    // The value doesn't change - nothing to do.
+    if ( pure brightnessValue == value )
+      return;
+
+    // Remember the property's new value.
+    pure brightnessValue = value;
+
+    // TO DO:
+    // 
+    // Now you can handle the alternation of the property.
+  }
+
+  $rect <1170,240,1370,280>
+  onget brightnessValue
+  {
+    return pure brightnessValue;
+  }
+
   // Directives to adapt the order of the above members according to how these members 
   // where arranged when the project content was stored. In this manner the storage 
   // and the expected order of the members don't depend. Merging of changes in the 
@@ -479,6 +503,9 @@ class DeviceClass : Templates::DeviceClass
   $member EWUpdateSlider
   $member Note2
   $member Note5
+  $member brightnessValue
+  $member OnSetbrightnessValue
+  $member OnGetbrightnessValue
 }
 
 $rect <230,60,430,100>

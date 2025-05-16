@@ -27,8 +27,7 @@
 #include "ewlocale.h"
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
-#include "_CoreSystemEvent.h"
-#include "_CoreSystemEventHandler.h"
+#include "_CorePropertyObserver.h"
 #include "_CoreView.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -71,7 +70,7 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
   WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
   WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
-  CoreSystemEventHandler__Init( &_this->UpdateSliderEventHandler, &_this->_.XObject, 0 );
+  CorePropertyObserver__Init( &_this->brightnessValueObserver, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
@@ -96,8 +95,10 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
-  CoreSystemEventHandler_OnSetEvent( &_this->UpdateSliderEventHandler, &EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass )->UpdateSliderEvent );
+  _this->brightnessValueObserver.OnEvent = EwNewSlot( _this, ApplicationApplication_setbrightnessValue );
+  CorePropertyObserver_OnSetOutlet( &_this->brightnessValueObserver, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
+  ApplicationDeviceClass_OnSetbrightnessValue ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -110,7 +111,7 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   ViewsRectangle__ReInit( &_this->Rectangle );
   WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
-  CoreSystemEventHandler__ReInit( &_this->UpdateSliderEventHandler );
+  CorePropertyObserver__ReInit( &_this->brightnessValueObserver );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -123,7 +124,7 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   ViewsRectangle__Done( &_this->Rectangle );
   WidgetSetToggleButton__Done( &_this->toggleLightButton );
   WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
-  CoreSystemEventHandler__Done( &_this->UpdateSliderEventHandler );
+  CorePropertyObserver__Done( &_this->brightnessValueObserver );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
@@ -156,16 +157,27 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
 void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
   sender )
 {
-  XInt32 brightnessVal;
   XString brightnessString;
 
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  brightnessVal = WidgetSetHorizontalSlider_OnGetCurrentValue( &_this->BrightnessSlider );
-  brightnessString = EwNewStringInt( brightnessVal, 0, 10 );
+  brightnessString = EwNewStringInt( WidgetSetHorizontalSlider_OnGetCurrentValue( 
+  &_this->BrightnessSlider ), 0, 10 );
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
   EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
+}
+
+/* This slot method is executed when the associated property observer 'PropertyObserver' 
+   is notified. */
+void ApplicationApplication_setbrightnessValue( ApplicationApplication _this, XObject 
+  sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass )->brightnessValue );
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -219,9 +231,6 @@ void ApplicationDeviceClass__Init( ApplicationDeviceClass _this, XObject aLink, 
   /* Allow the Immediate Garbage Collection to evalute the members of this class. */
   _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationDeviceClass );
 
-  /* ... then construct all embedded objects */
-  CoreSystemEvent__Init( &_this->UpdateSliderEvent, &_this->_.XObject, 0 );
-
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationDeviceClass );
 
@@ -234,9 +243,6 @@ void ApplicationDeviceClass__ReInit( ApplicationDeviceClass _this )
 {
   /* At first re-initialize the super class ... */
   TemplatesDeviceClass__ReInit( &_this->_.Super );
-
-  /* ... then re-construct all embedded objects */
-  CoreSystemEvent__ReInit( &_this->UpdateSliderEvent );
 }
 
 /* Finalizer method for the class 'Application::DeviceClass' */
@@ -247,9 +253,6 @@ void ApplicationDeviceClass__Done( ApplicationDeviceClass _this )
 
   /* Finalize this class */
   _this->_.Super._.VMT = EW_CLASS( TemplatesDeviceClass );
-
-  /* Finalize all embedded objects */
-  CoreSystemEvent__Done( &_this->UpdateSliderEvent );
 
   /* Don't forget to deinitialize the super class ... */
   TemplatesDeviceClass__Done( &_this->_.Super );
@@ -348,29 +351,34 @@ void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString
 }
 
 /* This method is intended to be called by the device to notify the GUI application 
-   about a particular system event. */
+   about an alternation of its setting or state value. */
 void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32 
-  newVal )
+  aNewValue )
 {
-  ApplicationDeviceClass context = EwNewObject( ApplicationDeviceClass, 0 );
-
-  ApplicationDeviceClass_OnSetbrightnessValue( context, newVal );
-  CoreSystemEvent_Trigger( &_this->UpdateSliderEvent, ((XObject)context ), 0 );
+  if ( aNewValue != _this->brightnessValue )
+  {
+    _this->brightnessValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
+      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
+  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
-void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 newVal )
+void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 aNewValue )
 {
-  ApplicationDeviceClass_EWUpdateSlider((ApplicationDeviceClass)_this, newVal );
+  ApplicationDeviceClass_EWUpdateSlider((ApplicationDeviceClass)_this, aNewValue );
 }
 
-/* 'C' function for method : 'Application::DeviceClass.OnSetbrightnessValue()' */
+/* Default onget method for the property 'brightnessValue' */
+XInt32 ApplicationDeviceClass_OnGetbrightnessValue( ApplicationDeviceClass _this )
+{
+  return _this->brightnessValue;
+}
+
+/* Default onset method for the property 'brightnessValue' */
 void ApplicationDeviceClass_OnSetbrightnessValue( ApplicationDeviceClass _this, 
   XInt32 value )
 {
-  if ( _this->brightnessValue == value )
-    return;
-
   _this->brightnessValue = value;
 }
 
@@ -379,9 +387,8 @@ EW_DEFINE_CLASS_VARIANTS( ApplicationDeviceClass )
 EW_END_OF_CLASS_VARIANTS( ApplicationDeviceClass )
 
 /* Virtual Method Table (VMT) for the class : 'Application::DeviceClass' */
-EW_DEFINE_CLASS( ApplicationDeviceClass, TemplatesDeviceClass, UpdateSliderEvent, 
-                 brightnessValue, brightnessValue, brightnessValue, brightnessValue, 
-                 brightnessValue, "Application::DeviceClass" )
+EW_DEFINE_CLASS( ApplicationDeviceClass, TemplatesDeviceClass, _.VMT, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, _.VMT, "Application::DeviceClass" )
 EW_END_OF_CLASS( ApplicationDeviceClass )
 
 /* User defined auto object: 'Application::Device' */

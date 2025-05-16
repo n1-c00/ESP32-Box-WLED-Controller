@@ -42,8 +42,8 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
+#include "_CorePropertyObserver.h"
 #include "_CoreRoot.h"
-#include "_CoreSystemEventHandler.h"
 #include "_CoreTimer.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -91,7 +91,7 @@ EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
   EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
   EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
-  EW_OBJECT  ( UpdateSliderEventHandler, CoreSystemEventHandler )
+  EW_OBJECT  ( brightnessValueObserver, CorePropertyObserver )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -131,6 +131,11 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
 
 /* 'C' function for method : 'Application::Application.BrightnessSlot()' */
 void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
+  sender );
+
+/* This slot method is executed when the associated property observer 'PropertyObserver' 
+   is notified. */
+void ApplicationApplication_setbrightnessValue( ApplicationApplication _this, XObject 
   sender );
 
 #ifdef __cplusplus

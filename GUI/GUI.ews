@@ -3,7 +3,7 @@ $version 1.0
 attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
+attr currentCodeInspector = Application::Application.setbrightnessValue;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -31,6 +31,7 @@ view Project
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-142,-25>;
   attr zoom = 0.75;
@@ -40,16 +41,10 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-52,-92>;
   attr zoom = 1.0;
-}
-
-view class Application::Application
-{
-  attr enableWireMode = false;
-  attr scrollTo = <522,-84>;
-  attr zoom = 0.75;
 }
 
 view class Application::DeviceClass
@@ -59,42 +54,39 @@ view class Application::DeviceClass
   attr zoom = 0.75;
 }
 
-codeview WidgetSet::ToggleButton.OnSetAppearance
+view class Application::Application
 {
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <0,0>;
+  attr enableWireMode = false;
+  attr scrollTo = <899,-118>;
+  attr zoom = 1.0;
 }
 
-codeview Core::SystemEvent.Trigger
+view profile Profile
+{
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
+}
+
+view class Core::PropertyObserver
+{
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
+}
+
+codeview Application::Application.setbrightnessValue
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <0,0>;
+  attr codeSelEnd = <57,0>;
+  attr codeSelStart = <57,0>;
 }
 
 codeview Application::Application.BrightnessSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <50,1>;
-  attr codeSelStart = <50,1>;
-}
-
-codeview Application::DeviceClass.EWUpdateSlider
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <37,4>;
-  attr codeSelStart = <37,4>;
-}
-
-codeview Core::SystemEventHandler.onEvent
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,2>;
-  attr codeSelEnd = <23,3>;
-  attr codeSelStart = <23,3>;
+  attr codeSelEnd = <66,0>;
+  attr codeSelStart = <66,0>;
 }
