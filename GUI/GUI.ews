@@ -1,5 +1,6 @@
 $version 1.0
 
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
 attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
@@ -60,7 +61,7 @@ view class Application::Application
   attr zoom = 1.0;
 }
 
-codeview Application::Application.BrightnessSlot
+codeview Application::DeviceClass.EWUpdateSlider
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;

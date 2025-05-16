@@ -1,9 +1,11 @@
 #include "httpTasks.h"
 
-static const char *TAG = "HTTP";
+static char *TAG = "HTTP";
 
 int http_POST(char *json_string)
 {
+    TAG = "HTTP_POST";
+
     struct sockaddr_in dest_addr;
     int s;
     char request[2048];
@@ -31,7 +33,7 @@ int http_POST(char *json_string)
         ESP_LOGE(TAG, "... Failed to allocate socket.");
         return -1;
     }
-    ESP_LOGI(TAG, "... allocated socket");
+    //ESP_LOGI(TAG, "... allocated socket");
 
     // Connect to the server
     if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
@@ -40,7 +42,7 @@ int http_POST(char *json_string)
         return -1;
     }
 
-    ESP_LOGI(TAG, "... connected");
+    //ESP_LOGI(TAG, "... connected");
 
     if (write(s, request, strlen(request)) < 0) { // Changed REQUEST to request
         ESP_LOGE(TAG, "... socket send failed");
@@ -54,6 +56,8 @@ int http_POST(char *json_string)
 
 int http_GET(char *buffer, int size)
 {
+    TAG = "HTTP_GET";
+
     struct sockaddr_in dest_addr;
     int s, r;
     char responsecode[4];
@@ -70,7 +74,7 @@ int http_GET(char *buffer, int size)
         "User-Agent: esp-idf/1.0 esp32\r\n"
         "\r\n";
 
-    ESP_LOGI(TAG, "... request: %s", REQUEST);
+    //ESP_LOGI(TAG, "... request: %s", REQUEST);
 
     // Create socket
     s = socket(AF_INET, SOCK_STREAM, 0);
@@ -78,7 +82,7 @@ int http_GET(char *buffer, int size)
         ESP_LOGE(TAG, "... Failed to allocate socket.");
         return 0;
     }
-    ESP_LOGI(TAG, "... allocated socket");
+    //ESP_LOGI(TAG, "... allocated socket");
 
     // Connect to the server
     if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
@@ -93,7 +97,7 @@ int http_GET(char *buffer, int size)
         ESP_LOGE(TAG, "... socket send failed");
         return 0;
     }
-    ESP_LOGI(TAG, "... socket send success");
+    //ESP_LOGI(TAG, "... socket send success");
 
     struct timeval receiving_timeout;
     receiving_timeout.tv_sec = 5;
@@ -104,7 +108,7 @@ int http_GET(char *buffer, int size)
         close(s);
         return 0;
     }
-    ESP_LOGI(TAG, "... set socket receiving timeout success");
+    //ESP_LOGI(TAG, "... set socket receiving timeout success");
 
     /* Fetch the first line of the HTTP response */
     bzero(buffer, size);              //clear the buffer

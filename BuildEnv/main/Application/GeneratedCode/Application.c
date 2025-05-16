@@ -342,7 +342,11 @@ void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32
   aNewValue )
 {
   if ( aNewValue != _this->brightnessValue )
+  {
     _this->brightnessValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
+      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
+  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
@@ -357,7 +361,11 @@ void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool
   aNewValue )
 {
   if ( aNewValue != _this->buttonValue )
+  {
     _this->buttonValue = aNewValue;
+    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
+      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
+  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */

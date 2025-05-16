@@ -334,10 +334,12 @@ class DeviceClass : Templates::DeviceClass
   }
 
   $rect <1370,110,1570,150>
+  $rect <1370,110,1570,150>
   property int32 brightnessValue;
 
   // This method is intended to be called by the device to notify the GUI application \
   // about an alternation of its setting or state value.
+  $rect <1170,110,1370,150>
   $rect <1170,110,1370,150>
   $output true
   method void EWUpdateSlider( arg int32 aNewValue )
@@ -382,6 +384,8 @@ class DeviceClass : Templates::DeviceClass
   $member Note5
   $member brightnessValue
   $member EWUpdateSlider
+  $member buttonValue
+  $member EWUpdateButton
   $member buttonValue
   $member EWUpdateButton
 }
