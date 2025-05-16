@@ -43,7 +43,6 @@
 #endif
 
 #include "_CoreRoot.h"
-#include "_CoreSystemEvent.h"
 #include "_CoreSystemEventHandler.h"
 #include "_CoreTimer.h"
 #include "_ViewsRectangle.h"
@@ -92,9 +91,7 @@ EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
   EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
   EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
-  EW_OBJECT  ( UpdateSliderEvent, CoreSystemEvent )
   EW_OBJECT  ( UpdateSliderEventHandler, CoreSystemEventHandler )
-  EW_PROPERTY( brightnessValue, XInt32 )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -135,25 +132,6 @@ void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject
 /* 'C' function for method : 'Application::Application.BrightnessSlot()' */
 void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
   sender );
-
-/* This method is intended to be called by the device to notify the GUI application 
-   about a particular system event. */
-void ApplicationApplication_EWUpdateSlider( ApplicationApplication _this, XInt32 
-  newVal );
-
-/* Wrapper function for the non virtual method : 'Application::Application.EWUpdateSlider()' */
-void ApplicationApplication__EWUpdateSlider( void* _this, XInt32 newVal );
-
-/* The following define announces the presence of the method Application::Application.EWUpdateSlider(). */
-#define _ApplicationApplication__EWUpdateSlider_
-
-/* This slot method is executed when the associated system event handler 'SystemEventHandler' 
-   receives an event. */
-void ApplicationApplication_onEvent( ApplicationApplication _this, XObject sender );
-
-/* 'C' function for method : 'Application::Application.OnSetbrightnessValue()' */
-void ApplicationApplication_OnSetbrightnessValue( ApplicationApplication _this, 
-  XInt32 value );
 
 #ifdef __cplusplus
   }

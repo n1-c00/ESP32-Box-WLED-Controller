@@ -43,6 +43,7 @@ static const char *default_json =
 #include "ewmain.h"
 #include "ewrte.h"
 #include "ew_bsp_system.h"
+#include "Application.h"
 
 
 static const char *TAG = "WLED_control";
@@ -55,6 +56,18 @@ char _value[20];
 char _dataType[20];
 
 
+void _EWUpdateSliderPROC()
+{
+
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the "bri" parameter from the JSON object */
+    cJSON *bri = cJSON_GetObjectItem(gWledJson, "bri");
+    /* Invoke the function to trigger the event */
+    ApplicationDeviceClass__EWUpdateSlider( device, bri->valueint );
+}
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default JSON
 object.
@@ -165,6 +178,9 @@ static void _wled_send_task(void *pvParameters)
     }
 }
 
+/*
+
+*/
 static void _wled_getStatus_task(void *pvParameters)
 {
     char incoming_json[1024];
@@ -206,7 +222,7 @@ static void _wled_getStatus_task(void *pvParameters)
             ESP_LOGI(TAG, "Brightness changed: gWledJson=%d, nWledJson=%d", bri_gWled->valueint, bri_nWled->valueint);
             // Update the local JSON object with the new brightness value
             cJSON_ReplaceItemInObject(gWledJson, "bri", cJSON_CreateNumber(bri_nWled->valueint));
-            //EWUpdateSlider(cJSON_CreateNumber(bri_nWled->valueint));
+            EwInvoke(_EWUpdateSliderPROC, 0);
         }
 
         // ***Compare "on" parameter***

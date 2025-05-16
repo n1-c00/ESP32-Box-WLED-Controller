@@ -42,6 +42,7 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
+#include "_CoreSystemEvent.h"
 #include "_TemplatesDeviceClass.h"
 
 /* Forward declaration of the class Application::DeviceClass */
@@ -53,6 +54,8 @@
 
 /* Deklaration of class : 'Application::DeviceClass' */
 EW_DEFINE_FIELDS( ApplicationDeviceClass, TemplatesDeviceClass )
+  EW_OBJECT  ( UpdateSliderEvent, CoreSystemEvent )
+  EW_PROPERTY( brightnessValue, XInt32 )
 EW_END_OF_FIELDS( ApplicationDeviceClass )
 
 /* Virtual Method Table (VMT) for the class : 'Application::DeviceClass' */
@@ -68,6 +71,21 @@ void ApplicationDeviceClass_Init( ApplicationDeviceClass _this, XHandle aArg );
 /* 'C' function for method : 'Application::DeviceClass.LedSetMethod()' */
 void ApplicationDeviceClass_LedSetMethod( ApplicationDeviceClass _this, XString 
   key, XString setpoint, XString dataType );
+
+/* This method is intended to be called by the device to notify the GUI application 
+   about a particular system event. */
+void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32 
+  newVal );
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
+void ApplicationDeviceClass__EWUpdateSlider( void* _this, XInt32 newVal );
+
+/* The following define announces the presence of the method Application::DeviceClass.EWUpdateSlider(). */
+#define _ApplicationDeviceClass__EWUpdateSlider_
+
+/* 'C' function for method : 'Application::DeviceClass.OnSetbrightnessValue()' */
+void ApplicationDeviceClass_OnSetbrightnessValue( ApplicationDeviceClass _this, 
+  XInt32 value );
 
 #ifdef __cplusplus
   }

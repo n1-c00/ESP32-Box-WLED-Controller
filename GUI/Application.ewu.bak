@@ -82,89 +82,18 @@ class Application : Core::Root
   $rect <560,130,760,170>
   slot BrightnessSlot
   {
-    var int32 brightnessValue = BrightnessSlider.CurrentValue;
-    var string brightnessString = string(brightnessValue);
+    var int32 brightnessVal = BrightnessSlider.CurrentValue;
+    var string brightnessString = string(brightnessVal);
     Application::Device.LedSetMethod("bri", brightnessString, "int");
-  }
-
-  $rect <1060,0,1260,40>
-  object Core::SystemEvent UpdateSliderEvent;
-
-  // This method is intended to be called by the device to notify the GUI application \
-  // about a particular system event.
-  $rect <860,0,1060,40>
-  $output true
-  method void EWUpdateSlider( arg int32 newVal )
-  {
-       var Application::Application context = new Application::Application;
-
-       context.brightnessValue = newVal; 
-
-       UpdateSliderEvent.Trigger( context, false );
-
-    /*
-       HINT 1:
-
-       When triggering the event you can pass an optional 'context' object.
-       With it additional event specific data can be attached at the event
-       and dispatched with it. All notified system event handler can thus
-       evaluate this 'context' information.
-
-       To do this, you will need to define a particular 'context' class
-       suitable to store the event specific information. Then create an
-       instance of the class, initialize it with all the specific context
-       data and finally pass the instance in the first parameter of the
-       Trigger() method:
-
-
-       var YourUnit::ContextClass context = new YourUnit::ContextClass;
-
-       context.SomeData1 = ...
-       context.SomeData2 = ...
-
-       SystemEvent.Trigger( context, false );
-
-
-       You can add parameters to the method in order to simply receive
-       values from the device.
-    */
-
-    /*
-       HINT 2:
-
-       When triggering a system event you can determine its priority. Per
-       default system events are delivered strictly in the order in which
-       they have been triggered. When you pass 'true' in the last parameter
-       of Trigger() you can force the event to be dispatched early:
-
-       SystemEvent.Trigger( null, true );
-    */
-  }
-
-  // The object 'SystemEvent' represents an individual system event. When the system \
-  // event is triggered all associated system event handler are notified automatically.
-  // 
-  // The method 'TriggerEvent' method is intended to be called by the device to notify \
-  // the GUI application about the particular system event represented by the object \
-  // 'SystemEvent'. This method exists for your convenience only and is optional. \
-  // See inline documentation inside the method.
-  note legend Note2
-  {
-    attr Bounds = <1280,0,1780,180>;
-  }
-
-  $rect <870,179,1070,219>
-  object Core::SystemEventHandler UpdateSliderEventHandler
-  {
-    preset OnEvent = onEvent;
-    preset Event = UpdateSliderEvent;
   }
 
   // This slot method is executed when the associated system event handler 'SystemEventHandler' \
   // receives an event.
-  $rect <1070,179,1270,219>
+  $rect <860,30,1060,70>
   slot onEvent
   {
+    BrightnessSlider.CurrentValue = brightnessValue;
+
     /*
        HINT 1:
 
@@ -200,19 +129,35 @@ class Application : Core::Root
     */
   }
 
-  // The object 'SystemEventHandler' is a handler of a particular system event. When \
-  // the system event is triggered, the handler calls the associated slot method \
-  // 'onEvent' automatically. Within the 'onEvent' method you can react to the event. \
-  // The method 'onEvent' exists for your convenience only. You can remove it and \
-  // connect the system event handler with another slot method. See inline documentation \
-  // inside the method.
-  // 
-  // Don't forget to connect the handler with the system event of interest. To do \
-  // this set the property 'Event' of the handler to refer to the correct system \
-  // event object.
-  note legend Note3
+  $rect <1060,30,1260,70>
+  object Core::SystemEventHandler UpdateSliderEventHandler
   {
-    attr Bounds = <1280,179,1780,399>;
+    preset OnEvent;
+    preset Event = UpdateSliderEvent;
+  }
+
+  $rect <1060,100,1260,140>
+  property int32 brightnessValue;
+
+  $rect <1060,140,1260,180>
+  onset brightnessValue
+  {
+    // The value doesn't change - nothing to do.
+    if ( pure brightnessValue == value )
+      return;
+
+    // Remember the property's new value.
+    pure brightnessValue = value;
+
+    // TO DO:
+    // 
+    // Now you can handle the alternation of the property.
+  }
+
+  $rect <1060,180,1260,220>
+  onget brightnessValue
+  {
+    return pure brightnessValue;
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -228,12 +173,11 @@ class Application : Core::Root
   $member LightOffSlot
   $member BrightnessSlider
   $member BrightnessSlot
-  $member UpdateSliderEvent
-  $member EWUpdateSlider
-  $member Note2
-  $member UpdateSliderEventHandler
   $member onEvent
-  $member Note3
+  $member UpdateSliderEventHandler
+  $member brightnessValue
+  $member OnSetbrightnessValue
+  $member OnGetbrightnessValue
 }
 
 $rect <230,20,430,60>
@@ -418,12 +362,6 @@ class DeviceClass : Templates::DeviceClass
     attr Bounds = <320,0,1100,220>;
   }
 
-  note arrow Note2
-  {
-    attr Point1 = <250,50>;
-    attr Point2 = <320,50>;
-  }
-
   // Constructor and Destructor
   note group Note1
   {
@@ -442,7 +380,88 @@ class DeviceClass : Templates::DeviceClass
   // new created Methods for LED Controlls
   note group Note
   {
-    attr Bounds = <1160,0,1710,300>;
+    attr Bounds = <1160,0,1710,400>;
+  }
+
+  $rect <1370,110,1570,150>
+  object Core::SystemEvent UpdateSliderEvent;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about a particular system event.
+  $rect <1170,110,1370,150>
+  $output true
+  method void EWUpdateSlider( arg int32 newVal )
+  {
+       var Application::DeviceClass context = new Application::DeviceClass;
+
+       context.brightnessValue = newVal; 
+
+       UpdateSliderEvent.Trigger( app, false );
+
+    /*
+       HINT 1:
+
+       When triggering the event you can pass an optional 'context' object.
+       With it additional event specific data can be attached at the event
+       and dispatched with it. All notified system event handler can thus
+       evaluate this 'context' information.
+
+       To do this, you will need to define a particular 'context' class
+       suitable to store the event specific information. Then create an
+       instance of the class, initialize it with all the specific context
+       data and finally pass the instance in the first parameter of the
+       Trigger() method:
+
+
+       var YourUnit::ContextClass context = new YourUnit::ContextClass;
+
+       context.SomeData1 = ...
+       context.SomeData2 = ...
+
+       SystemEvent.Trigger( context, false );
+
+
+       You can add parameters to the method in order to simply receive
+       values from the device.
+    */
+
+    /*
+       HINT 2:
+
+       When triggering a system event you can determine its priority. Per
+       default system events are delivered strictly in the order in which
+       they have been triggered. When you pass 'true' in the last parameter
+       of Trigger() you can force the event to be dispatched early:
+
+       SystemEvent.Trigger( null, true );
+    */
+  }
+
+  // The object 'SystemEvent' represents an individual system event. When the system \
+  // event is triggered all associated system event handler are notified automatically.
+  // 
+  // The method 'TriggerEvent' method is intended to be called by the device to notify \
+  // the GUI application about the particular system event represented by the object \
+  // 'SystemEvent'. This method exists for your convenience only and is optional. \
+  // See inline documentation inside the method.
+  note legend Note2
+  {
+    attr Bounds = <1190,410,1690,590>;
+  }
+
+  // The object 'SystemEventHandler' is a handler of a particular system event. When \
+  // the system event is triggered, the handler calls the associated slot method \
+  // 'onEvent' automatically. Within the 'onEvent' method you can react to the event. \
+  // The method 'onEvent' exists for your convenience only. You can remove it and \
+  // connect the system event handler with another slot method. See inline documentation \
+  // inside the method.
+  // 
+  // Don't forget to connect the handler with the system event of interest. To do \
+  // this set the property 'Event' of the handler to refer to the correct system \
+  // event object.
+  note legend Note5
+  {
+    attr Bounds = <1190,600,1690,820>;
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -453,10 +472,13 @@ class DeviceClass : Templates::DeviceClass
   $member Init
   $member Note4
   $member Note3
-  $member Note2
   $member Note1
   $member Note
   $member LedSetMethod
+  $member UpdateSliderEvent
+  $member EWUpdateSlider
+  $member Note2
+  $member Note5
 }
 
 $rect <230,60,430,100>

@@ -6607,7 +6607,6 @@ void CoreSystemEventHandler_onEvent( CoreSystemEventHandler _this, XObject sende
     return;
 
   _this->Context = _this->Event->context;
-  EwSignal( _this->OnEvent, ((XObject)_this ));
   _this->Context = 0;
 }
 
@@ -6634,7 +6633,7 @@ EW_DEFINE_CLASS_VARIANTS( CoreSystemEventHandler )
 EW_END_OF_CLASS_VARIANTS( CoreSystemEventHandler )
 
 /* Virtual Method Table (VMT) for the class : 'Core::SystemEventHandler' */
-EW_DEFINE_CLASS( CoreSystemEventHandler, XObject, Context, Context, OnEvent, _.VMT, 
+EW_DEFINE_CLASS( CoreSystemEventHandler, XObject, Context, Context, _.VMT, _.VMT, 
                  _.VMT, _.VMT, "Core::SystemEventHandler" )
 EW_END_OF_CLASS( CoreSystemEventHandler )
 
