@@ -24,8 +24,8 @@
 *
 *******************************************************************************/
 
-#ifndef _CoreTask_H
-#define _CoreTask_H
+#ifndef _EffectsFaderTask_H
+#define _EffectsFaderTask_H
 
 #ifdef __cplusplus
   extern "C"
@@ -42,11 +42,7 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
-/* Forward declaration of the class Core::Task */
-#ifndef _CoreTask_
-  EW_DECLARE_CLASS( CoreTask )
-#define _CoreTask_
-#endif
+#include "_CoreTask.h"
 
 /* Forward declaration of the class Core::TaskQueue */
 #ifndef _CoreTaskQueue_
@@ -54,34 +50,32 @@
 #define _CoreTaskQueue_
 #endif
 
+/* Forward declaration of the class Effects::Fader */
+#ifndef _EffectsFader_
+  EW_DECLARE_CLASS( EffectsFader )
+#define _EffectsFader_
+#endif
 
-/* The class Core::Task provides the basic functionality for implementing tasks 
-   which then can be scheduled for later execution. The execution of tasks is controlled 
-   by instances of the class Core::TaskQueue.
-   Usually you will use this class to derive your own task class. In your task class 
-   you can implement what to do when the task is started, canceled or completed. 
-   For this purpose you can override the methods @OnStart(), @OnCancel(), @OnComplete() 
-   and @OnContinue().
-   It is essential to understand, that the entire 'task' functionality has nothing 
-   to do with multi-threading or multi-tasking features known from operating systems. 
-   Applications developed with Chora are limited to a single-thread environment. 
-   There is no real background thread activity. Accordingly your implementation 
-   of a task should behave cooperatively. A well designed task should perform its 
-   job quickly, use timers or effects to delay execution and when the job is done 
-   reports its completion by calling the method @Complete(). */
-EW_DEFINE_FIELDS( CoreTask, XObject )
-  EW_VARIABLE( queue,           CoreTaskQueue )
-  EW_VARIABLE( prev,            CoreTask )
-  EW_VARIABLE( next,            CoreTask )
-EW_END_OF_FIELDS( CoreTask )
+/* Forward declaration of the class Effects::FaderTask */
+#ifndef _EffectsFaderTask_
+  EW_DECLARE_CLASS( EffectsFaderTask )
+#define _EffectsFaderTask_
+#endif
 
-/* Virtual Method Table (VMT) for the class : 'Core::Task' */
-EW_DEFINE_METHODS( CoreTask, XObject )
-  EW_METHOD( OnComplete,        void )( CoreTask _this, CoreTaskQueue aQueue )
-  EW_METHOD( OnCancel,          void )( CoreTask _this, CoreTaskQueue aQueue )
-  EW_METHOD( OnStart,           void )( CoreTask _this, CoreTaskQueue aQueue )
-  EW_METHOD( Complete,          void )( CoreTask _this )
-EW_END_OF_METHODS( CoreTask )
+
+/* Deklaration of class : 'Effects::FaderTask' */
+EW_DEFINE_FIELDS( EffectsFaderTask, CoreTask )
+  EW_VARIABLE( last,            EffectsFader )
+  EW_VARIABLE( first,           EffectsFader )
+EW_END_OF_FIELDS( EffectsFaderTask )
+
+/* Virtual Method Table (VMT) for the class : 'Effects::FaderTask' */
+EW_DEFINE_METHODS( EffectsFaderTask, CoreTask )
+  EW_METHOD( OnComplete,        void )( EffectsFaderTask _this, CoreTaskQueue aQueue )
+  EW_METHOD( OnCancel,          void )( EffectsFaderTask _this, CoreTaskQueue aQueue )
+  EW_METHOD( OnStart,           void )( EffectsFaderTask _this, CoreTaskQueue aQueue )
+  EW_METHOD( Complete,          void )( EffectsFaderTask _this )
+EW_END_OF_METHODS( EffectsFaderTask )
 
 /* The method OnComplete() is called when the task is done with its work. The default 
    implementation of this method does nothing. You can override this method in derived 
@@ -90,10 +84,7 @@ EW_END_OF_METHODS( CoreTask )
    To complete a task you should call explicitly the method @Complete(). The parameter 
    aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
    again a task to the same queue, etc. */
-void CoreTask_OnComplete( CoreTask _this, CoreTaskQueue aQueue );
-
-/* Wrapper function for the virtual method : 'Core::Task.OnComplete()' */
-void CoreTask__OnComplete( void* _this, CoreTaskQueue aQueue );
+void EffectsFaderTask_OnComplete( EffectsFaderTask _this, CoreTaskQueue aQueue );
 
 /* The method OnCancel() is called when the task is canceled after being started. 
    The default implementation of this method does nothing. You can override this 
@@ -103,10 +94,7 @@ void CoreTask__OnComplete( void* _this, CoreTaskQueue aQueue );
    To cancel a task you should call explicitly the method @Cancel(). The parameter 
    aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
    again a task to the same queue, etc. */
-void CoreTask_OnCancel( CoreTask _this, CoreTaskQueue aQueue );
-
-/* Wrapper function for the virtual method : 'Core::Task.OnCancel()' */
-void CoreTask__OnCancel( void* _this, CoreTaskQueue aQueue );
+void EffectsFaderTask_OnCancel( EffectsFaderTask _this, CoreTaskQueue aQueue );
 
 /* The method OnStart() is called at the begin of the execution of this task. The 
    default implementation of the method simply cancels the task causing the next 
@@ -126,40 +114,25 @@ void CoreTask__OnCancel( void* _this, CoreTaskQueue aQueue );
    step is terminated, don't forget to call @Complete().
    The parameter aQueue refers to the queue this task belongs to. It can be used 
    to schedule more task to execute later. */
-void CoreTask_OnStart( CoreTask _this, CoreTaskQueue aQueue );
-
-/* Wrapper function for the virtual method : 'Core::Task.OnStart()' */
-void CoreTask__OnStart( void* _this, CoreTaskQueue aQueue );
+void EffectsFaderTask_OnStart( EffectsFaderTask _this, CoreTaskQueue aQueue );
 
 /* The method Complete() informs the task queue about the completion of this task. 
    Thereupon the next available task in the queue can be executed. This method is 
    usually called in context of the @OnStart() or @OnContinue() method when the 
    task has finalized its work. Calling the method for a not current task has no 
    effect. */
-void CoreTask_Complete( CoreTask _this );
+void EffectsFaderTask_Complete( EffectsFaderTask _this );
 
-/* Wrapper function for the virtual method : 'Core::Task.Complete()' */
-void CoreTask__Complete( void* _this );
+/* 'C' function for method : 'Effects::FaderTask.RemoveFader()' */
+void EffectsFaderTask_RemoveFader( EffectsFaderTask _this, EffectsFader aFader );
 
-/* The method Cancel() removes this task from the task queue where the task has 
-   been previously scheduled. In the case the task is already in progress, the queue 
-   will advise the task to abort its work immediately before the task is removed 
-   from the queue (see @OnCancel()).
-   Whether a task is waiting for execution can be determined by @IsScheduled(). 
-   Whether a task is in progress can be determined by @IsCurrent().
-   Canceling a running task will cause the task queue to start the next available 
-   task. */
-void CoreTask_Cancel( CoreTask _this );
-
-/* The method IsCurrent() returns 'true' if the affected task is currently performed. 
-   The method returns 'false' if the task is done, waiting for execution or it simply 
-   doesn't belong to any task queue. */
-XBool CoreTask_IsCurrent( CoreTask _this );
+/* 'C' function for method : 'Effects::FaderTask.AddFader()' */
+void EffectsFaderTask_AddFader( EffectsFaderTask _this, EffectsFader aFader );
 
 #ifdef __cplusplus
   }
 #endif
 
-#endif /* _CoreTask_H */
+#endif /* _EffectsFaderTask_H */
 
 /* Embedded Wizard */

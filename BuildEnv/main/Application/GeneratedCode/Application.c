@@ -27,6 +27,10 @@
 #include "ewlocale.h"
 #include "_ApplicationApplication.h"
 #include "_ApplicationDeviceClass.h"
+#include "_ApplicationcolorSelection.h"
+#include "_ApplicationhomeScreen.h"
+#include "_CoreGroup.h"
+#include "_CoreSlideTouchHandler.h"
 #include "_CoreView.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
@@ -66,38 +70,26 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationApplication );
 
   /* ... then construct all embedded objects */
-  ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
-  WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
-  WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
+  ApplicationcolorSelection__Init( &_this->colorSelection, &_this->_.XObject, 0 );
+  ApplicationhomeScreen__Init( &_this->homeScreen, &_this->_.XObject, 0 );
+  CoreSlideTouchHandler__Init( &_this->SlideTouchHandler, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationApplication );
 
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
-  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
-  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
-  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
-  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
-  WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
-  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
-  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
-  ApplicationDeviceClass_OnSetbuttonValue ));
-  _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
-  _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
-  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
-  &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
-  _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
-  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( &_this->BrightnessSlider, 
-  WidgetSetHorizontalSlider_OnGetCurrentValue, WidgetSetHorizontalSlider_OnSetCurrentValue ));
-  WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
-  &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
+  CoreRectView__OnSetBounds( &_this->colorSelection, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->homeScreen, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->SlideTouchHandler, _Const0000 );
+  _this->SlideTouchHandler.SlideVert = 0;
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->colorSelection ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->homeScreen ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->SlideTouchHandler ), 0 );
+  _this->SlideTouchHandler.OnStart = EwNewSlot( _this, ApplicationApplication_Slot );
+
+  /* Call the user defined constructor */
+  ApplicationApplication_Init( _this, aArg );
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -107,9 +99,9 @@ void ApplicationApplication__ReInit( ApplicationApplication _this )
   CoreRoot__ReInit( &_this->_.Super );
 
   /* ... then re-construct all embedded objects */
-  ViewsRectangle__ReInit( &_this->Rectangle );
-  WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
-  WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
+  ApplicationcolorSelection__ReInit( &_this->colorSelection );
+  ApplicationhomeScreen__ReInit( &_this->homeScreen );
+  CoreSlideTouchHandler__ReInit( &_this->SlideTouchHandler );
 }
 
 /* Finalizer method for the class 'Application::Application' */
@@ -119,50 +111,40 @@ void ApplicationApplication__Done( ApplicationApplication _this )
   _this->_.Super._.VMT = EW_CLASS( CoreRoot );
 
   /* Finalize all embedded objects */
-  ViewsRectangle__Done( &_this->Rectangle );
-  WidgetSetToggleButton__Done( &_this->toggleLightButton );
-  WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
+  ApplicationcolorSelection__Done( &_this->colorSelection );
+  ApplicationhomeScreen__Done( &_this->homeScreen );
+  CoreSlideTouchHandler__Done( &_this->SlideTouchHandler );
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
 }
 
-/* 'C' function for method : 'Application::Application.LightOnSlot()' */
-void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject sender )
+/* The method Init() is invoked automatically after the component has been created. 
+   This method can be overridden and filled with logic containing additional initialization 
+   statements. */
+void ApplicationApplication_Init( ApplicationApplication _this, XHandle aArg )
 {
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
-  EW_UNUSED_ARG( sender );
+  EW_UNUSED_ARG( aArg );
 
-  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0003 ), EwLoadString( &_Const0004 ), EwLoadString( &_Const0005 ));
+  CoreGroup_PresentDialog((CoreGroup)_this, ((CoreGroup)&_this->homeScreen ), 0, 
+  0, 0, 0, 0, 0, EwNullSlot, EwNullSlot, 0 );
 }
 
-/* 'C' function for method : 'Application::Application.LightOffSlot()' */
-void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject 
-  sender )
+/* 'C' function for method : 'Application::Application.Slot()' */
+void ApplicationApplication_Slot( ApplicationApplication _this, XObject sender )
 {
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
-  EW_UNUSED_ARG( sender );
-
-  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0003 ), EwLoadString( &_Const0006 ), EwLoadString( &_Const0005 ));
-}
-
-/* 'C' function for method : 'Application::Application.BrightnessSlot()' */
-void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
-  sender )
-{
-  XString brightnessString;
-
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  brightnessString = EwNewStringInt( WidgetSetHorizontalSlider_OnGetCurrentValue( 
-  &_this->BrightnessSlider ), 0, 10 );
-  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
+  _this->currentView = (XBool)!_this->currentView;
+
+  if ( _this->currentView )
+    CoreGroup_SwitchToDialog((CoreGroup)_this, ((CoreGroup)&_this->colorSelection ), 
+    0, 0, 0, 0, 0, 0, 0, EwNullSlot, EwNullSlot, 0 );
+  else
+    CoreGroup_SwitchToDialog((CoreGroup)_this, ((CoreGroup)&_this->homeScreen ), 
+    0, 0, 0, 0, 0, 0, 0, EwNullSlot, EwNullSlot, 0 );
 }
 
 /* Variants derived from the class : 'Application::Application' */
@@ -170,8 +152,8 @@ EW_DEFINE_CLASS_VARIANTS( ApplicationApplication )
 EW_END_OF_CLASS_VARIANTS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
-EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, Rectangle, _.VMT, _.VMT, _.VMT, 
-                 _.VMT, _.VMT, "Application::Application" )
+EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, colorSelection, currentView, 
+                 currentView, currentView, currentView, currentView, "Application::Application" )
   CoreRectView_initLayoutContext,
   CoreRoot_GetRoot,
   CoreRoot_Draw,
@@ -185,6 +167,7 @@ EW_DEFINE_CLASS( ApplicationApplication, CoreRoot, Rectangle, _.VMT, _.VMT, _.VM
   CoreRoot_ChangeViewState,
   CoreGroup_OnSetBounds,
   CoreRoot_OnSetFocus,
+  CoreRoot_OnSetOpacity,
   CoreRoot_DispatchEvent,
   CoreRoot_BroadcastEvent,
   CoreGroup_UpdateViewState,
@@ -426,5 +409,212 @@ void ApplicationDevice__ReInit( ApplicationDeviceClass _this )
 /* Table with links to derived variants of the auto object : 'Application::Device' */
 EW_DEFINE_AUTOOBJECT_VARIANTS( ApplicationDevice )
 EW_END_OF_AUTOOBJECT_VARIANTS( ApplicationDevice )
+
+/* Initializer for the class 'Application::homeScreen' */
+void ApplicationhomeScreen__Init( ApplicationhomeScreen _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  CoreGroup__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationhomeScreen );
+
+  /* ... then construct all embedded objects */
+  ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
+  WidgetSetToggleButton__Init( &_this->toggleLightButton, &_this->_.XObject, 0 );
+  WidgetSetHorizontalSlider__Init( &_this->BrightnessSlider, &_this->_.XObject, 0 );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( ApplicationhomeScreen );
+
+  /* ... and initialize objects, variables, properties, etc. */
+  CoreRectView__OnSetBounds( _this, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
+  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
+  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
+  WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
+  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
+  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
+  ApplicationDeviceClass_OnSetbuttonValue ));
+  _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationhomeScreen_LightOnSlot );
+  _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationhomeScreen_LightOffSlot );
+  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
+  &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
+  _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationhomeScreen_BrightnessSlot );
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
+  ApplicationDeviceClass_OnSetbrightnessValue ));
+  WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
+  &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
+}
+
+/* Re-Initializer for the class 'Application::homeScreen' */
+void ApplicationhomeScreen__ReInit( ApplicationhomeScreen _this )
+{
+  /* At first re-initialize the super class ... */
+  CoreGroup__ReInit( &_this->_.Super );
+
+  /* ... then re-construct all embedded objects */
+  ViewsRectangle__ReInit( &_this->Rectangle );
+  WidgetSetToggleButton__ReInit( &_this->toggleLightButton );
+  WidgetSetHorizontalSlider__ReInit( &_this->BrightnessSlider );
+}
+
+/* Finalizer method for the class 'Application::homeScreen' */
+void ApplicationhomeScreen__Done( ApplicationhomeScreen _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( CoreGroup );
+
+  /* Finalize all embedded objects */
+  ViewsRectangle__Done( &_this->Rectangle );
+  WidgetSetToggleButton__Done( &_this->toggleLightButton );
+  WidgetSetHorizontalSlider__Done( &_this->BrightnessSlider );
+
+  /* Don't forget to deinitialize the super class ... */
+  CoreGroup__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Application::homeScreen.LightOnSlot()' */
+void ApplicationhomeScreen_LightOnSlot( ApplicationhomeScreen _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( sender );
+
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0003 ), EwLoadString( &_Const0004 ), EwLoadString( &_Const0005 ));
+}
+
+/* 'C' function for method : 'Application::homeScreen.LightOffSlot()' */
+void ApplicationhomeScreen_LightOffSlot( ApplicationhomeScreen _this, XObject sender )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( sender );
+
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0003 ), EwLoadString( &_Const0006 ), EwLoadString( &_Const0005 ));
+}
+
+/* 'C' function for method : 'Application::homeScreen.BrightnessSlot()' */
+void ApplicationhomeScreen_BrightnessSlot( ApplicationhomeScreen _this, XObject 
+  sender )
+{
+  XString brightnessString;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  brightnessString = EwNewStringInt( WidgetSetHorizontalSlider_OnGetCurrentValue( 
+  &_this->BrightnessSlider ), 0, 10 );
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
+}
+
+/* Variants derived from the class : 'Application::homeScreen' */
+EW_DEFINE_CLASS_VARIANTS( ApplicationhomeScreen )
+EW_END_OF_CLASS_VARIANTS( ApplicationhomeScreen )
+
+/* Virtual Method Table (VMT) for the class : 'Application::homeScreen' */
+EW_DEFINE_CLASS( ApplicationhomeScreen, CoreGroup, Rectangle, _.VMT, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, "Application::homeScreen" )
+  CoreRectView_initLayoutContext,
+  CoreView_GetRoot,
+  CoreGroup_Draw,
+  CoreGroup_GetClipping,
+  CoreView_HandleEvent,
+  CoreGroup_CursorHitTest,
+  CoreGroup_AdjustDrawingArea,
+  CoreRectView_ArrangeView,
+  CoreRectView_MoveView,
+  CoreRectView_GetExtent,
+  CoreGroup_ChangeViewState,
+  CoreGroup_OnSetBounds,
+  CoreGroup_OnSetFocus,
+  CoreGroup_OnSetOpacity,
+  CoreGroup_DispatchEvent,
+  CoreGroup_BroadcastEvent,
+  CoreGroup_UpdateViewState,
+  CoreGroup_InvalidateArea,
+EW_END_OF_CLASS( ApplicationhomeScreen )
+
+/* Initializer for the class 'Application::colorSelection' */
+void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject aLink, XHandle aArg )
+{
+  /* At first initialize the super class ... */
+  CoreGroup__Init( &_this->_.Super, aLink, aArg );
+
+  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
+  _this->_.XObject._.GCT = EW_CLASS_GCT( ApplicationcolorSelection );
+
+  /* ... then construct all embedded objects */
+  ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
+
+  /* Setup the VMT pointer */
+  _this->_.VMT = EW_CLASS( ApplicationcolorSelection );
+
+  /* ... and initialize objects, variables, properties, etc. */
+  CoreRectView__OnSetBounds( _this, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
+}
+
+/* Re-Initializer for the class 'Application::colorSelection' */
+void ApplicationcolorSelection__ReInit( ApplicationcolorSelection _this )
+{
+  /* At first re-initialize the super class ... */
+  CoreGroup__ReInit( &_this->_.Super );
+
+  /* ... then re-construct all embedded objects */
+  ViewsRectangle__ReInit( &_this->Rectangle );
+}
+
+/* Finalizer method for the class 'Application::colorSelection' */
+void ApplicationcolorSelection__Done( ApplicationcolorSelection _this )
+{
+  /* Finalize this class */
+  _this->_.Super._.VMT = EW_CLASS( CoreGroup );
+
+  /* Finalize all embedded objects */
+  ViewsRectangle__Done( &_this->Rectangle );
+
+  /* Don't forget to deinitialize the super class ... */
+  CoreGroup__Done( &_this->_.Super );
+}
+
+/* Variants derived from the class : 'Application::colorSelection' */
+EW_DEFINE_CLASS_VARIANTS( ApplicationcolorSelection )
+EW_END_OF_CLASS_VARIANTS( ApplicationcolorSelection )
+
+/* Virtual Method Table (VMT) for the class : 'Application::colorSelection' */
+EW_DEFINE_CLASS( ApplicationcolorSelection, CoreGroup, Rectangle, _.VMT, _.VMT, 
+                 _.VMT, _.VMT, _.VMT, "Application::colorSelection" )
+  CoreRectView_initLayoutContext,
+  CoreView_GetRoot,
+  CoreGroup_Draw,
+  CoreGroup_GetClipping,
+  CoreView_HandleEvent,
+  CoreGroup_CursorHitTest,
+  CoreGroup_AdjustDrawingArea,
+  CoreRectView_ArrangeView,
+  CoreRectView_MoveView,
+  CoreRectView_GetExtent,
+  CoreGroup_ChangeViewState,
+  CoreGroup_OnSetBounds,
+  CoreGroup_OnSetFocus,
+  CoreGroup_OnSetOpacity,
+  CoreGroup_DispatchEvent,
+  CoreGroup_BroadcastEvent,
+  CoreGroup_UpdateViewState,
+  CoreGroup_InvalidateArea,
+EW_END_OF_CLASS( ApplicationcolorSelection )
 
 /* Embedded Wizard */

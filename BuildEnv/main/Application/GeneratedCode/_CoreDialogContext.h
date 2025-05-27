@@ -24,8 +24,8 @@
 *
 *******************************************************************************/
 
-#ifndef Application_H
-#define Application_H
+#ifndef _CoreDialogContext_H
+#define _CoreDialogContext_H
 
 #ifdef __cplusplus
   extern "C"
@@ -42,18 +42,43 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
-#include "_ApplicationApplication.h"
-#include "_ApplicationDeviceClass.h"
-#include "_ApplicationcolorSelection.h"
-#include "_ApplicationhomeScreen.h"
+/* Forward declaration of the class Core::DialogContext */
+#ifndef _CoreDialogContext_
+  EW_DECLARE_CLASS( CoreDialogContext )
+#define _CoreDialogContext_
+#endif
 
-/* User defined auto object: 'Application::Device' */
-EW_DECLARE_AUTOOBJECT( ApplicationDevice, ApplicationDeviceClass )
+/* Forward declaration of the class Core::Group */
+#ifndef _CoreGroup_
+  EW_DECLARE_CLASS( CoreGroup )
+#define _CoreGroup_
+#endif
+
+/* Forward declaration of the class Effects::Transition */
+#ifndef _EffectsTransition_
+  EW_DECLARE_CLASS( EffectsTransition )
+#define _EffectsTransition_
+#endif
+
+
+/* Deklaration of class : 'Core::DialogContext' */
+EW_DEFINE_FIELDS( CoreDialogContext, XObject )
+  EW_VARIABLE( group,           CoreGroup )
+  EW_VARIABLE( next,            CoreDialogContext )
+  EW_VARIABLE( dismissTransition, EffectsTransition )
+  EW_VARIABLE( restoreTransition, EffectsTransition )
+  EW_VARIABLE( overlayTransition, EffectsTransition )
+  EW_VARIABLE( overrideRestoreTransition, EffectsTransition )
+EW_END_OF_FIELDS( CoreDialogContext )
+
+/* Virtual Method Table (VMT) for the class : 'Core::DialogContext' */
+EW_DEFINE_METHODS( CoreDialogContext, XObject )
+EW_END_OF_METHODS( CoreDialogContext )
 
 #ifdef __cplusplus
   }
 #endif
 
-#endif /* Application_H */
+#endif /* _CoreDialogContext_H */
 
 /* Embedded Wizard */

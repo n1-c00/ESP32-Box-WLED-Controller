@@ -1,7 +1,7 @@
 ﻿$version 14.02
 
 // This is the root component of the entire GUI application.
-$rect <20,20,220,60>
+$rect <-270,30,-70,70>
 $output false
 class Application : Core::Root
 {
@@ -31,136 +31,6 @@ class Application : Core::Root
   {
     attr Bounds = <10,260,790,490>;
   }
-
-  $rect <20,20,160,60>
-  object Views::Rectangle Rectangle
-  {
-    preset Bounds = <0,0,320,240>;
-  }
-
-  $rect <20,20,160,60>
-  object WidgetSet::ToggleButton toggleLightButton
-  {
-    preset Bounds = <108,43,212,102>;
-    preset OnUpdate = null;
-    preset OnSwitchOn = LightOnSlot;
-    preset OnSwitchOff = LightOffSlot;
-    preset LabelOn = "";
-    preset LabelOff = "";
-    preset Label = "";
-    preset Appearance = WidgetSet::Switch_Lime_Large;
-  }
-
-  $rect <558,35,758,75>
-  slot LightOnSlot
-  {
-    Application::Device.LedSetMethod("on", "true", "bool");
-  }
-
-  // LedSet
-  note group Note
-  {
-    attr Bounds = <550,-10,850,250>;
-  }
-
-  $rect <560,80,760,120>
-  slot LightOffSlot
-  {
-    Application::Device.LedSetMethod("on", "false", "bool");
-  }
-
-  $rect <20,20,160,60>
-  object WidgetSet::HorizontalSlider BrightnessSlider
-  {
-    preset Bounds = <60,135,260,195>;
-    preset OnEnd = BrightnessSlot;
-    preset MaxValue = 255;
-    preset CurrentValue = 40;
-    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
-  }
-
-  $rect <560,130,760,170>
-  slot BrightnessSlot
-  {
-    var string brightnessString = string(BrightnessSlider.CurrentValue);
-    Application::Device.LedSetMethod("bri", brightnessString, "int");
-  }
-
-  $rect <870,20,1070,60>
-  object Core::PropertyObserver brightnessValueObserver
-  {
-    preset OnEvent = setbrightnessValue;
-    preset Outlet = ^Application::Device.brightnessValue;
-  }
-
-  // This slot method is executed when the associated property observer 'PropertyObserver' \
-  // is notified.
-  $rect <1070,20,1270,60>
-  slot setbrightnessValue
-  {
-    BrightnessSlider.CurrentValue = Application::Device.brightnessValue;
-    /*
-       HINT 1:
-
-       You can evaluate the 'sender' parameter. It refers to the observer
-       this method has been called from. This is very useful if multiple
-       property observer are connected to one and the same 'onEvent'
-       method:
-
-       if ( sender == Observer1 )
-         trace "The event comes from the Observer1";
-
-       if ( sender == Observer2 )
-         trace "... or from the Observer2";
-    */
-  }
-
-  $rect <870,70,1070,110>
-  object Core::PropertyObserver buttonValueObserver
-  {
-    preset OnEvent = setButtonValue;
-    preset Outlet = ^Application::Device.buttonValue;
-  }
-
-  // This slot method is executed when the associated property observer 'PropertyObserver' \
-  // is notified.
-  $rect <1070,70,1270,110>
-  slot setButtonValue
-  {
-    toggleLightButton.Checked = Application::Device.buttonValue;
-    /*
-       HINT 1:
-
-       You can evaluate the 'sender' parameter. It refers to the observer
-       this method has been called from. This is very useful if multiple
-       property observer are connected to one and the same 'onEvent'
-       method:
-
-       if ( sender == Observer1 )
-         trace "The event comes from the Observer1";
-
-       if ( sender == Observer2 )
-         trace "... or from the Observer2";
-    */
-  }
-
-  // Directives to adapt the order of the above members according to how these members 
-  // where arranged when the project content was stored. In this manner the storage 
-  // and the expected order of the members don't depend. Merging of changes in the 
-  // project files is simplified.
-  $member Bounds
-  $member Note1
-  $member Rectangle
-  $member Note
-  $member toggleLightButton
-  $member LightOnSlot
-  $member LightOffSlot
-  $member BrightnessSlider
-  $member BrightnessSlot
-  $member brightnessValueObserver
-  $member setbrightnessValue
-  $member buttonValueObserver
-  $member setButtonValue
 }
 
 $rect <230,20,430,60>
@@ -472,4 +342,400 @@ autoobject Application::DeviceClass Device;
 note legend Note
 {
   attr Bounds = <440,19,940,289>;
+}
+
+// GUI
+note group Note1
+{
+  attr Bounds = <-290,-10,10,190>;
+}
+
+$rect <-270,80,-70,120>
+$output false
+class Component : Core::Group
+{
+  $rect <10,279,210,319>
+  inherited property Bounds = <0,0,320,240>;
+
+  $rect <10,390,210,430>
+  inherited method UpdateLayout()
+  {
+    // Always invoke the inherited method.
+    super( aSize );
+
+    /*
+
+      HINT:
+
+      This method exists for sophisticated layout calculation. Please note, that in 
+      most cases it is completely sufficient to use the views property 'Layout' to
+      determine how the view should behave when the component is resized.
+
+    */
+
+    /*
+
+      TO DO:
+
+      Put here the code to calculate new position and size of enclosed views. The
+      current (new) size of the component itself is passed in the parameter aSize.
+      For example:
+
+        SomeView.Bounds = rect( 10, 10, aSize.x - 20, aSize.y - 20 );
+
+    */
+  }
+
+  $rect <10,350,210,390>
+  inherited method UpdateViewState()
+  {
+    // Always invoke the inherited method.
+    super( aState );
+
+    /*
+
+      HINT 1:
+
+      This method is invoked automatically when the state set of the component has
+      been changed. The new state set can be found in the parameter aState.
+      Following are the important states:
+
+        Enabled   --> The component can react to user inputs.
+
+        Selected  --> The component is selected in context of its owner.
+
+        Focused   --> The component is selected in context of its owner and 
+                      the owner can react to keyboard events. In this manner the
+                      component is also able to react to keyboard events.
+
+        Modal     --> The component is modal. All events are redirected to this
+                      component.
+
+      To determine whether a state is currently active or not you have to test
+      the aState parameter. For example to test the 'Selected' state:
+
+        if ( aState.contains( Core::ViewState[ Selected ]))
+        {
+          ... yes, this component is currently selected.
+        }
+
+    */
+
+    /*
+
+      HINT 2:
+
+      Alternatively you can request this method invocation by executing explicitly
+      following code:
+
+
+        InvalidateViewState();
+
+    */
+      
+    /*
+
+      TO DO 1:
+
+      Put here the code to ensure that the visual aspect of the component does
+      reflect its current state. For example, depending on its 'Enabled' state
+      a component may appear with full colors or pale if it is disabled:
+
+        if ( aState.contains( Core::ViewState[ Enabled ]))
+        {
+          SomeBackgroundView.Opacity = 255;
+          SomeTextView.Color         = #000000FF;
+        }
+        else
+        {
+          SomeBackgroundView.Opacity = 128;
+          SomeTextView.Color         = #00000080;
+        }
+
+
+      TO DO 2:
+
+      You can evaluate here also the state of any other member in your component.
+      For example in a push-button component, the button should appear highlighted
+      as long as the user holds the finger within a touch area of the button:
+
+        if ( SomeTouchHandler.Down && SomeTouchHandler.Inside )
+          HighlightedBackground.Visible = true;
+        else
+          HighlightedBackground.Visible = false;
+
+      The touch handler itself only requests the update method to be called. Use
+      for this purpose 'InvalidateViewState()' method.
+
+
+      TO DO 3:
+
+      You can calculate here also the position/size of views accordingly to the
+      state of any other member in your component. For example in a slider you
+      can calculate the position of the slider knob from some properties like
+      'SliderValue' and 'SliderRange':
+
+        SliderKnob.Bounds.origin.x = ( SliderValue * Bounds.w ) / SliderRange;
+
+      Changing the 'SliderValue' or 'SliderRange' property should only request
+      the update method to be called. Use for this purpose 'InvalidateViewState()'
+      method.
+
+    */
+  }
+
+  // To do:
+  // 
+  // - Adjust the visible size of your component (the thick blue border).
+  // 
+  // - The simplest way to compose the appearance of the component is to use the \
+  // 'Views' and 'Widget Sets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To implement the interface of the component use the 'Property' template from \
+  // the Gallery folder 'Chora'.
+  // 
+  // - To store values use the 'Variable' and 'Array' templates available in the \
+  // Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - In the method 'UpdateViewState()' you can put code to update the state of \
+  // views enclosed in your component.
+  // 
+  // - In the method 'UpdateLayout()' you can put code to perform sophisticated layout \
+  // calculation for enclosed views.
+  note legend Note1
+  {
+    attr Bounds = <220,270,1000,590>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  // LedSet
+  note group Note
+  {
+    attr Bounds = <550,-10,850,250>;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::ToggleButton toggleLightButton
+  {
+    preset Bounds = <108,43,212,102>;
+    preset OnUpdate = null;
+    preset Outlet = ^Application::Device.buttonValue;
+    preset OnSwitchOn = LightOnSlot;
+    preset OnSwitchOff = LightOffSlot;
+    preset LabelOn = "";
+    preset LabelOff = "";
+    preset Label = "";
+    preset Appearance = WidgetSet::Switch_Lime_Large;
+  }
+
+  $rect <558,35,758,75>
+  slot LightOnSlot
+  {
+    Application::Device.LedSetMethod("on", "true", "bool");
+  }
+
+  $rect <560,80,760,120>
+  slot LightOffSlot
+  {
+    Application::Device.LedSetMethod("on", "false", "bool");
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalSlider BrightnessSlider
+  {
+    preset Bounds = <60,135,260,195>;
+    preset OnEnd = BrightnessSlot;
+    preset Outlet = ^Application::Device.brightnessValue;
+    preset MaxValue = 255;
+    preset CurrentValue = 40;
+    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
+  }
+
+  $rect <560,130,760,170>
+  slot BrightnessSlot
+  {
+    var string brightnessString = string(BrightnessSlider.CurrentValue);
+    Application::Device.LedSetMethod("bri", brightnessString, "int");
+  }
+}
+
+$rect <-270,130,-70,170>
+$output false
+class Component1 : Core::Group
+{
+  $rect <10,230,210,270>
+  inherited property Bounds = <0,0,300,200>;
+
+  $rect <10,390,210,430>
+  inherited method UpdateLayout()
+  {
+    // Always invoke the inherited method.
+    super( aSize );
+
+    /*
+
+      HINT:
+
+      This method exists for sophisticated layout calculation. Please note, that in 
+      most cases it is completely sufficient to use the views property 'Layout' to
+      determine how the view should behave when the component is resized.
+
+    */
+
+    /*
+
+      TO DO:
+
+      Put here the code to calculate new position and size of enclosed views. The
+      current (new) size of the component itself is passed in the parameter aSize.
+      For example:
+
+        SomeView.Bounds = rect( 10, 10, aSize.x - 20, aSize.y - 20 );
+
+    */
+  }
+
+  $rect <10,350,210,390>
+  inherited method UpdateViewState()
+  {
+    // Always invoke the inherited method.
+    super( aState );
+
+    /*
+
+      HINT 1:
+
+      This method is invoked automatically when the state set of the component has
+      been changed. The new state set can be found in the parameter aState.
+      Following are the important states:
+
+        Enabled   --> The component can react to user inputs.
+
+        Selected  --> The component is selected in context of its owner.
+
+        Focused   --> The component is selected in context of its owner and 
+                      the owner can react to keyboard events. In this manner the
+                      component is also able to react to keyboard events.
+
+        Modal     --> The component is modal. All events are redirected to this
+                      component.
+
+      To determine whether a state is currently active or not you have to test
+      the aState parameter. For example to test the 'Selected' state:
+
+        if ( aState.contains( Core::ViewState[ Selected ]))
+        {
+          ... yes, this component is currently selected.
+        }
+
+    */
+
+    /*
+
+      HINT 2:
+
+      Alternatively you can request this method invocation by executing explicitly
+      following code:
+
+
+        InvalidateViewState();
+
+    */
+      
+    /*
+
+      TO DO 1:
+
+      Put here the code to ensure that the visual aspect of the component does
+      reflect its current state. For example, depending on its 'Enabled' state
+      a component may appear with full colors or pale if it is disabled:
+
+        if ( aState.contains( Core::ViewState[ Enabled ]))
+        {
+          SomeBackgroundView.Opacity = 255;
+          SomeTextView.Color         = #000000FF;
+        }
+        else
+        {
+          SomeBackgroundView.Opacity = 128;
+          SomeTextView.Color         = #00000080;
+        }
+
+
+      TO DO 2:
+
+      You can evaluate here also the state of any other member in your component.
+      For example in a push-button component, the button should appear highlighted
+      as long as the user holds the finger within a touch area of the button:
+
+        if ( SomeTouchHandler.Down && SomeTouchHandler.Inside )
+          HighlightedBackground.Visible = true;
+        else
+          HighlightedBackground.Visible = false;
+
+      The touch handler itself only requests the update method to be called. Use
+      for this purpose 'InvalidateViewState()' method.
+
+
+      TO DO 3:
+
+      You can calculate here also the position/size of views accordingly to the
+      state of any other member in your component. For example in a slider you
+      can calculate the position of the slider knob from some properties like
+      'SliderValue' and 'SliderRange':
+
+        SliderKnob.Bounds.origin.x = ( SliderValue * Bounds.w ) / SliderRange;
+
+      Changing the 'SliderValue' or 'SliderRange' property should only request
+      the update method to be called. Use for this purpose 'InvalidateViewState()'
+      method.
+
+    */
+  }
+
+  // To do:
+  // 
+  // - Adjust the visible size of your component (the thick blue border).
+  // 
+  // - The simplest way to compose the appearance of the component is to use the \
+  // 'Views' and 'Widget Sets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To implement the interface of the component use the 'Property' template from \
+  // the Gallery folder 'Chora'.
+  // 
+  // - To store values use the 'Variable' and 'Array' templates available in the \
+  // Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - In the method 'UpdateViewState()' you can put code to update the state of \
+  // views enclosed in your component.
+  // 
+  // - In the method 'UpdateLayout()' you can put code to perform sophisticated layout \
+  // calculation for enclosed views.
+  note legend Note1
+  {
+    attr Bounds = <220,230,1000,550>;
+  }
 }

@@ -1,108 +1,5 @@
 ﻿$version 14.02
 
-// This is the root component of the entire GUI application.
-$rect <20,20,220,60>
-$output false
-class Application : Core::Root
-{
-  $rect <340,10,540,50>
-  inherited property Bounds = <0,0,320,240>;
-
-  // To do:
-  // 
-  // - Adjust the visible size of your application (the thick blue border). It should \
-  // correspond to the size of your target display.
-  // 
-  // - The simplest way to compose the appearance of the application is to use the \
-  // 'Views' and 'Widgets' from the Gallery.
-  // 
-  // - To react to touch or keyboard events use the templates from the Gallery folder \
-  // 'Event Handlers'.
-  // 
-  // - To perform transitions (animations) use the templates from the Gallery folder \
-  // 'Effects'.
-  // 
-  // - To store values use the 'Variable', 'Array' and 'Property' templates available \
-  // in the Gallery folder 'Chora'.
-  // 
-  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
-  // in the Gallery folder 'Chora'.
-  note legend Note1
-  {
-    attr Bounds = <10,260,790,490>;
-  }
-
-  $rect <20,20,160,60>
-  object Views::Rectangle Rectangle
-  {
-    preset Bounds = <0,0,320,240>;
-  }
-
-  $rect <20,20,160,60>
-  object WidgetSet::ToggleButton toggleLightButton
-  {
-    preset Bounds = <108,43,212,102>;
-    preset OnUpdate = null;
-    preset Outlet = ^Application::Device.buttonValue;
-    preset OnSwitchOn = LightOnSlot;
-    preset OnSwitchOff = LightOffSlot;
-    preset LabelOn = "";
-    preset LabelOff = "";
-    preset Label = "";
-    preset Appearance = WidgetSet::Switch_Lime_Large;
-  }
-
-  $rect <558,35,758,75>
-  slot LightOnSlot
-  {
-    Application::Device.LedSetMethod("on", "true", "bool");
-  }
-
-  // LedSet
-  note group Note
-  {
-    attr Bounds = <550,-10,850,250>;
-  }
-
-  $rect <560,80,760,120>
-  slot LightOffSlot
-  {
-    Application::Device.LedSetMethod("on", "false", "bool");
-  }
-
-  $rect <20,20,160,60>
-  object WidgetSet::HorizontalSlider BrightnessSlider
-  {
-    preset Bounds = <60,135,260,195>;
-    preset OnEnd = BrightnessSlot;
-    preset Outlet = ^BrightnessSlider.CurrentValue;
-    preset MaxValue = 255;
-    preset CurrentValue = 40;
-    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
-  }
-
-  $rect <560,130,760,170>
-  slot BrightnessSlot
-  {
-    var string brightnessString = string(BrightnessSlider.CurrentValue);
-    Application::Device.LedSetMethod("bri", brightnessString, "int");
-  }
-
-  // Directives to adapt the order of the above members according to how these members 
-  // where arranged when the project content was stored. In this manner the storage 
-  // and the expected order of the members don't depend. Merging of changes in the 
-  // project files is simplified.
-  $member Bounds
-  $member Note1
-  $member Rectangle
-  $member Note
-  $member toggleLightButton
-  $member LightOnSlot
-  $member LightOffSlot
-  $member BrightnessSlider
-  $member BrightnessSlot
-}
-
 $rect <230,20,430,60>
 $output false
 resource Resources::Font Font
@@ -413,3 +310,708 @@ note legend Note
 {
   attr Bounds = <440,19,940,289>;
 }
+
+// This is the root component of the entire GUI application.
+$rect <-270,30,-70,70>
+$output false
+class Application : Core::Root
+{
+  $rect <340,10,540,50>
+  inherited property Bounds = <0,0,320,240>;
+
+  // To do:
+  // 
+  // - Adjust the visible size of your application (the thick blue border). It should \
+  // correspond to the size of your target display.
+  // 
+  // - The simplest way to compose the appearance of the application is to use the \
+  // 'Views' and 'Widgets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To store values use the 'Variable', 'Array' and 'Property' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  note legend Note1
+  {
+    attr Bounds = <390,250,1170,480>;
+  }
+
+  $rect <20,20,160,60>
+  object Application::homeScreen homeScreen
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <20,20,160,60>
+  object Application::colorSelection colorSelection
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <0,260,150,300>
+  inherited method Init()
+  {
+    PresentDialog( homeScreen, null, null, null, null, null, null, null, null, false );
+  }
+
+  $rect <340,70,540,110>
+  slot Slot
+  {
+    currentView = !currentView;
+    if ( currentView ){
+      SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
+     }
+     else{
+      SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
+     }
+  }
+
+  $rect <20,20,160,60>
+  object Core::SlideTouchHandler SlideTouchHandler
+  {
+    preset Bounds = <0,0,320,240>;
+    preset OnSlide = null;
+    preset OnEnd = null;
+    preset OnStart = Slot;
+    preset SlideVert = false;
+  }
+
+  $rect <340,130,540,170>
+  var bool currentView;
+
+  // Directives to adapt the order of the above members according to how these members 
+  // where arranged when the project content was stored. In this manner the storage 
+  // and the expected order of the members don't depend. Merging of changes in the 
+  // project files is simplified.
+  $member Bounds
+  $member Note1
+  $member colorSelection
+  $member homeScreen
+  $member Init
+  $member Slot
+  $member SlideTouchHandler
+  $member currentView
+
+  // Directives to adapt the order of members belonging to this class so they appear 
+  // correctly arranged relative to the members inherited from the ancestor (super) 
+  // classes. The numbers indicate the order-displacement to apply on the respective 
+  // member once all members have been loaded and combined with members from the 
+  // ancestor classes.
+  $reorder next 1
+  $reorder prev 1
+  $reorder Owner 1
+  $reorder viewShape 1
+  $reorder viewState 1
+  $reorder layoutContext 1
+  $reorder initLayoutContext 1
+  $reorder OnSetStackingPriority 1
+  $reorder OnSetLayout 1
+  $reorder GetRoot 1
+  $reorder Draw 1
+  $reorder GetClipping 1
+  $reorder HandleEvent 1
+  $reorder CursorHitTest 1
+  $reorder AdjustDrawingArea 1
+  $reorder ArrangeView 1
+  $reorder MoveView 1
+  $reorder GetExtent 1
+  $reorder ChangeViewState 1
+  $reorder StackingPriority 1
+  $reorder Layout 1
+  $reorder OnSetBounds 1
+  $reorder Bounds 1
+  $reorder first 1
+  $reorder last 1
+  $reorder keyHandlers 1
+  $reorder buffer 1
+  $reorder dialogStack 1
+  $reorder fadersQueue 1
+  $reorder pendingFader 1
+  $reorder extClipLeft 1
+  $reorder extClipRight 1
+  $reorder extClipTop 1
+  $reorder extClipBottom 1
+  $reorder processKeyHandlers 1
+  $reorder updateBufferSlot 1
+  $reorder drawContent 1
+  $reorder recalculateLayout 1
+  $reorder updateComponentWithDelay 1
+  $reorder updateComponent 1
+  $reorder OnGetDeriveEnabledState 1
+  $reorder OnSetDeriveEnabledState 1
+  $reorder OnSetFocus 1
+  $reorder OnGetClipViews 1
+  $reorder OnSetClipViews 1
+  $reorder OnGetBuffered 1
+  $reorder OnSetBuffered 1
+  $reorder OnGetEnabled 1
+  $reorder OnSetEnabled 1
+  $reorder OnSetOpacity 1
+  $reorder OnGetEmbedded 1
+  $reorder OnSetEmbedded 1
+  $reorder OnGetAlphaBlended 1
+  $reorder OnSetAlphaBlended 1
+  $reorder OnGetVisible 1
+  $reorder OnSetVisible 1
+  $reorder ExtendClipping 1
+  $reorder DrawForeground 1
+  $reorder DrawBackground 1
+  $reorder GetMaximalSize 1
+  $reorder GetMinimalSize 1
+  $reorder FindActiveDialogByClass 1
+  $reorder FindDialogByClass 1
+  $reorder FindCurrentDialog 1
+  $reorder IsCurrentDialog 1
+  $reorder IsActiveDialog 1
+  $reorder IsDialog 1
+  $reorder GetIndexOfDialog 1
+  $reorder GetDialogAtIndex 1
+  $reorder CountDialogs 1
+  $reorder SwitchToDialog 1
+  $reorder DismissDialog 1
+  $reorder PresentDialog 1
+  $reorder ObtainFocus 1
+  $reorder HasViewState 1
+  $reorder LocalPosition 1
+  $reorder GlobalPosition 1
+  $reorder DispatchEvent 1
+  $reorder BroadcastEventAtPosition 1
+  $reorder BroadcastEvent 1
+  $reorder UpdateLayout 1
+  $reorder UpdateViewState 1
+  $reorder InvalidateLayout 1
+  $reorder InvalidateViewState 1
+  $reorder InvalidateArea 1
+  $reorder GetIndexOfView 1
+  $reorder GetViewAtIndex 1
+  $reorder CountViews 1
+  $reorder FindViewWithStackingPriority 1
+  $reorder FindViewInDirection 1
+  $reorder FindViewWithinArea 1
+  $reorder FindViewAtPosition 1
+  $reorder FindPrevView 1
+  $reorder FindNextView 1
+  $reorder FindSiblingView 1
+  $reorder GetContentArea 1
+  $reorder FadeGroup 1
+  $reorder RestackBehind 1
+  $reorder RestackBack 1
+  $reorder RestackTop 1
+  $reorder Restack 1
+  $reorder RemoveAll 1
+  $reorder Remove 1
+  $reorder AddBehind 1
+  $reorder Add 1
+  $reorder DeriveEnabledState 1
+  $reorder Focus 1
+  $reorder ClipViews 1
+  $reorder Buffered 1
+  $reorder Enabled 1
+  $reorder Opacity 1
+  $reorder Embedded 1
+  $reorder AlphaBlended 1
+  $reorder Visible 1
+  $reorder keyLastLocked 1
+  $reorder keyLastCharCode 1
+  $reorder keyLastCode 1
+  $reorder keyLastTarget 1
+  $reorder hasRootFocus 1
+  $reorder updateLock 1
+  $reorder animationLock 1
+  $reorder modalGroups 1
+  $reorder currentEventTimestamp 1
+  $reorder createDragEvent 1
+  $reorder createCursorEvent 1
+  $reorder createCursorGrabEvent 1
+  $reorder cursorHoldTimerProc 1
+  $reorder cursorHoldTimer 1
+  $reorder cursorSequelCounter 1
+  $reorder cursorSequelArea 1
+  $reorder cursorHoldPeriod 1
+  $reorder cursorHittingPos 1
+  $reorder cursorHittingTime 1
+  $reorder cursorCaptureView 1
+  $reorder cursorCurrentPos 1
+  $reorder cursorTargetView 1
+  $reorder cursorHitOffset 1
+  $reorder cursorLastPos 1
+  $reorder cursorFirstPos 1
+  $reorder cursorFinger 1
+  $reorder fpsTime 1
+  $reorder fpsCounter 1
+  $reorder lastRegions 1
+  $reorder noOfLastRegions 1
+  $reorder canvas 1
+  $reorder regionsArea 1
+  $reorder regions 1
+  $reorder noOfRegions 1
+  $reorder GetFPS 1
+  $reorder Update 1
+  $reorder UpdateGE20 1
+  $reorder EndUpdate 1
+  $reorder UpdateCanvas 1
+  $reorder GetUpdateRegion 1
+  $reorder BeginUpdate 1
+  $reorder DoesNeedUpdate 1
+  $reorder Initialize 1
+  $reorder SetRootFocus 1
+  $reorder SetUserInputTimestamp 1
+  $reorder DriveKeyboardHitting 1
+  $reorder DriveCursorMovement 1
+  $reorder DriveMultiTouchMovement 1
+  $reorder DriveCursorHitting 1
+  $reorder DriveMultiTouchHitting 1
+  $reorder OnGetActiveDialogClass 1
+  $reorder OnSetActiveDialogClass 1
+  $reorder OnGetActiveDialog 1
+  $reorder OnSetActiveDialog 1
+  $reorder OnSetVirtualKeyboard 1
+  $reorder OnSetCursorDragLimit 1
+  $reorder OnSetCursorSequelDelay 1
+  $reorder OnGetStyles 1
+  $reorder OnSetStyles 1
+  $reorder OnGetLanguage 1
+  $reorder OnSetLanguage 1
+  $reorder EndAnimation 1
+  $reorder BeginAnimation 1
+  $reorder CaptureCursor 1
+  $reorder RetargetCursorWithReason 1
+  $reorder RetargetCursor 1
+  $reorder DeflectCursor 1
+  $reorder GetModalGroup 1
+  $reorder EndModal 1
+  $reorder BeginModal 1
+  $reorder ActiveDialogClass 1
+  $reorder ActiveDialog 1
+  $reorder VirtualKeyboard 1
+  $reorder CursorDragLimit 1
+  $reorder CursorSequelDelay 1
+  $reorder Styles 1
+  $reorder Language 1
+  $reorder Note1 1
+  $reorder colorSelection 1
+  $reorder homeScreen 1
+}
+
+// GUI
+note group Note1
+{
+  attr Bounds = <-290,-10,10,190>;
+}
+
+$rect <-270,80,-70,120>
+$output false
+class homeScreen : Core::Group
+{
+  $rect <10,279,210,319>
+  inherited property Bounds = <0,0,320,240>;
+
+  $rect <10,390,210,430>
+  inherited method UpdateLayout()
+  {
+    // Always invoke the inherited method.
+    super( aSize );
+
+    /*
+
+      HINT:
+
+      This method exists for sophisticated layout calculation. Please note, that in 
+      most cases it is completely sufficient to use the views property 'Layout' to
+      determine how the view should behave when the component is resized.
+
+    */
+
+    /*
+
+      TO DO:
+
+      Put here the code to calculate new position and size of enclosed views. The
+      current (new) size of the component itself is passed in the parameter aSize.
+      For example:
+
+        SomeView.Bounds = rect( 10, 10, aSize.x - 20, aSize.y - 20 );
+
+    */
+  }
+
+  $rect <10,350,210,390>
+  inherited method UpdateViewState()
+  {
+    // Always invoke the inherited method.
+    super( aState );
+
+    /*
+
+      HINT 1:
+
+      This method is invoked automatically when the state set of the component has
+      been changed. The new state set can be found in the parameter aState.
+      Following are the important states:
+
+        Enabled   --> The component can react to user inputs.
+
+        Selected  --> The component is selected in context of its owner.
+
+        Focused   --> The component is selected in context of its owner and 
+                      the owner can react to keyboard events. In this manner the
+                      component is also able to react to keyboard events.
+
+        Modal     --> The component is modal. All events are redirected to this
+                      component.
+
+      To determine whether a state is currently active or not you have to test
+      the aState parameter. For example to test the 'Selected' state:
+
+        if ( aState.contains( Core::ViewState[ Selected ]))
+        {
+          ... yes, this component is currently selected.
+        }
+
+    */
+
+    /*
+
+      HINT 2:
+
+      Alternatively you can request this method invocation by executing explicitly
+      following code:
+
+
+        InvalidateViewState();
+
+    */
+      
+    /*
+
+      TO DO 1:
+
+      Put here the code to ensure that the visual aspect of the component does
+      reflect its current state. For example, depending on its 'Enabled' state
+      a component may appear with full colors or pale if it is disabled:
+
+        if ( aState.contains( Core::ViewState[ Enabled ]))
+        {
+          SomeBackgroundView.Opacity = 255;
+          SomeTextView.Color         = #000000FF;
+        }
+        else
+        {
+          SomeBackgroundView.Opacity = 128;
+          SomeTextView.Color         = #00000080;
+        }
+
+
+      TO DO 2:
+
+      You can evaluate here also the state of any other member in your component.
+      For example in a push-button component, the button should appear highlighted
+      as long as the user holds the finger within a touch area of the button:
+
+        if ( SomeTouchHandler.Down && SomeTouchHandler.Inside )
+          HighlightedBackground.Visible = true;
+        else
+          HighlightedBackground.Visible = false;
+
+      The touch handler itself only requests the update method to be called. Use
+      for this purpose 'InvalidateViewState()' method.
+
+
+      TO DO 3:
+
+      You can calculate here also the position/size of views accordingly to the
+      state of any other member in your component. For example in a slider you
+      can calculate the position of the slider knob from some properties like
+      'SliderValue' and 'SliderRange':
+
+        SliderKnob.Bounds.origin.x = ( SliderValue * Bounds.w ) / SliderRange;
+
+      Changing the 'SliderValue' or 'SliderRange' property should only request
+      the update method to be called. Use for this purpose 'InvalidateViewState()'
+      method.
+
+    */
+  }
+
+  // To do:
+  // 
+  // - Adjust the visible size of your component (the thick blue border).
+  // 
+  // - The simplest way to compose the appearance of the component is to use the \
+  // 'Views' and 'Widget Sets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To implement the interface of the component use the 'Property' template from \
+  // the Gallery folder 'Chora'.
+  // 
+  // - To store values use the 'Variable' and 'Array' templates available in the \
+  // Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - In the method 'UpdateViewState()' you can put code to update the state of \
+  // views enclosed in your component.
+  // 
+  // - In the method 'UpdateLayout()' you can put code to perform sophisticated layout \
+  // calculation for enclosed views.
+  note legend Note1
+  {
+    attr Bounds = <220,270,1000,590>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  // LedSet
+  note group Note
+  {
+    attr Bounds = <550,-10,850,250>;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::ToggleButton toggleLightButton
+  {
+    preset Bounds = <108,43,212,102>;
+    preset OnUpdate = null;
+    preset Outlet = ^Application::Device.buttonValue;
+    preset OnSwitchOn = LightOnSlot;
+    preset OnSwitchOff = LightOffSlot;
+    preset LabelOn = "";
+    preset LabelOff = "";
+    preset Label = "";
+    preset Appearance = WidgetSet::Switch_Lime_Large;
+  }
+
+  $rect <558,35,758,75>
+  slot LightOnSlot
+  {
+    Application::Device.LedSetMethod("on", "true", "bool");
+  }
+
+  $rect <560,80,760,120>
+  slot LightOffSlot
+  {
+    Application::Device.LedSetMethod("on", "false", "bool");
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalSlider BrightnessSlider
+  {
+    preset Bounds = <60,135,260,195>;
+    preset OnEnd = BrightnessSlot;
+    preset Outlet = ^Application::Device.brightnessValue;
+    preset MaxValue = 255;
+    preset CurrentValue = 40;
+    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
+  }
+
+  $rect <560,130,760,170>
+  slot BrightnessSlot
+  {
+    var string brightnessString = string(BrightnessSlider.CurrentValue);
+    Application::Device.LedSetMethod("bri", brightnessString, "int");
+  }
+}
+
+$rect <-270,130,-70,170>
+$output false
+class colorSelection : Core::Group
+{
+  $rect <10,339,210,379>
+  inherited property Bounds = <0,0,320,240>;
+
+  $rect <10,499,210,539>
+  inherited method UpdateLayout()
+  {
+    // Always invoke the inherited method.
+    super( aSize );
+
+    /*
+
+      HINT:
+
+      This method exists for sophisticated layout calculation. Please note, that in 
+      most cases it is completely sufficient to use the views property 'Layout' to
+      determine how the view should behave when the component is resized.
+
+    */
+
+    /*
+
+      TO DO:
+
+      Put here the code to calculate new position and size of enclosed views. The
+      current (new) size of the component itself is passed in the parameter aSize.
+      For example:
+
+        SomeView.Bounds = rect( 10, 10, aSize.x - 20, aSize.y - 20 );
+
+    */
+  }
+
+  $rect <10,459,210,499>
+  inherited method UpdateViewState()
+  {
+    // Always invoke the inherited method.
+    super( aState );
+
+    /*
+
+      HINT 1:
+
+      This method is invoked automatically when the state set of the component has
+      been changed. The new state set can be found in the parameter aState.
+      Following are the important states:
+
+        Enabled   --> The component can react to user inputs.
+
+        Selected  --> The component is selected in context of its owner.
+
+        Focused   --> The component is selected in context of its owner and 
+                      the owner can react to keyboard events. In this manner the
+                      component is also able to react to keyboard events.
+
+        Modal     --> The component is modal. All events are redirected to this
+                      component.
+
+      To determine whether a state is currently active or not you have to test
+      the aState parameter. For example to test the 'Selected' state:
+
+        if ( aState.contains( Core::ViewState[ Selected ]))
+        {
+          ... yes, this component is currently selected.
+        }
+
+    */
+
+    /*
+
+      HINT 2:
+
+      Alternatively you can request this method invocation by executing explicitly
+      following code:
+
+
+        InvalidateViewState();
+
+    */
+      
+    /*
+
+      TO DO 1:
+
+      Put here the code to ensure that the visual aspect of the component does
+      reflect its current state. For example, depending on its 'Enabled' state
+      a component may appear with full colors or pale if it is disabled:
+
+        if ( aState.contains( Core::ViewState[ Enabled ]))
+        {
+          SomeBackgroundView.Opacity = 255;
+          SomeTextView.Color         = #000000FF;
+        }
+        else
+        {
+          SomeBackgroundView.Opacity = 128;
+          SomeTextView.Color         = #00000080;
+        }
+
+
+      TO DO 2:
+
+      You can evaluate here also the state of any other member in your component.
+      For example in a push-button component, the button should appear highlighted
+      as long as the user holds the finger within a touch area of the button:
+
+        if ( SomeTouchHandler.Down && SomeTouchHandler.Inside )
+          HighlightedBackground.Visible = true;
+        else
+          HighlightedBackground.Visible = false;
+
+      The touch handler itself only requests the update method to be called. Use
+      for this purpose 'InvalidateViewState()' method.
+
+
+      TO DO 3:
+
+      You can calculate here also the position/size of views accordingly to the
+      state of any other member in your component. For example in a slider you
+      can calculate the position of the slider knob from some properties like
+      'SliderValue' and 'SliderRange':
+
+        SliderKnob.Bounds.origin.x = ( SliderValue * Bounds.w ) / SliderRange;
+
+      Changing the 'SliderValue' or 'SliderRange' property should only request
+      the update method to be called. Use for this purpose 'InvalidateViewState()'
+      method.
+
+    */
+  }
+
+  // To do:
+  // 
+  // - Adjust the visible size of your component (the thick blue border).
+  // 
+  // - The simplest way to compose the appearance of the component is to use the \
+  // 'Views' and 'Widget Sets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To implement the interface of the component use the 'Property' template from \
+  // the Gallery folder 'Chora'.
+  // 
+  // - To store values use the 'Variable' and 'Array' templates available in the \
+  // Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - In the method 'UpdateViewState()' you can put code to update the state of \
+  // views enclosed in your component.
+  // 
+  // - In the method 'UpdateLayout()' you can put code to perform sophisticated layout \
+  // calculation for enclosed views.
+  note legend Note1
+  {
+    attr Bounds = <220,339,1000,659>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+}
+
+// Directives to adapt the order of the above members according to how these members 
+// where arranged when the project content was stored. In this manner the storage 
+// and the expected order of the members don't depend. Merging of changes in the 
+// project files is simplified.
+$member Application
+$member Font
+$member Inline
+$member DeviceClass
+$member Device
+$member Note
+$member Note1
+$member homeScreen
+$member colorSelection
