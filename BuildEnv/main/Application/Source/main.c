@@ -19,12 +19,18 @@
 #include "cJSON.h"
 #include "httpTasks/httpTasks.h"
 
-//Json object aswell as the initial JSON string
+/*Includes for Embedded Wizard*/
+#include "ewmain.h"
+#include "ewrte.h"
+#include "ew_bsp_system.h"
+#include "Application.h"
+
+//Json object for the Local WLED status (gWledJson) and the new WLED status (nWledJson)
 static cJSON *gWledJson = NULL;
 static cJSON *nWledJson = NULL;
 
-
-char json[1024]; // Buffer for the JSON string
+// buffer for ingoing JSON data and a default JSON status
+char json[1024];
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
@@ -39,13 +45,6 @@ static const char *default_json =
   "\"o2\":false,\"o3\":false,\"si\":0,\"m12\":0}]}";
 
 
-/*Includes for Embedded Wizard*/
-#include "ewmain.h"
-#include "ewrte.h"
-#include "ew_bsp_system.h"
-#include "Application.h"
-
-
 static const char *TAG = "WLED_control";
 
 /* Create a queue to send requests from the frontend to the task, aswell as 2 variables that serve as parameters*/
@@ -55,7 +54,11 @@ char _key[20];
 char _value[20];
 char _dataType[20];
 
-
+/***********************************************************************
+The following functions are a thread-safe way to update the GUI. They
+get the access to the Device Interface instance and call the corresponding
+Method defined in Embedded Wizard.
+************************************************************************/
 void _EWUpdateSliderPROC()
 {
 
@@ -68,9 +71,21 @@ void _EWUpdateSliderPROC()
     /* Invoke the function to trigger the event */
     ApplicationDeviceClass__EWUpdateSlider( device, bri->valueint );
 }
+void _EWUpdateButtonPROC()
+{
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the "on" parameter from the JSON object */
+    cJSON *on = cJSON_GetObjectItem(gWledJson, "on");
+    /* Invoke the function to trigger the event */
+    ApplicationDeviceClass__EWUpdateButton( device, cJSON_IsTrue(on) );
+}
+
 /***********************************************************************
-Initialize the JSON object at startup with a HTTP request or a default JSON
-object.
+Initialize the JSON object at startup with a HTTP request or a default 
+JSON object.
 ************************************************************************/
 void JsonInit()
 {
@@ -148,10 +163,10 @@ static int _LedModify(char *key, char *value, char *dataType)
     }
 }
 
-/************************************************************ 
-    This is the task that handels the queue from the frontend.
-    It will run in the FreeRTOS event loop.
-************************************************************/
+/***********************************************************************
+This is the task that handels the queue from the frontend.
+It will run in the FreeRTOS event loop.
+************************************************************************/
 static void _wled_send_task(void *pvParameters)
 {
     bool trigger;
@@ -178,16 +193,17 @@ static void _wled_send_task(void *pvParameters)
     }
 }
 
-/*
-
-*/
+/***********************************************************************
+This task checks the current state of the WLED device every 3 seconds
+If a mismatch between the local Status and the WLED device is detected,
+it will update the local JSON object and trigger the GUI update.
+************************************************************************/
 static void _wled_getStatus_task(void *pvParameters)
 {
-    char incoming_json[1024];
 
     // ***Send the HTTP request to the WLED device***
     while(1){
-        int r = http_GET(incoming_json, sizeof(incoming_json));
+        int r = http_GET(json, sizeof(json));
         if (r != 200) {
             ESP_LOGE(TAG, "Failed to get JSON object.");
             vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -195,11 +211,11 @@ static void _wled_getStatus_task(void *pvParameters)
         }
 
         // ***Format the response***
-        char *json_start = strstr(incoming_json, "\r\n\r\n");  // Use incoming_json instead of json
+        char *json_start = strstr(json, "\r\n\r\n");  // Use incoming_json instead of json
         if (json_start != NULL) {
             json_start += 4; // Skip the \r\n\r\n separator
         } else {
-            json_start = strstr(incoming_json, "{"); // Fallback: look for first {
+            json_start = strstr(json, "{"); // Fallback: look for first {
         }
 
         if (json_start == NULL) {
@@ -232,12 +248,10 @@ static void _wled_getStatus_task(void *pvParameters)
             ESP_LOGI(TAG, "On state changed: gWledJson=%s, nWledJson=%s", 
                     cJSON_IsTrue(on_gWled) ? "true" : "false", 
                     cJSON_IsTrue(on_nWled) ? "true" : "false");
-            
             // Update the local JSON object with the new on/off state
             cJSON_ReplaceItemInObject(gWledJson, "on", cJSON_CreateBool(cJSON_IsTrue(on_nWled)));
-            
+            EwInvoke(_EWUpdateButtonPROC, 0);      
         }
-
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
         
@@ -245,9 +259,9 @@ static void _wled_getStatus_task(void *pvParameters)
     }
 }
 
-/**************************************************************************
+/***********************************************************************
   The GUI_Task() function implements the main loop of the Embedded Wizard
-**************************************************************************/
+************************************************************************/
 void _GUI_task(void *pvParameters)
 {
   unsigned int stack;
@@ -277,10 +291,10 @@ void _GUI_task(void *pvParameters)
 
 
 
-/**************************************************************************
+/***********************************************************************
   The main function is the entry point of the application. It initializes
   the system and starts the GUI task, as well as the WLED HTTP task.
-**************************************************************************/
+************************************************************************/
 void app_main(void)
 {
     /* Set up the flash-storage for the Wi-Fi module*/
@@ -305,5 +319,5 @@ void app_main(void)
 
     /* Put the wled task into the event-loop*/
     xTaskCreate(&_wled_send_task, "wled_send_task", 4096, NULL, 5, NULL);
-    xTaskCreate(&_wled_getStatus_task, "wled_update_frontedn", 4096, NULL, 5, NULL);
+    xTaskCreate(&_wled_getStatus_task, "wled_update_frontend", 4096, NULL, 5, NULL);
 }

@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "EmbeddedWizard-ESP32-S3-BOX-3",
-    "project_version":    "15d5c95-dirty",
+    "project_version":    "87a3885-dirty",
     "project_path":       "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/BuildEnv",
     "idf_path":           "C:/Users/nicoz/esp/v5.4/esp-idf",
     "build_dir":          "C:/Users/nicoz/esp/ESP32-Box-WLED-Controller/BuildEnv/build",

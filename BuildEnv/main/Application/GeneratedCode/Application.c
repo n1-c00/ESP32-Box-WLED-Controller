@@ -79,17 +79,30 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
 
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->colorSelection, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->homeScreen, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->SlideTouchHandler, _Const0000 );
-  _this->SlideTouchHandler.SlideVert = 0;
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->colorSelection ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->homeScreen ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->SlideTouchHandler ), 0 );
-  _this->SlideTouchHandler.OnStart = EwNewSlot( _this, ApplicationApplication_Slot );
-
-  /* Call the user defined constructor */
-  ApplicationApplication_Init( _this, aArg );
+  CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
+  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
+  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
+  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
+  WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
+  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
+  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
+  ApplicationDeviceClass_OnSetbuttonValue ));
+  _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
+  _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
+  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
+  &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
+  _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
+  ApplicationDeviceClass_OnSetbrightnessValue ));
+  WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
+  &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
 }
 
 /* Re-Initializer for the class 'Application::Application' */

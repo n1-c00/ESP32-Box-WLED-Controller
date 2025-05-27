@@ -32,7 +32,7 @@ view Project
   attr aspectRatio = 1.0;
   attr enableGrid = true;
   attr grid = 10;
-  attr scrollTo = <162,-25>;
+  attr scrollTo = <-29,-25>;
   attr zoom = 0.75;
 }
 
