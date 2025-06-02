@@ -37,6 +37,8 @@
 #include "_WidgetSetHorizontalSliderConfig.h"
 #include "_WidgetSetToggleButton.h"
 #include "_WidgetSetToggleButtonConfig.h"
+#include "_WidgetSetVerticalSlider.h"
+#include "_WidgetSetVerticalSliderConfig.h"
 #include "Application.h"
 #include "WidgetSet.h"
 
@@ -46,7 +48,8 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
   0xFFFF, 0xFFFF, 0xC557, 0x006F, 0x006E, 0x0000, 0xC557, 0x0074, 0x0072, 0x0075,
   0x0065, 0x0000, 0xC557, 0x0062, 0x006F, 0x006F, 0x006C, 0x0000, 0xC557, 0x0066,
   0x0061, 0x006C, 0x0073, 0x0065, 0x0000, 0xC557, 0x0062, 0x0072, 0x0069, 0x0000,
-  0xC557, 0x0069, 0x006E, 0x0074, 0x0000
+  0xC557, 0x0069, 0x006E, 0x0074, 0x0000, 0xC557, 0x003B, 0x0000, 0xC557, 0x0063,
+  0x006F, 0x006C, 0x0000, 0xC557, 0x0061, 0x0072, 0x0072, 0x0061, 0x0079, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -59,6 +62,12 @@ static const XStringRes _Const0005 = { _StringsDefault0, 0x000D };
 static const XStringRes _Const0006 = { _StringsDefault0, 0x0013 };
 static const XStringRes _Const0007 = { _StringsDefault0, 0x001A };
 static const XStringRes _Const0008 = { _StringsDefault0, 0x001F };
+static const XRect _Const0009 = {{ 40, 20 }, { 100, 220 }};
+static const XRect _Const000A = {{ 131, 20 }, { 190, 220 }};
+static const XRect _Const000B = {{ 220, 20 }, { 285, 220 }};
+static const XStringRes _Const000C = { _StringsDefault0, 0x0024 };
+static const XStringRes _Const000D = { _StringsDefault0, 0x0027 };
+static const XStringRes _Const000E = { _StringsDefault0, 0x002C };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -79,30 +88,17 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
 
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
-  WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
-  WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
-  WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
-  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
-  WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
-  WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->toggleLightButton ), 0 );
-  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BrightnessSlider ), 0 );
-  WidgetSetToggleButton_OnSetOutlet( &_this->toggleLightButton, EwNewRef( EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbuttonValue, 
-  ApplicationDeviceClass_OnSetbuttonValue ));
-  _this->toggleLightButton.OnSwitchOn = EwNewSlot( _this, ApplicationApplication_LightOnSlot );
-  _this->toggleLightButton.OnSwitchOff = EwNewSlot( _this, ApplicationApplication_LightOffSlot );
-  WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
-  &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
-  _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
-  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( EwGetAutoObject( 
-  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
-  ApplicationDeviceClass_OnSetbrightnessValue ));
-  WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
-  &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
+  CoreRectView__OnSetBounds( &_this->colorSelection, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->homeScreen, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->SlideTouchHandler, _Const0000 );
+  _this->SlideTouchHandler.SlideVert = 0;
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->colorSelection ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->homeScreen ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->SlideTouchHandler ), 0 );
+  _this->SlideTouchHandler.OnStart = EwNewSlot( _this, ApplicationApplication_Slot );
+
+  /* Call the user defined constructor */
+  ApplicationApplication_Init( _this, aArg );
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -337,11 +333,7 @@ void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32
   aNewValue )
 {
   if ( aNewValue != _this->brightnessValue )
-  {
     _this->brightnessValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
-      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
@@ -356,17 +348,36 @@ void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool
   aNewValue )
 {
   if ( aNewValue != _this->buttonValue )
-  {
     _this->buttonValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
-      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */
 void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue )
 {
   ApplicationDeviceClass_EWUpdateButton((ApplicationDeviceClass)_this, aNewValue );
+}
+
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateColor( ApplicationDeviceClass _this, XInt32 
+  aNewValueRed, XInt32 aNewValueGreen, XInt32 aNewValueBlue )
+{
+  if ( aNewValueRed != _this->redValue )
+    _this->redValue = aNewValueRed;
+
+  if ( aNewValueGreen != _this->greenValue )
+    _this->greenValue = aNewValueGreen;
+
+  if ( aNewValueBlue != _this->blueValue )
+    _this->blueValue = aNewValueBlue;
+}
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateColor()' */
+void ApplicationDeviceClass__EWUpdateColor( void* _this, XInt32 aNewValueRed, XInt32 
+  aNewValueGreen, XInt32 aNewValueBlue )
+{
+  ApplicationDeviceClass_EWUpdateColor((ApplicationDeviceClass)_this, aNewValueRed
+  , aNewValueGreen, aNewValueBlue );
 }
 
 /* Default onget method for the property 'brightnessValue' */
@@ -393,6 +404,45 @@ void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBoo
   value )
 {
   _this->buttonValue = value;
+}
+
+/* Default onget method for the property 'redValue' */
+XInt32 ApplicationDeviceClass_OnGetredValue( ApplicationDeviceClass _this )
+{
+  return _this->redValue;
+}
+
+/* Default onset method for the property 'redValue' */
+void ApplicationDeviceClass_OnSetredValue( ApplicationDeviceClass _this, XInt32 
+  value )
+{
+  _this->redValue = value;
+}
+
+/* Default onget method for the property 'greenValue' */
+XInt32 ApplicationDeviceClass_OnGetgreenValue( ApplicationDeviceClass _this )
+{
+  return _this->greenValue;
+}
+
+/* Default onset method for the property 'greenValue' */
+void ApplicationDeviceClass_OnSetgreenValue( ApplicationDeviceClass _this, XInt32 
+  value )
+{
+  _this->greenValue = value;
+}
+
+/* Default onget method for the property 'blueValue' */
+XInt32 ApplicationDeviceClass_OnGetblueValue( ApplicationDeviceClass _this )
+{
+  return _this->blueValue;
+}
+
+/* Default onset method for the property 'blueValue' */
+void ApplicationDeviceClass_OnSetblueValue( ApplicationDeviceClass _this, XInt32 
+  value )
+{
+  _this->blueValue = value;
 }
 
 /* Variants derived from the class : 'Application::DeviceClass' */
@@ -570,6 +620,9 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
 
   /* ... then construct all embedded objects */
   ViewsRectangle__Init( &_this->Rectangle, &_this->_.XObject, 0 );
+  WidgetSetVerticalSlider__Init( &_this->RedSlider, &_this->_.XObject, 0 );
+  WidgetSetVerticalSlider__Init( &_this->GreenSlider, &_this->_.XObject, 0 );
+  WidgetSetVerticalSlider__Init( &_this->BlueSlider, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationcolorSelection );
@@ -577,7 +630,34 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
+  CoreRectView__OnSetBounds( &_this->RedSlider, _Const0009 );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->RedSlider, 254 );
+  CoreRectView__OnSetBounds( &_this->GreenSlider, _Const000A );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->GreenSlider, 254 );
+  CoreRectView__OnSetBounds( &_this->BlueSlider, _Const000B );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->BlueSlider, 254 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->RedSlider ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->GreenSlider ), 0 );
+  CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->BlueSlider ), 0 );
+  _this->RedSlider.OnEnd = EwNewSlot( _this, ApplicationcolorSelection_ColorSlot );
+  WidgetSetVerticalSlider_OnSetOutlet( &_this->RedSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetredValue, 
+  ApplicationDeviceClass_OnSetredValue ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->RedSlider, EwGetAutoObject( &WidgetSetVerticalSlider_Lime_Large, 
+  WidgetSetVerticalSliderConfig ));
+  _this->GreenSlider.OnEnd = EwNewSlot( _this, ApplicationcolorSelection_ColorSlot );
+  WidgetSetVerticalSlider_OnSetOutlet( &_this->GreenSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetgreenValue, 
+  ApplicationDeviceClass_OnSetgreenValue ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->GreenSlider, EwGetAutoObject( 
+  &WidgetSetVerticalSlider_Lime_Large, WidgetSetVerticalSliderConfig ));
+  _this->BlueSlider.OnEnd = EwNewSlot( _this, ApplicationcolorSelection_ColorSlot );
+  WidgetSetVerticalSlider_OnSetOutlet( &_this->BlueSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetblueValue, 
+  ApplicationDeviceClass_OnSetblueValue ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->BlueSlider, EwGetAutoObject( 
+  &WidgetSetVerticalSlider_Lime_Large, WidgetSetVerticalSliderConfig ));
 }
 
 /* Re-Initializer for the class 'Application::colorSelection' */
@@ -588,6 +668,9 @@ void ApplicationcolorSelection__ReInit( ApplicationcolorSelection _this )
 
   /* ... then re-construct all embedded objects */
   ViewsRectangle__ReInit( &_this->Rectangle );
+  WidgetSetVerticalSlider__ReInit( &_this->RedSlider );
+  WidgetSetVerticalSlider__ReInit( &_this->GreenSlider );
+  WidgetSetVerticalSlider__ReInit( &_this->BlueSlider );
 }
 
 /* Finalizer method for the class 'Application::colorSelection' */
@@ -598,9 +681,37 @@ void ApplicationcolorSelection__Done( ApplicationcolorSelection _this )
 
   /* Finalize all embedded objects */
   ViewsRectangle__Done( &_this->Rectangle );
+  WidgetSetVerticalSlider__Done( &_this->RedSlider );
+  WidgetSetVerticalSlider__Done( &_this->GreenSlider );
+  WidgetSetVerticalSlider__Done( &_this->BlueSlider );
 
   /* Don't forget to deinitialize the super class ... */
   CoreGroup__Done( &_this->_.Super );
+}
+
+/* 'C' function for method : 'Application::colorSelection.ColorSlot()' */
+void ApplicationcolorSelection_ColorSlot( ApplicationcolorSelection _this, XObject 
+  sender )
+{
+  XString redString;
+  XString greenString;
+  XString blueString;
+  XString colorString;
+
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( sender );
+
+  redString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->RedSlider ), 
+  0, 10 );
+  greenString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->GreenSlider ), 
+  0, 10 );
+  blueString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->BlueSlider ), 
+  0, 10 );
+  colorString = EwConcatString( EwConcatString( EwConcatString( EwConcatString( 
+  EwConcatString( redString, EwLoadString( &_Const000C )), greenString ), EwLoadString( 
+  &_Const000C )), blueString ), EwLoadString( &_Const000C ));
+  ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
+  EwLoadString( &_Const000D ), colorString, EwLoadString( &_Const000E ));
 }
 
 /* Variants derived from the class : 'Application::colorSelection' */

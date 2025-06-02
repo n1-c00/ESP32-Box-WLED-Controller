@@ -82,7 +82,19 @@ void _EWUpdateButtonPROC()
     /* Invoke the function to trigger the event */
     ApplicationDeviceClass__EWUpdateButton( device, cJSON_IsTrue(on) );
 }
+void _EWUpdateColorPROC()
+{
+    int r, g, b = 0;
 
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the rgb-array and seperate it into r, g, b values */
+
+    /*Invoke the function to trigger the event*/
+    ApplicationDeviceClass__EWUpdateColor(device, r, g, b)
+}
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default 
 JSON object.
@@ -157,8 +169,28 @@ static int _LedModify(char *key, char *value, char *dataType)
                                   key,
                                   cJSON_CreateNumber(v));
         return 0;
-    }
-    else {
+    }else if (strcmp(dataType, "array") == 0){
+        // Parse the RGB values from the semicolon-separated string
+        int r, g, b;
+        if (sscanf(value, "%d;%d;%d", &r, &g, &b) == 3) {
+            // Create a new array with the RGB values
+            cJSON *rgb_array = cJSON_CreateArray();
+            if (rgb_array == NULL) {
+                return -1; // Failed to create array
+            }
+            
+            // Add the RGB values to the array
+            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(r));
+            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(g));
+            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(b));
+            
+            // Replace the array in the JSON object
+            cJSON_ReplaceItemInObject(gWledJson, key, rgb_array);
+            return 0;
+        } else {
+            return -1; // Failed to parse RGB values
+        }
+    }else {
         return -1; // error: unknown Key
     }
 }
@@ -231,7 +263,7 @@ static void _wled_getStatus_task(void *pvParameters)
             continue;
         }
         
-        //***Compare "bri" parameter***
+        //Compare "bri" parameter
         cJSON *bri_gWled = cJSON_GetObjectItem(gWledJson, "bri");
         cJSON *bri_nWled = cJSON_GetObjectItem(nWledJson, "bri");
         if (bri_gWled && bri_nWled && bri_gWled->valueint != bri_nWled->valueint) {
@@ -241,7 +273,7 @@ static void _wled_getStatus_task(void *pvParameters)
             EwInvoke(_EWUpdateSliderPROC, 0);
         }
 
-        // ***Compare "on" parameter***
+        // Compare "on" parameter
         cJSON *on_gWled = cJSON_GetObjectItem(gWledJson, "on");
         cJSON *on_nWled = cJSON_GetObjectItem(nWledJson, "on");
         if (on_gWled && on_nWled && cJSON_IsTrue(on_gWled) != cJSON_IsTrue(on_nWled)) {
@@ -252,6 +284,9 @@ static void _wled_getStatus_task(void *pvParameters)
             cJSON_ReplaceItemInObject(gWledJson, "on", cJSON_CreateBool(cJSON_IsTrue(on_nWled)));
             EwInvoke(_EWUpdateButtonPROC, 0);      
         }
+
+        // Compare "col" parameter
+
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
         

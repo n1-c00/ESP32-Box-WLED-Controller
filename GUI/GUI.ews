@@ -1,9 +1,9 @@
 $version 1.0
 
-attr active = Application::Application;
+attr active = Application::DeviceClass;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.Slot;
+attr currentCodeInspector = Application::DeviceClass.EWUpdateColor;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -40,61 +40,43 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
-  attr scrollTo = <-579,-92>;
-  attr zoom = 1.0;
-}
-
-view class Application::Application
-{
-  attr enableWireMode = false;
-  attr scrollTo = <78,-68>;
+  attr scrollTo = <-309,-41>;
   attr zoom = 0.75;
 }
 
 view class Application::homeScreen
 {
-  attr enableWireMode = false;
-  attr scrollTo = <-9,-64>;
+  attr scrollTo = <-9,7>;
   attr zoom = 0.75;
 }
 
 view class Application::colorSelection
 {
   attr enableWireMode = false;
-  attr scrollTo = <-183,-41>;
-  attr zoom = 1.25;
+  attr scrollTo = <-225,-71>;
+  attr zoom = 0.75;
 }
 
-codeview Application::Application.Init
+view class Application::DeviceClass
+{
+  attr enableWireMode = false;
+  attr scrollTo = <591,10>;
+  attr zoom = 0.75;
+}
+
+codeview Application::colorSelection.ColorSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <83,0>;
+  attr codeSelEnd = <74,4>;
+  attr codeSelStart = <74,4>;
 }
 
-codeview Application::DeviceClass.LedSetMethod
+codeview Application::DeviceClass.EWUpdateColor
 {
   attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,0>;
-  attr codeSelStart = <0,0>;
-}
-
-codeview Application::Application.Slot
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <28,5>;
-  attr codeSelStart = <28,5>;
-}
-
-codeview Core::Group.PresentDialog
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,11>;
-  attr codeSelEnd = <2,16>;
-  attr codeSelStart = <2,16>;
+  attr codeFirstPos = <0,8>;
+  attr codeSelEnd = <11,16>;
+  attr codeSelStart = <11,16>;
 }

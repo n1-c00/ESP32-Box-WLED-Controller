@@ -16,7 +16,7 @@ resource Resources::Font Font
   attr fontrowdistance RowDistance;
 }
 
-$rect <20,100,220,140>
+$rect <240,-20,440,20>
 inline Inline
 {
   /*
@@ -35,7 +35,7 @@ inline Inline
   */
 }
 
-$rect <20,60,220,100>
+$rect <20,80,220,120>
 $output false
 class DeviceClass : Templates::DeviceClass
 {
@@ -212,7 +212,7 @@ class DeviceClass : Templates::DeviceClass
   // See inline documentation inside the method.
   note legend Note2
   {
-    attr Bounds = <1190,410,1690,590>;
+    attr Bounds = <1160,410,1660,590>;
   }
 
   // The object 'SystemEventHandler' is a handler of a particular system event. When \
@@ -264,6 +264,43 @@ class DeviceClass : Templates::DeviceClass
     }
   }
 
+  $rect <1370,210,1570,250>
+  property int32 redValue;
+
+  $rect <1370,260,1570,300>
+  property int32 greenValue;
+
+  $rect <1370,310,1570,350>
+  property int32 blueValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,210,1370,250>
+  $output true
+  method void EWUpdateColor( arg int32 aNewValueRed, arg int32 aNewValueGreen, arg int32 aNewValueBlue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValueRed != pure redValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure redValue = aNewValueRed;
+    }
+
+    if ( aNewValueGreen != pure greenValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure greenValue = aNewValueGreen;
+    }
+
+    if ( aNewValueBlue != pure blueValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure blueValue = aNewValueBlue;
+    }
+
+
+  }
+
   // Directives to adapt the order of the above members according to how these members 
   // where arranged when the project content was stored. In this manner the storage 
   // and the expected order of the members don't depend. Merging of changes in the 
@@ -281,9 +318,13 @@ class DeviceClass : Templates::DeviceClass
   $member EWUpdateSlider
   $member buttonValue
   $member EWUpdateButton
+  $member redValue
+  $member greenValue
+  $member blueValue
+  $member EWUpdateColor
 }
 
-$rect <230,60,430,100>
+$rect <20,30,220,70>
 autoobject Application::DeviceClass Device;
 
 // The class 'Application::DeviceClass' implements the interface between the GUI \
@@ -607,7 +648,7 @@ class homeScreen : Core::Group
   $rect <10,279,210,319>
   inherited property Bounds = <0,0,320,240>;
 
-  $rect <10,390,210,430>
+  $rect <10,360,210,400>
   inherited method UpdateLayout()
   {
     // Always invoke the inherited method.
@@ -636,7 +677,7 @@ class homeScreen : Core::Group
     */
   }
 
-  $rect <10,350,210,390>
+  $rect <10,320,210,360>
   inherited method UpdateViewState()
   {
     // Always invoke the inherited method.
@@ -830,7 +871,7 @@ class colorSelection : Core::Group
   $rect <10,339,210,379>
   inherited property Bounds = <0,0,320,240>;
 
-  $rect <10,499,210,539>
+  $rect <10,420,210,460>
   inherited method UpdateLayout()
   {
     // Always invoke the inherited method.
@@ -859,7 +900,7 @@ class colorSelection : Core::Group
     */
   }
 
-  $rect <10,459,210,499>
+  $rect <10,380,210,420>
   inherited method UpdateViewState()
   {
     // Always invoke the inherited method.
@@ -993,6 +1034,48 @@ class colorSelection : Core::Group
   object Views::Rectangle Rectangle
   {
     preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider RedSlider
+  {
+    preset Bounds = <40,20,100,220>;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.redValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider GreenSlider
+  {
+    preset Bounds = <131,20,190,220>;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.greenValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider BlueSlider
+  {
+    preset Bounds = <220,20,285,220>;
+    preset OnUpdate = null;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.blueValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <370,10,570,50>
+  slot ColorSlot
+  {
+    var string redString = string(RedSlider.CurrentValue);
+    var string greenString = string(GreenSlider.CurrentValue);
+    var string blueString = string(BlueSlider.CurrentValue);
+
+    var string colorString = string(redString + ";" + greenString + ";" + blueString + ";");
+    Application::Device.LedSetMethod("col", colorString, "array");
   }
 }
 

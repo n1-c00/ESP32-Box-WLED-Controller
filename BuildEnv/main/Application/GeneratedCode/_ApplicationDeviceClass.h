@@ -54,6 +54,9 @@
 /* Deklaration of class : 'Application::DeviceClass' */
 EW_DEFINE_FIELDS( ApplicationDeviceClass, TemplatesDeviceClass )
   EW_PROPERTY( brightnessValue, XInt32 )
+  EW_PROPERTY( redValue,        XInt32 )
+  EW_PROPERTY( greenValue,      XInt32 )
+  EW_PROPERTY( blueValue,       XInt32 )
   EW_PROPERTY( buttonValue,     XBool )
 EW_END_OF_FIELDS( ApplicationDeviceClass )
 
@@ -93,6 +96,18 @@ void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue );
 /* The following define announces the presence of the method Application::DeviceClass.EWUpdateButton(). */
 #define _ApplicationDeviceClass__EWUpdateButton_
 
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateColor( ApplicationDeviceClass _this, XInt32 
+  aNewValueRed, XInt32 aNewValueGreen, XInt32 aNewValueBlue );
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateColor()' */
+void ApplicationDeviceClass__EWUpdateColor( void* _this, XInt32 aNewValueRed, XInt32 
+  aNewValueGreen, XInt32 aNewValueBlue );
+
+/* The following define announces the presence of the method Application::DeviceClass.EWUpdateColor(). */
+#define _ApplicationDeviceClass__EWUpdateColor_
+
 /* Default onget method for the property 'brightnessValue' */
 XInt32 ApplicationDeviceClass_OnGetbrightnessValue( ApplicationDeviceClass _this );
 
@@ -105,6 +120,27 @@ XBool ApplicationDeviceClass_OnGetbuttonValue( ApplicationDeviceClass _this );
 
 /* Default onset method for the property 'buttonValue' */
 void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBool 
+  value );
+
+/* Default onget method for the property 'redValue' */
+XInt32 ApplicationDeviceClass_OnGetredValue( ApplicationDeviceClass _this );
+
+/* Default onset method for the property 'redValue' */
+void ApplicationDeviceClass_OnSetredValue( ApplicationDeviceClass _this, XInt32 
+  value );
+
+/* Default onget method for the property 'greenValue' */
+XInt32 ApplicationDeviceClass_OnGetgreenValue( ApplicationDeviceClass _this );
+
+/* Default onset method for the property 'greenValue' */
+void ApplicationDeviceClass_OnSetgreenValue( ApplicationDeviceClass _this, XInt32 
+  value );
+
+/* Default onget method for the property 'blueValue' */
+XInt32 ApplicationDeviceClass_OnGetblueValue( ApplicationDeviceClass _this );
+
+/* Default onset method for the property 'blueValue' */
+void ApplicationDeviceClass_OnSetblueValue( ApplicationDeviceClass _this, XInt32 
   value );
 
 #ifdef __cplusplus

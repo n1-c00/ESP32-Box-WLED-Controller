@@ -1,38 +1,5 @@
 ﻿$version 14.02
 
-// This is the root component of the entire GUI application.
-$rect <-270,30,-70,70>
-$output false
-class Application : Core::Root
-{
-  $rect <340,10,540,50>
-  inherited property Bounds = <0,0,320,240>;
-
-  // To do:
-  // 
-  // - Adjust the visible size of your application (the thick blue border). It should \
-  // correspond to the size of your target display.
-  // 
-  // - The simplest way to compose the appearance of the application is to use the \
-  // 'Views' and 'Widgets' from the Gallery.
-  // 
-  // - To react to touch or keyboard events use the templates from the Gallery folder \
-  // 'Event Handlers'.
-  // 
-  // - To perform transitions (animations) use the templates from the Gallery folder \
-  // 'Effects'.
-  // 
-  // - To store values use the 'Variable', 'Array' and 'Property' templates available \
-  // in the Gallery folder 'Chora'.
-  // 
-  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
-  // in the Gallery folder 'Chora'.
-  note legend Note1
-  {
-    attr Bounds = <10,260,790,490>;
-  }
-}
-
 $rect <230,20,430,60>
 $output false
 resource Resources::Font Font
@@ -49,7 +16,7 @@ resource Resources::Font Font
   attr fontrowdistance RowDistance;
 }
 
-$rect <20,100,220,140>
+$rect <240,-20,440,20>
 inline Inline
 {
   /*
@@ -68,7 +35,7 @@ inline Inline
   */
 }
 
-$rect <20,60,220,100>
+$rect <20,80,220,120>
 $output false
 class DeviceClass : Templates::DeviceClass
 {
@@ -245,7 +212,7 @@ class DeviceClass : Templates::DeviceClass
   // See inline documentation inside the method.
   note legend Note2
   {
-    attr Bounds = <1190,410,1690,590>;
+    attr Bounds = <1160,410,1660,590>;
   }
 
   // The object 'SystemEventHandler' is a handler of a particular system event. When \
@@ -264,12 +231,10 @@ class DeviceClass : Templates::DeviceClass
   }
 
   $rect <1370,110,1570,150>
-  $rect <1370,110,1570,150>
   property int32 brightnessValue;
 
   // This method is intended to be called by the device to notify the GUI application \
   // about an alternation of its setting or state value.
-  $rect <1170,110,1370,150>
   $rect <1170,110,1370,150>
   $output true
   method void EWUpdateSlider( arg int32 aNewValue )
@@ -299,6 +264,57 @@ class DeviceClass : Templates::DeviceClass
     }
   }
 
+  $rect <1370,210,1570,250>
+  property int32 redValue;
+
+  $rect <1370,260,1570,300>
+  property int32 greenValue;
+
+  $rect <1370,310,1570,350>
+  property int32 blueValue;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,210,1370,250>
+  $output true
+  method void EWUpdateRed( arg int32 aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure redValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure redValue = aNewValue;
+    }
+  }
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,260,1370,300>
+  $output true
+  method void EWUpdateGreen( arg int32 aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure greenValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure greenValue = aNewValue;
+    }
+  }
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about an alternation of its setting or state value.
+  $rect <1170,310,1370,350>
+  $output true
+  method void EWUpdateBlue( arg int32 aNewValue )
+  {
+    // Only if the reported value does differ from the one stored currently in the property.
+    if ( aNewValue != pure blueValue )
+    {
+      // Remember the new value in the internal memory of the property.
+      pure blueValue = aNewValue;
+    }
+  }
+
   // Directives to adapt the order of the above members according to how these members 
   // where arranged when the project content was stored. In this manner the storage 
   // and the expected order of the members don't depend. Merging of changes in the 
@@ -316,11 +332,15 @@ class DeviceClass : Templates::DeviceClass
   $member EWUpdateSlider
   $member buttonValue
   $member EWUpdateButton
-  $member buttonValue
-  $member EWUpdateButton
+  $member redValue
+  $member greenValue
+  $member blueValue
+  $member EWUpdateRed
+  $member EWUpdateGreen
+  $member EWUpdateBlue
 }
 
-$rect <230,60,430,100>
+$rect <20,30,220,70>
 autoobject Application::DeviceClass Device;
 
 // The class 'Application::DeviceClass' implements the interface between the GUI \
@@ -342,6 +362,295 @@ note legend Note
   attr Bounds = <440,19,940,289>;
 }
 
+// This is the root component of the entire GUI application.
+$rect <-270,30,-70,70>
+$output false
+class Application : Core::Root
+{
+  $rect <340,10,540,50>
+  inherited property Bounds = <0,0,320,240>;
+
+  // To do:
+  // 
+  // - Adjust the visible size of your application (the thick blue border). It should \
+  // correspond to the size of your target display.
+  // 
+  // - The simplest way to compose the appearance of the application is to use the \
+  // 'Views' and 'Widgets' from the Gallery.
+  // 
+  // - To react to touch or keyboard events use the templates from the Gallery folder \
+  // 'Event Handlers'.
+  // 
+  // - To perform transitions (animations) use the templates from the Gallery folder \
+  // 'Effects'.
+  // 
+  // - To store values use the 'Variable', 'Array' and 'Property' templates available \
+  // in the Gallery folder 'Chora'.
+  // 
+  // - To implement behavior use the 'Method' and 'Slot Method' templates available \
+  // in the Gallery folder 'Chora'.
+  note legend Note1
+  {
+    attr Bounds = <390,250,1170,480>;
+  }
+
+  $rect <20,20,160,60>
+  object Application::homeScreen homeScreen
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <20,20,160,60>
+  object Application::colorSelection colorSelection
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <0,260,150,300>
+  inherited method Init()
+  {
+    PresentDialog( homeScreen, null, null, null, null, null, null, null, null, false );
+  }
+
+  $rect <340,70,540,110>
+  slot Slot
+  {
+    currentView = !currentView;
+    if ( currentView ){
+      SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
+     }
+     else{
+      SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
+     }
+  }
+
+  $rect <20,20,160,60>
+  object Core::SlideTouchHandler SlideTouchHandler
+  {
+    preset Bounds = <0,0,320,240>;
+    preset OnSlide = null;
+    preset OnEnd = null;
+    preset OnStart = Slot;
+    preset SlideVert = false;
+  }
+
+  $rect <340,130,540,170>
+  var bool currentView;
+
+  // Directives to adapt the order of the above members according to how these members 
+  // where arranged when the project content was stored. In this manner the storage 
+  // and the expected order of the members don't depend. Merging of changes in the 
+  // project files is simplified.
+  $member Bounds
+  $member Note1
+  $member colorSelection
+  $member homeScreen
+  $member Init
+  $member Slot
+  $member SlideTouchHandler
+  $member currentView
+
+  // Directives to adapt the order of members belonging to this class so they appear 
+  // correctly arranged relative to the members inherited from the ancestor (super) 
+  // classes. The numbers indicate the order-displacement to apply on the respective 
+  // member once all members have been loaded and combined with members from the 
+  // ancestor classes.
+  $reorder next 1
+  $reorder prev 1
+  $reorder Owner 1
+  $reorder viewShape 1
+  $reorder viewState 1
+  $reorder layoutContext 1
+  $reorder initLayoutContext 1
+  $reorder OnSetStackingPriority 1
+  $reorder OnSetLayout 1
+  $reorder GetRoot 1
+  $reorder Draw 1
+  $reorder GetClipping 1
+  $reorder HandleEvent 1
+  $reorder CursorHitTest 1
+  $reorder AdjustDrawingArea 1
+  $reorder ArrangeView 1
+  $reorder MoveView 1
+  $reorder GetExtent 1
+  $reorder ChangeViewState 1
+  $reorder StackingPriority 1
+  $reorder Layout 1
+  $reorder OnSetBounds 1
+  $reorder Bounds 1
+  $reorder first 1
+  $reorder last 1
+  $reorder keyHandlers 1
+  $reorder buffer 1
+  $reorder dialogStack 1
+  $reorder fadersQueue 1
+  $reorder pendingFader 1
+  $reorder extClipLeft 1
+  $reorder extClipRight 1
+  $reorder extClipTop 1
+  $reorder extClipBottom 1
+  $reorder processKeyHandlers 1
+  $reorder updateBufferSlot 1
+  $reorder drawContent 1
+  $reorder recalculateLayout 1
+  $reorder updateComponentWithDelay 1
+  $reorder updateComponent 1
+  $reorder OnGetDeriveEnabledState 1
+  $reorder OnSetDeriveEnabledState 1
+  $reorder OnSetFocus 1
+  $reorder OnGetClipViews 1
+  $reorder OnSetClipViews 1
+  $reorder OnGetBuffered 1
+  $reorder OnSetBuffered 1
+  $reorder OnGetEnabled 1
+  $reorder OnSetEnabled 1
+  $reorder OnSetOpacity 1
+  $reorder OnGetEmbedded 1
+  $reorder OnSetEmbedded 1
+  $reorder OnGetAlphaBlended 1
+  $reorder OnSetAlphaBlended 1
+  $reorder OnGetVisible 1
+  $reorder OnSetVisible 1
+  $reorder ExtendClipping 1
+  $reorder DrawForeground 1
+  $reorder DrawBackground 1
+  $reorder GetMaximalSize 1
+  $reorder GetMinimalSize 1
+  $reorder FindActiveDialogByClass 1
+  $reorder FindDialogByClass 1
+  $reorder FindCurrentDialog 1
+  $reorder IsCurrentDialog 1
+  $reorder IsActiveDialog 1
+  $reorder IsDialog 1
+  $reorder GetIndexOfDialog 1
+  $reorder GetDialogAtIndex 1
+  $reorder CountDialogs 1
+  $reorder SwitchToDialog 1
+  $reorder DismissDialog 1
+  $reorder PresentDialog 1
+  $reorder ObtainFocus 1
+  $reorder HasViewState 1
+  $reorder LocalPosition 1
+  $reorder GlobalPosition 1
+  $reorder DispatchEvent 1
+  $reorder BroadcastEventAtPosition 1
+  $reorder BroadcastEvent 1
+  $reorder UpdateLayout 1
+  $reorder UpdateViewState 1
+  $reorder InvalidateLayout 1
+  $reorder InvalidateViewState 1
+  $reorder InvalidateArea 1
+  $reorder GetIndexOfView 1
+  $reorder GetViewAtIndex 1
+  $reorder CountViews 1
+  $reorder FindViewWithStackingPriority 1
+  $reorder FindViewInDirection 1
+  $reorder FindViewWithinArea 1
+  $reorder FindViewAtPosition 1
+  $reorder FindPrevView 1
+  $reorder FindNextView 1
+  $reorder FindSiblingView 1
+  $reorder GetContentArea 1
+  $reorder FadeGroup 1
+  $reorder RestackBehind 1
+  $reorder RestackBack 1
+  $reorder RestackTop 1
+  $reorder Restack 1
+  $reorder RemoveAll 1
+  $reorder Remove 1
+  $reorder AddBehind 1
+  $reorder Add 1
+  $reorder DeriveEnabledState 1
+  $reorder Focus 1
+  $reorder ClipViews 1
+  $reorder Buffered 1
+  $reorder Enabled 1
+  $reorder Opacity 1
+  $reorder Embedded 1
+  $reorder AlphaBlended 1
+  $reorder Visible 1
+  $reorder keyLastLocked 1
+  $reorder keyLastCharCode 1
+  $reorder keyLastCode 1
+  $reorder keyLastTarget 1
+  $reorder hasRootFocus 1
+  $reorder updateLock 1
+  $reorder animationLock 1
+  $reorder modalGroups 1
+  $reorder currentEventTimestamp 1
+  $reorder createDragEvent 1
+  $reorder createCursorEvent 1
+  $reorder createCursorGrabEvent 1
+  $reorder cursorHoldTimerProc 1
+  $reorder cursorHoldTimer 1
+  $reorder cursorSequelCounter 1
+  $reorder cursorSequelArea 1
+  $reorder cursorHoldPeriod 1
+  $reorder cursorHittingPos 1
+  $reorder cursorHittingTime 1
+  $reorder cursorCaptureView 1
+  $reorder cursorCurrentPos 1
+  $reorder cursorTargetView 1
+  $reorder cursorHitOffset 1
+  $reorder cursorLastPos 1
+  $reorder cursorFirstPos 1
+  $reorder cursorFinger 1
+  $reorder fpsTime 1
+  $reorder fpsCounter 1
+  $reorder lastRegions 1
+  $reorder noOfLastRegions 1
+  $reorder canvas 1
+  $reorder regionsArea 1
+  $reorder regions 1
+  $reorder noOfRegions 1
+  $reorder GetFPS 1
+  $reorder Update 1
+  $reorder UpdateGE20 1
+  $reorder EndUpdate 1
+  $reorder UpdateCanvas 1
+  $reorder GetUpdateRegion 1
+  $reorder BeginUpdate 1
+  $reorder DoesNeedUpdate 1
+  $reorder Initialize 1
+  $reorder SetRootFocus 1
+  $reorder SetUserInputTimestamp 1
+  $reorder DriveKeyboardHitting 1
+  $reorder DriveCursorMovement 1
+  $reorder DriveMultiTouchMovement 1
+  $reorder DriveCursorHitting 1
+  $reorder DriveMultiTouchHitting 1
+  $reorder OnGetActiveDialogClass 1
+  $reorder OnSetActiveDialogClass 1
+  $reorder OnGetActiveDialog 1
+  $reorder OnSetActiveDialog 1
+  $reorder OnSetVirtualKeyboard 1
+  $reorder OnSetCursorDragLimit 1
+  $reorder OnSetCursorSequelDelay 1
+  $reorder OnGetStyles 1
+  $reorder OnSetStyles 1
+  $reorder OnGetLanguage 1
+  $reorder OnSetLanguage 1
+  $reorder EndAnimation 1
+  $reorder BeginAnimation 1
+  $reorder CaptureCursor 1
+  $reorder RetargetCursorWithReason 1
+  $reorder RetargetCursor 1
+  $reorder DeflectCursor 1
+  $reorder GetModalGroup 1
+  $reorder EndModal 1
+  $reorder BeginModal 1
+  $reorder ActiveDialogClass 1
+  $reorder ActiveDialog 1
+  $reorder VirtualKeyboard 1
+  $reorder CursorDragLimit 1
+  $reorder CursorSequelDelay 1
+  $reorder Styles 1
+  $reorder Language 1
+  $reorder Note1 1
+  $reorder colorSelection 1
+  $reorder homeScreen 1
+}
+
 // GUI
 note group Note1
 {
@@ -350,12 +659,12 @@ note group Note1
 
 $rect <-270,80,-70,120>
 $output false
-class Component : Core::Group
+class homeScreen : Core::Group
 {
   $rect <10,279,210,319>
   inherited property Bounds = <0,0,320,240>;
 
-  $rect <10,390,210,430>
+  $rect <10,360,210,400>
   inherited method UpdateLayout()
   {
     // Always invoke the inherited method.
@@ -384,7 +693,7 @@ class Component : Core::Group
     */
   }
 
-  $rect <10,350,210,390>
+  $rect <10,320,210,360>
   inherited method UpdateViewState()
   {
     // Always invoke the inherited method.
@@ -573,12 +882,12 @@ class Component : Core::Group
 
 $rect <-270,130,-70,170>
 $output false
-class Component1 : Core::Group
+class colorSelection : Core::Group
 {
-  $rect <10,230,210,270>
-  inherited property Bounds = <0,0,300,200>;
+  $rect <10,339,210,379>
+  inherited property Bounds = <0,0,320,240>;
 
-  $rect <10,390,210,430>
+  $rect <10,420,210,460>
   inherited method UpdateLayout()
   {
     // Always invoke the inherited method.
@@ -607,7 +916,7 @@ class Component1 : Core::Group
     */
   }
 
-  $rect <10,350,210,390>
+  $rect <10,380,210,420>
   inherited method UpdateViewState()
   {
     // Always invoke the inherited method.
@@ -734,6 +1043,68 @@ class Component1 : Core::Group
   // calculation for enclosed views.
   note legend Note1
   {
-    attr Bounds = <220,230,1000,550>;
+    attr Bounds = <220,339,1000,659>;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,320,240>;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider RedSlider
+  {
+    preset Bounds = <40,20,100,220>;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.redValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider GreenSlider
+  {
+    preset Bounds = <131,20,190,220>;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.greenValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::VerticalSlider BlueSlider
+  {
+    preset Bounds = <220,20,285,220>;
+    preset OnUpdate = null;
+    preset OnEnd = ColorSlot;
+    preset Outlet = ^Application::Device.blueValue;
+    preset MaxValue = 254;
+    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+  }
+
+  $rect <370,10,570,50>
+  slot ColorSlot
+  {
+    var string redString = string(RedSlider.CurrentValue);
+    var string greenString = string(GreenSlider.CurrentValue);
+    var string blueString = string(BlueSlider.CurrentValue);
+
+    var string colorString = string(redString + ";" + greenString + ";" + blueString + ";");
+    Application::Device.LedSetMethod("col", colorString, "array");
   }
 }
+
+// Directives to adapt the order of the above members according to how these members 
+// where arranged when the project content was stored. In this manner the storage 
+// and the expected order of the members don't depend. Merging of changes in the 
+// project files is simplified.
+$member Application
+$member Font
+$member Inline
+$member DeviceClass
+$member Device
+$member Note
+$member Note1
+$member homeScreen
+$member colorSelection

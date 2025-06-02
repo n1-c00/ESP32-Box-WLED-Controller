@@ -44,6 +44,7 @@
 
 #include "_CoreGroup.h"
 #include "_ViewsRectangle.h"
+#include "_WidgetSetVerticalSlider.h"
 
 /* Forward declaration of the class Application::colorSelection */
 #ifndef _ApplicationcolorSelection_
@@ -91,6 +92,9 @@
 /* Deklaration of class : 'Application::colorSelection' */
 EW_DEFINE_FIELDS( ApplicationcolorSelection, CoreGroup )
   EW_OBJECT  ( Rectangle,       ViewsRectangle )
+  EW_OBJECT  ( RedSlider,       WidgetSetVerticalSlider )
+  EW_OBJECT  ( GreenSlider,     WidgetSetVerticalSlider )
+  EW_OBJECT  ( BlueSlider,      WidgetSetVerticalSlider )
 EW_END_OF_FIELDS( ApplicationcolorSelection )
 
 /* Virtual Method Table (VMT) for the class : 'Application::colorSelection' */
@@ -121,6 +125,10 @@ EW_DEFINE_METHODS( ApplicationcolorSelection, CoreGroup )
   EW_METHOD( UpdateViewState,   void )( CoreGroup _this, XSet aState )
   EW_METHOD( InvalidateArea,    void )( CoreGroup _this, XRect aArea )
 EW_END_OF_METHODS( ApplicationcolorSelection )
+
+/* 'C' function for method : 'Application::colorSelection.ColorSlot()' */
+void ApplicationcolorSelection_ColorSlot( ApplicationcolorSelection _this, XObject 
+  sender );
 
 #ifdef __cplusplus
   }
