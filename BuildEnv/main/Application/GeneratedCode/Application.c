@@ -48,8 +48,9 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
   0xFFFF, 0xFFFF, 0xC557, 0x006F, 0x006E, 0x0000, 0xC557, 0x0074, 0x0072, 0x0075,
   0x0065, 0x0000, 0xC557, 0x0062, 0x006F, 0x006F, 0x006C, 0x0000, 0xC557, 0x0066,
   0x0061, 0x006C, 0x0073, 0x0065, 0x0000, 0xC557, 0x0062, 0x0072, 0x0069, 0x0000,
-  0xC557, 0x0069, 0x006E, 0x0074, 0x0000, 0xC557, 0x003B, 0x0000, 0xC557, 0x0063,
-  0x006F, 0x006C, 0x0000, 0xC557, 0x0061, 0x0072, 0x0072, 0x0061, 0x0079, 0x0000
+  0xC557, 0x0069, 0x006E, 0x0074, 0x0000, 0xC557, 0x0030, 0x003B, 0x0000, 0xC557,
+  0x003B, 0x0000, 0xC557, 0x0063, 0x006F, 0x006C, 0x0000, 0xC557, 0x0072, 0x0067,
+  0x0062, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -66,8 +67,9 @@ static const XRect _Const0009 = {{ 40, 20 }, { 100, 220 }};
 static const XRect _Const000A = {{ 131, 20 }, { 190, 220 }};
 static const XRect _Const000B = {{ 220, 20 }, { 285, 220 }};
 static const XStringRes _Const000C = { _StringsDefault0, 0x0024 };
-static const XStringRes _Const000D = { _StringsDefault0, 0x0027 };
-static const XStringRes _Const000E = { _StringsDefault0, 0x002C };
+static const XStringRes _Const000D = { _StringsDefault0, 0x0028 };
+static const XStringRes _Const000E = { _StringsDefault0, 0x002B };
+static const XStringRes _Const000F = { _StringsDefault0, 0x0030 };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -708,10 +710,11 @@ void ApplicationcolorSelection_ColorSlot( ApplicationcolorSelection _this, XObje
   blueString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->BlueSlider ), 
   0, 10 );
   colorString = EwConcatString( EwConcatString( EwConcatString( EwConcatString( 
-  EwConcatString( redString, EwLoadString( &_Const000C )), greenString ), EwLoadString( 
-  &_Const000C )), blueString ), EwLoadString( &_Const000C ));
+  EwConcatString( EwConcatString( EwLoadString( &_Const000C ), redString ), EwLoadString( 
+  &_Const000D )), greenString ), EwLoadString( &_Const000D )), blueString ), EwLoadString( 
+  &_Const000D ));
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const000D ), colorString, EwLoadString( &_Const000E ));
+  EwLoadString( &_Const000E ), colorString, EwLoadString( &_Const000F ));
 }
 
 /* Variants derived from the class : 'Application::colorSelection' */

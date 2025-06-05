@@ -84,8 +84,9 @@ void _EWUpdateButtonPROC()
 }
 void _EWUpdateColorPROC()
 {
-    int r, g, b = 0;
-
+    int r = 0; 
+    int g = 0; 
+    int b = 0;
     /* Obtain access to the Device Interface instance */
     ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
                                                     ApplicationDeviceClass );
@@ -93,7 +94,7 @@ void _EWUpdateColorPROC()
     /* Get the value of the rgb-array and seperate it into r, g, b values */
 
     /*Invoke the function to trigger the event*/
-    ApplicationDeviceClass__EWUpdateColor(device, r, g, b)
+    ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
 }
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default 
@@ -169,29 +170,36 @@ static int _LedModify(char *key, char *value, char *dataType)
                                   key,
                                   cJSON_CreateNumber(v));
         return 0;
-    }else if (strcmp(dataType, "array") == 0){
+    }else if (strcmp(dataType, "rgb") == 0){
+        cJSON *array = cJSON_GetObjectItem(gWledJson, key);
         // Parse the RGB values from the semicolon-separated string
-        int r, g, b;
-        if (sscanf(value, "%d;%d;%d", &r, &g, &b) == 3) {
+        uint8_t r, g, b;
+        uint8_t Index = 0;
+        // Check if the value is in the expected format
+        if (sscanf(value, "%d;%d;%d;%d", &Index, &r, &g, &b) == 4) {
             // Create a new array with the RGB values
-            cJSON *rgb_array = cJSON_CreateArray();
-            if (rgb_array == NULL) {
+            cJSON *new_array = cJSON_CreateArray();
+            if (new_array == NULL) {
                 return -1; // Failed to create array
             }
             
             // Add the RGB values to the array
-            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(r));
-            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(g));
-            cJSON_AddItemToArray(rgb_array, cJSON_CreateNumber(b));
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(r));
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(g));
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(b));
             
-            // Replace the array in the JSON object
-            cJSON_ReplaceItemInObject(gWledJson, key, rgb_array);
+            // Replace the existing array with the new one
+            cJSON_ReplaceItemInArray(array, 
+                                    Index, 
+                                    new_array);
+            ESP_LOGI(TAG, "%s", cJSON_PrintUnformatted(gWledJson));
+
             return 0;
         } else {
             return -1; // Failed to parse RGB values
         }
     }else {
-        return -1; // error: unknown Key
+        return -2; // error: unknown Key
     }
 }
 

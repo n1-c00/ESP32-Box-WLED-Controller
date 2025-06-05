@@ -24,7 +24,7 @@
 
 
 /* Web path to the WLED host */
-#define WEB_SERVER "192.168.8.164"
+#define WEB_SERVER "192.168.16.164"
 #define WEB_PORT "80"
 #define WEB_PATH "/json/state"
 
