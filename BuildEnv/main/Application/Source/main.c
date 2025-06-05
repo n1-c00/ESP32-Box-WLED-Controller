@@ -82,20 +82,20 @@ void _EWUpdateButtonPROC()
     /* Invoke the function to trigger the event */
     ApplicationDeviceClass__EWUpdateButton( device, cJSON_IsTrue(on) );
 }
-void _EWUpdateColorPROC()
-{
-    int r = 0; 
-    int g = 0; 
-    int b = 0;
-    /* Obtain access to the Device Interface instance */
-    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
-                                                    ApplicationDeviceClass );
+// void _EWUpdateColorPROC()
+// {
+//     int r = 0; 
+//     int g = 0; 
+//     int b = 0;
+//     /* Obtain access to the Device Interface instance */
+//     ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+//                                                     ApplicationDeviceClass );
 
-    /* Get the value of the rgb-array and seperate it into r, g, b values */
+//     /* Get the value of the rgb-array and seperate it into r, g, b values */
 
-    /*Invoke the function to trigger the event*/
-    ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
-}
+//     /*Invoke the function to trigger the event*/
+//     ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
+// }
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default 
 JSON object.
@@ -171,12 +171,17 @@ static int _LedModify(char *key, char *value, char *dataType)
                                   cJSON_CreateNumber(v));
         return 0;
     }else if (strcmp(dataType, "rgb") == 0){
-        cJSON *array = cJSON_GetObjectItem(gWledJson, key);
+        cJSON *segments = cJSON_GetObjectItem(gWledJson, "seg");
+        cJSON *firstSeg = cJSON_GetArrayItem(segments, 0);
+
+        cJSON *array = cJSON_GetObjectItem(firstSeg, key);
         // Parse the RGB values from the semicolon-separated string
-        uint8_t r, g, b;
+        int r, g, b;
         uint8_t Index = 0;
+       
         // Check if the value is in the expected format
         if (sscanf(value, "%d;%d;%d;%d", &Index, &r, &g, &b) == 4) {
+
             // Create a new array with the RGB values
             cJSON *new_array = cJSON_CreateArray();
             if (new_array == NULL) {
@@ -187,12 +192,11 @@ static int _LedModify(char *key, char *value, char *dataType)
             cJSON_AddItemToArray(new_array, cJSON_CreateNumber(r));
             cJSON_AddItemToArray(new_array, cJSON_CreateNumber(g));
             cJSON_AddItemToArray(new_array, cJSON_CreateNumber(b));
-            
+
             // Replace the existing array with the new one
             cJSON_ReplaceItemInArray(array, 
                                     Index, 
                                     new_array);
-            ESP_LOGI(TAG, "%s", cJSON_PrintUnformatted(gWledJson));
 
             return 0;
         } else {
