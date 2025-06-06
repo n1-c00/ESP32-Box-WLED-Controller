@@ -404,9 +404,10 @@ class Application : Core::Root
     preset OnEnd = Slot;
     preset OnStart = null;
     preset SlideVert = false;
-    preset RubberBandEffectElasticity = 1.0;
+    preset RubberBandEffectElasticity = 5.0;
     preset ResetSpace = -1;
     preset ResetDelay = 200;
+    preset Friction = 1.0;
   }
 
   $rect <340,130,540,170>
@@ -1033,8 +1034,9 @@ class colorSelection : Core::Group
     preset Bounds = <40,20,100,220>;
     preset OnEnd = ColorSlot;
     preset Outlet = ^Application::Device.redValue;
-    preset MaxValue = 254;
-    preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
+    preset MaxValue = 255;
+    preset CurrentValue = 100;
+    preset Appearance = verticalSliderConfigRed;
   }
 
   $rect <20,20,160,60>
@@ -1043,7 +1045,7 @@ class colorSelection : Core::Group
     preset Bounds = <131,20,190,220>;
     preset OnEnd = ColorSlot;
     preset Outlet = ^Application::Device.greenValue;
-    preset MaxValue = 254;
+    preset MaxValue = 255;
     preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
   }
 
@@ -1054,7 +1056,7 @@ class colorSelection : Core::Group
     preset OnUpdate = null;
     preset OnEnd = ColorSlot;
     preset Outlet = ^Application::Device.blueValue;
-    preset MaxValue = 254;
+    preset MaxValue = 255;
     preset Appearance = WidgetSet::VerticalSlider_Lime_Large;
   }
 
@@ -1068,6 +1070,120 @@ class colorSelection : Core::Group
     var string colorString = string("0;" + redString + ";" + greenString + ";" + blueString + ";");
     Application::Device.LedSetMethod("col", colorString, "rgb");
   }
+
+  // This autoobject provides the default customization for the 'vertical slider' \
+  // widget (WidgetSet::VerticalSlider) in its large size variant.
+  $rect <370,130,670,170>
+  object WidgetSet::VerticalSliderConfig verticalSliderConfigRed
+  {
+    preset KeyRepeatPeriod = 100;
+    preset KeyRepeatDelay = 500;
+    preset ThumbFrameActive = 3;
+    preset ThumbFrameFocused = 2;
+    preset ThumbFrameDisabled = 0;
+    preset ThumbFrameDefault = 1;
+    preset ThumbBitmapActive = Application::ThumbKnobLargeRed;
+    preset ThumbBitmapFocused = Application::ThumbKnobLargeRed;
+    preset ThumbBitmapDisabled = Application::ThumbKnobLargeRed;
+    preset ThumbBitmapDefault = Application::ThumbKnobLargeRed;
+    preset ThumbMarginTop = -5;
+    preset ThumbMarginBottom = -2;
+    preset TrackAboveFrameActive = 0;
+    preset TrackAboveFrameFocused = 0;
+    preset TrackAboveFrameDisabled = 0;
+    preset TrackAboveFrameDefault = 0;
+    preset TrackAboveBitmapActive = Application::VerticalSliderTrackLargeRed;
+    preset TrackAboveBitmapFocused = Application::VerticalSliderTrackLargeRed;
+    preset TrackAboveBitmapDisabled = Application::VerticalSliderTrackLargeRed;
+    preset TrackAboveBitmapDefault = Application::VerticalSliderTrackLargeRed;
+    preset TrackBelowFrameActive = 1;
+    preset TrackBelowFrameFocused = 1;
+    preset TrackBelowFrameDisabled = 1;
+    preset TrackBelowFrameDefault = 1;
+    preset TrackBelowBitmapActive = Application::VerticalSliderTrackLargeRed;
+    preset TrackBelowBitmapFocused = Application::VerticalSliderTrackLargeRed;
+    preset TrackBelowBitmapDisabled = Application::VerticalSliderTrackLargeRed;
+    preset TrackBelowBitmapDefault = Application::VerticalSliderTrackLargeRed;
+    preset WidgetMinSize = <59,68>;
+  }
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-279,220,1,260>
+$output false
+resource Resources::Bitmap VerticalSliderTrackLargeRed
+{
+  attr bitmapfile FileName = .\image\VerticalSliderTrackLargeRed.png;
+  attr framesize FrameSize = <27,68>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-279,270,1,310>
+$output false
+resource Resources::Bitmap VerticalSliderTrackLargeGreen
+{
+  attr bitmapfile FileName = .\image\VerticalSliderTrackLargeGreen.png;
+  attr framesize FrameSize = <27,68>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-279,320,1,360>
+$output false
+resource Resources::Bitmap VerticalSliderTrackLargeBlue
+{
+  attr bitmapfile FileName = .\image\VerticalSliderTrackLargeBlue.png;
+  attr framesize FrameSize = <27,68>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-270,390,10,430>
+$output false
+resource Resources::Bitmap ThumbKnobLargeRed
+{
+  attr bitmapfile FileName = .\image\ThumbKnobLargeRed.png;
+  attr framesize FrameSize = <59,59>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-270,439,10,479>
+$output false
+resource Resources::Bitmap ThumbKnobLargeGreen
+{
+  attr bitmapfile FileName = .\image\ThumbKnobLargeGreen.png;
+  attr framesize FrameSize = <59,59>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource used per default by the Widgets customized for the large size.
+$rect <-270,490,10,530>
+$output false
+resource Resources::Bitmap ThumbKnobLargeBlue
+{
+  attr bitmapfile FileName = .\image\ThumbKnobLargeBlue.png;
+  attr framesize FrameSize = <59,59>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
 }
 
 // Directives to adapt the order of the above members according to how these members 
@@ -1083,3 +1199,9 @@ $member Note
 $member Note1
 $member homeScreen
 $member colorSelection
+$member VerticalSliderTrackLargeRed
+$member VerticalSliderTrackLargeGreen
+$member VerticalSliderTrackLargeBlue
+$member ThumbKnobLargeRed
+$member ThumbKnobLargeGreen
+$member ThumbKnobLargeBlue
