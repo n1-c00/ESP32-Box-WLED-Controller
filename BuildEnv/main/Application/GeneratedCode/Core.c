@@ -6174,7 +6174,12 @@ void CoreSlideTouchHandler__Init( CoreSlideTouchHandler _this, XObject aLink, XH
   /* ... and initialize objects, variables, properties, etc. */
   _this->Super2.viewState = CoreViewStateAlphaBlended | CoreViewStateEnabled | CoreViewStateFastReshape 
   | CoreViewStatePreEnabled | CoreViewStateTouchable | CoreViewStateVisible;
+  _this->frictFactor = 5000.0f;
   _this->SlideVert = 1;
+  _this->RubberBandEffectElasticity = 5.0f;
+  _this->ResetSpace = -1;
+  _this->ResetDelay = 200;
+  _this->Friction = 0.5f;
 }
 
 /* Re-Initializer for the class 'Core::SlideTouchHandler' */
@@ -6436,10 +6441,7 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
     _this->parkingY = 0;
 
     if ( !_this->Sliding )
-    {
       _this->Sliding = 1;
-      EwSignal( _this->OnStart, ((XObject)_this ));
-    }
 
     _this->initOffset = _this->Offset;
     _this->refTime = event1->Super1.Time;
@@ -6457,14 +6459,16 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
     if ( newOffset.X < 0 )
       newOffset.X = ( newOffset.X / 2 );
     else
-      if ( newOffset.X > 0 )
-        newOffset.X = ( newOffset.X / 2 );
+      if ( newOffset.X > _this->MaxOffset.X )
+        newOffset.X = ( _this->MaxOffset.X + (( newOffset.X - _this->MaxOffset.X ) 
+        / 2 ));
 
     if ( newOffset.Y < 0 )
       newOffset.Y = ( newOffset.Y / 2 );
     else
-      if ( newOffset.Y > 0 )
-        newOffset.Y = ( newOffset.Y / 2 );
+      if ( newOffset.Y > _this->MaxOffset.Y )
+        newOffset.Y = ( _this->MaxOffset.Y + (( newOffset.Y - _this->MaxOffset.Y ) 
+        / 2 ));
 
     if ( EwCompPoint( newOffset, _this->Offset ))
     {
@@ -6474,16 +6478,27 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
   }
 
   if ((( event3 != 0 ) && !event3->Down ) && (( event3->Super1.Time - _this->refTime ) 
-      >= 200 ))
+      >= (XUInt32)_this->ResetDelay ))
   {
     _this->speedX = 0.0f;
     _this->speedY = 0.0f;
   }
 
-  if ( hold && (( event1->Super1.Time - _this->refTime ) >= 200 ))
+  if ( hold && (( event1->Super1.Time - _this->refTime ) >= (XUInt32)_this->ResetDelay ))
   {
     _this->speedX = 0.0f;
     _this->speedY = 0.0f;
+  }
+
+  if ( release && ( _this->ResetSpace >= 0 ))
+  {
+    XPoint d = EwMovePointNeg( event1->CurrentPos, event1->HittingPos );
+
+    if ((( d.X * d.X ) + ( d.Y * d.Y )) <= ( _this->ResetSpace * _this->ResetSpace ))
+    {
+      _this->speedX = 0.0f;
+      _this->speedY = 0.0f;
+    }
   }
 
   if (( event2 != 0 ) && ( event2->Super1.Time > _this->refTime ))
@@ -6517,20 +6532,20 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
     _this->speedY = 0.0f;
   }
 
-  if (( _this->Offset.X <= 0 ) || ( _this->Offset.X >= 0 ))
+  if (( _this->Offset.X <= 0 ) || ( _this->Offset.X >= _this->MaxOffset.X ))
     _this->speedX = 0.0f;
   else
     if ( _this->speedX == 0.0f )
     {
       XInt32 targetX = _this->Offset.X;
       XInt32 snapN = 0;
-      XInt32 snapP = 0;
+      XInt32 snapP = _this->MaxOffset.X;
 
       if ( targetX < 0 )
         snapP = 0;
       else
-        if ( targetX > 0 )
-          snapN = 0;
+        if ( targetX > snapP )
+          snapN = _this->MaxOffset.X;
         else
         {
           snapN = targetX;
@@ -6547,10 +6562,12 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
         XFloat distance = (XFloat)( targetX - _this->Offset.X );
 
         if ( distance > 0.0f )
-          _this->speedX = EwMathSqrt(( distance * 2.0f ) * 5000.0f ) + 20.0f;
+          _this->speedX = EwMathSqrt(( distance * 2.0f ) * _this->frictFactor ) 
+          + 20.0f;
 
         if ( distance < 0.0f )
-          _this->speedX = -EwMathSqrt(( -distance * 2.0f ) * 5000.0f ) - 20.0f;
+          _this->speedX = -EwMathSqrt(( -distance * 2.0f ) * _this->frictFactor ) 
+          - 20.0f;
 
         _this->accelerationX = ( 400.0f - ( _this->speedX * _this->speedX )) / ( 
         2.0f * distance );
@@ -6560,7 +6577,7 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
     else
     {
       XFloat speedX2 = _this->speedX * _this->speedX;
-      XFloat distance = speedX2 / 10000.0f;
+      XFloat distance = speedX2 / ( 2.0f * _this->frictFactor );
       XInt32 targetX = _this->Offset.X;
       XInt32 targetX0;
       XInt32 snapN;
@@ -6572,21 +6589,21 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
       if ( _this->speedX < 0.0f )
         targetX = targetX - (XInt32)distance;
 
-      if ( targetX > 0 )
-        targetX = 0;
+      if ( targetX > _this->MaxOffset.X )
+        targetX = _this->MaxOffset.X;
       else
         if ( targetX < 0 )
           targetX = 0;
 
       targetX0 = targetX;
       snapN = 0;
-      snapP = 0;
+      snapP = _this->MaxOffset.X;
 
       if ( targetX < 0 )
         snapP = 0;
       else
-        if ( targetX > 0 )
-          snapN = 0;
+        if ( targetX > snapP )
+          snapN = _this->MaxOffset.X;
         else
         {
           snapN = targetX;
@@ -6621,10 +6638,10 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
           XFloat snapDist = (XFloat)( targetX - targetX0 );
 
           if ( snapDist > 0.0f )
-            _this->speedX = _this->speedX + EwMathSqrt(( snapDist * 2.0f ) * 5000.0f );
+            _this->speedX = _this->speedX + EwMathSqrt(( snapDist * 2.0f ) * _this->frictFactor );
 
           if ( snapDist < 0.0f )
-            _this->speedX = _this->speedX - EwMathSqrt(( -snapDist * 2.0f ) * 5000.0f );
+            _this->speedX = _this->speedX - EwMathSqrt(( -snapDist * 2.0f ) * _this->frictFactor );
         }
 
         if ( _this->speedX > 0.0f )
@@ -6641,20 +6658,20 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
         _this->speedX = 0.0f;
     }
 
-  if (( _this->Offset.Y <= 0 ) || ( _this->Offset.Y >= 0 ))
+  if (( _this->Offset.Y <= 0 ) || ( _this->Offset.Y >= _this->MaxOffset.Y ))
     _this->speedY = 0.0f;
   else
     if ( _this->speedY == 0.0f )
     {
       XInt32 targetY = _this->Offset.Y;
       XInt32 snapN = 0;
-      XInt32 snapP = 0;
+      XInt32 snapP = _this->MaxOffset.Y;
 
       if ( targetY < 0 )
         snapP = 0;
       else
-        if ( targetY > 0 )
-          snapN = 0;
+        if ( targetY > snapP )
+          snapN = _this->MaxOffset.Y;
         else
         {
           snapN = targetY;
@@ -6671,10 +6688,12 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
         XFloat distance = (XFloat)( targetY - _this->Offset.Y );
 
         if ( distance > 0.0f )
-          _this->speedY = EwMathSqrt(( distance * 2.0f ) * 5000.0f ) + 20.0f;
+          _this->speedY = EwMathSqrt(( distance * 2.0f ) * _this->frictFactor ) 
+          + 20.0f;
 
         if ( distance < 0.0f )
-          _this->speedY = -EwMathSqrt(( -distance * 2.0f ) * 5000.0f ) - 20.0f;
+          _this->speedY = -EwMathSqrt(( -distance * 2.0f ) * _this->frictFactor ) 
+          - 20.0f;
 
         _this->accelerationY = ( 400.0f - ( _this->speedY * _this->speedY )) / ( 
         2.0f * distance );
@@ -6684,7 +6703,7 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
     else
     {
       XFloat speedY2 = _this->speedY * _this->speedY;
-      XFloat distance = speedY2 / 10000.0f;
+      XFloat distance = speedY2 / ( 2.0f * _this->frictFactor );
       XInt32 targetY = _this->Offset.Y;
       XInt32 targetY0;
       XInt32 snapN;
@@ -6696,21 +6715,21 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
       if ( _this->speedY < 0.0f )
         targetY = targetY - (XInt32)distance;
 
-      if ( targetY > 0 )
-        targetY = 0;
+      if ( targetY > _this->MaxOffset.Y )
+        targetY = _this->MaxOffset.Y;
       else
         if ( targetY < 0 )
           targetY = 0;
 
       targetY0 = targetY;
       snapN = 0;
-      snapP = 0;
+      snapP = _this->MaxOffset.Y;
 
       if ( targetY < 0 )
         snapP = 0;
       else
-        if ( targetY > 0 )
-          snapN = 0;
+        if ( targetY > snapP )
+          snapN = _this->MaxOffset.Y;
         else
         {
           snapN = targetY;
@@ -6745,10 +6764,10 @@ XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEven
           XFloat snapDist = (XFloat)( targetY - targetY0 );
 
           if ( snapDist > 0.0f )
-            _this->speedY = _this->speedY + EwMathSqrt(( snapDist * 2.0f ) * 5000.0f );
+            _this->speedY = _this->speedY + EwMathSqrt(( snapDist * 2.0f ) * _this->frictFactor );
 
           if ( snapDist < 0.0f )
-            _this->speedY = _this->speedY - EwMathSqrt(( -snapDist * 2.0f ) * 5000.0f );
+            _this->speedY = _this->speedY - EwMathSqrt(( -snapDist * 2.0f ) * _this->frictFactor );
         }
 
         if ( _this->speedY > 0.0f )
@@ -6919,7 +6938,7 @@ void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sende
   else
     if ( _this->parkingX )
     {
-      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeX / 0.5f ), 5.0f );
+      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeX / 0.5f ), _this->RubberBandEffectElasticity );
       newOffset.X = (XInt32)( _this->startX + (((XFloat)_this->endX - _this->startX ) 
       * f ));
     }
@@ -6935,7 +6954,7 @@ void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sende
   else
     if ( _this->parkingY )
     {
-      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeY / 0.5f ), 5.0f );
+      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeY / 0.5f ), _this->RubberBandEffectElasticity );
       newOffset.Y = (XInt32)( _this->startY + (((XFloat)_this->endY - _this->startY ) 
       * f ));
     }
@@ -6962,10 +6981,10 @@ void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sende
     _this->parkingX = 1;
   }
   else
-    if ( !_this->parkingX && ( newOffset.X > 0 ))
+    if ( !_this->parkingX && ( newOffset.X > _this->MaxOffset.X ))
     {
       _this->startX = (XFloat)newOffset.X;
-      _this->endX = 0;
+      _this->endX = _this->MaxOffset.X;
       _this->startTimeX = _this->timer->Time;
       _this->parkingX = 1;
     }
@@ -6978,10 +6997,10 @@ void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sende
     _this->parkingY = 1;
   }
   else
-    if ( !_this->parkingY && ( newOffset.Y > 0 ))
+    if ( !_this->parkingY && ( newOffset.Y > _this->MaxOffset.Y ))
     {
       _this->startY = (XFloat)newOffset.Y;
-      _this->endY = 0;
+      _this->endY = _this->MaxOffset.Y;
       _this->startTimeY = _this->timer->Time;
       _this->parkingY = 1;
     }
@@ -7015,7 +7034,61 @@ void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sende
   {
     CoreSlideTouchHandler_stopAnimation( _this );
     _this->Sliding = 0;
+    EwSignal( _this->OnEnd, ((XObject)_this ));
   }
+}
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetRubberBandEffectElasticity()' */
+void CoreSlideTouchHandler_OnSetRubberBandEffectElasticity( CoreSlideTouchHandler _this, 
+  XFloat value )
+{
+  if ( value < 1.0f )
+    value = 1.0f;
+
+  if ( value > 100.0f )
+    value = 100.0f;
+
+  _this->RubberBandEffectElasticity = value;
+}
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetSpace()' */
+void CoreSlideTouchHandler_OnSetResetSpace( CoreSlideTouchHandler _this, XInt32 
+  value )
+{
+  if ( value < 0 )
+    value = -1;
+
+  _this->ResetSpace = value;
+}
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetDelay()' */
+void CoreSlideTouchHandler_OnSetResetDelay( CoreSlideTouchHandler _this, XInt32 
+  value )
+{
+  if ( value < 0 )
+    value = 0;
+
+  _this->ResetDelay = value;
+}
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetFriction()' */
+void CoreSlideTouchHandler_OnSetFriction( CoreSlideTouchHandler _this, XFloat value )
+{
+  if ( value < 0.0f )
+    value = 0.0f;
+
+  if ( value > 1.0f )
+    value = 1.0f;
+
+  if ( value == _this->Friction )
+    return;
+
+  _this->Friction = value;
+
+  if ( value < ( 1e-007f ))
+    value = 1e-007f;
+
+  _this->frictFactor = value * 10000.0f;
 }
 
 /* Variants derived from the class : 'Core::SlideTouchHandler' */
@@ -7023,7 +7096,7 @@ EW_DEFINE_CLASS_VARIANTS( CoreSlideTouchHandler )
 EW_END_OF_CLASS_VARIANTS( CoreSlideTouchHandler )
 
 /* Virtual Method Table (VMT) for the class : 'Core::SlideTouchHandler' */
-EW_DEFINE_CLASS( CoreSlideTouchHandler, CoreRectView, timer, timer, OnStart, state, 
+EW_DEFINE_CLASS( CoreSlideTouchHandler, CoreRectView, timer, timer, OnEnd, state, 
                  state, state, "Core::SlideTouchHandler" )
   CoreRectView_initLayoutContext,
   CoreView_GetRoot,

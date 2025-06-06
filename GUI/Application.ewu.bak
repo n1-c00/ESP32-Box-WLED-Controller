@@ -16,7 +16,7 @@ resource Resources::Font Font
   attr fontrowdistance RowDistance;
 }
 
-$rect <240,-20,440,20>
+$rect <230,-20,430,20>
 inline Inline
 {
   /*
@@ -203,18 +203,6 @@ class DeviceClass : Templates::DeviceClass
     attr Bounds = <1160,0,1710,400>;
   }
 
-  // The object 'SystemEvent' represents an individual system event. When the system \
-  // event is triggered all associated system event handler are notified automatically.
-  // 
-  // The method 'TriggerEvent' method is intended to be called by the device to notify \
-  // the GUI application about the particular system event represented by the object \
-  // 'SystemEvent'. This method exists for your convenience only and is optional. \
-  // See inline documentation inside the method.
-  note legend Note2
-  {
-    attr Bounds = <1160,410,1660,590>;
-  }
-
   // The object 'SystemEventHandler' is a handler of a particular system event. When \
   // the system event is triggered, the handler calls the associated slot method \
   // 'onEvent' automatically. Within the 'onEvent' method you can react to the event. \
@@ -277,42 +265,28 @@ class DeviceClass : Templates::DeviceClass
   // about an alternation of its setting or state value.
   $rect <1170,210,1370,250>
   $output true
-  method void EWUpdateRed( arg int32 aNewValue )
+  method void EWUpdateColor( arg int32 aNewValueRed, arg int32 aNewValueGreen, arg int32 aNewValueBlue )
   {
     // Only if the reported value does differ from the one stored currently in the property.
-    if ( aNewValue != pure redValue )
+    if ( aNewValueRed != pure redValue )
     {
       // Remember the new value in the internal memory of the property.
-      pure redValue = aNewValue;
+      pure redValue = aNewValueRed;
     }
-  }
 
-  // This method is intended to be called by the device to notify the GUI application \
-  // about an alternation of its setting or state value.
-  $rect <1170,260,1370,300>
-  $output true
-  method void EWUpdateGreen( arg int32 aNewValue )
-  {
-    // Only if the reported value does differ from the one stored currently in the property.
-    if ( aNewValue != pure greenValue )
+    if ( aNewValueGreen != pure greenValue )
     {
       // Remember the new value in the internal memory of the property.
-      pure greenValue = aNewValue;
+      pure greenValue = aNewValueGreen;
     }
-  }
 
-  // This method is intended to be called by the device to notify the GUI application \
-  // about an alternation of its setting or state value.
-  $rect <1170,310,1370,350>
-  $output true
-  method void EWUpdateBlue( arg int32 aNewValue )
-  {
-    // Only if the reported value does differ from the one stored currently in the property.
-    if ( aNewValue != pure blueValue )
+    if ( aNewValueBlue != pure blueValue )
     {
       // Remember the new value in the internal memory of the property.
-      pure blueValue = aNewValue;
+      pure blueValue = aNewValueBlue;
     }
+
+
   }
 
   // Directives to adapt the order of the above members according to how these members 
@@ -326,7 +300,6 @@ class DeviceClass : Templates::DeviceClass
   $member Note1
   $member Note
   $member LedSetMethod
-  $member Note2
   $member Note5
   $member brightnessValue
   $member EWUpdateSlider
@@ -335,9 +308,7 @@ class DeviceClass : Templates::DeviceClass
   $member redValue
   $member greenValue
   $member blueValue
-  $member EWUpdateRed
-  $member EWUpdateGreen
-  $member EWUpdateBlue
+  $member EWUpdateColor
 }
 
 $rect <20,30,220,70>
@@ -415,23 +386,27 @@ class Application : Core::Root
   $rect <340,70,540,110>
   slot Slot
   {
-    currentView = !currentView;
-    if ( currentView ){
-      SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
-     }
-     else{
-      SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
-     }
+      currentView = !currentView;
+      if ( currentView ){
+        SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
+       }
+       else{
+        SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
+       }
   }
 
   $rect <20,20,160,60>
   object Core::SlideTouchHandler SlideTouchHandler
   {
     preset Bounds = <0,0,320,240>;
+    preset MaxOffset = <320,240>;
     preset OnSlide = null;
-    preset OnEnd = null;
-    preset OnStart = Slot;
+    preset OnEnd = Slot;
+    preset OnStart = null;
     preset SlideVert = false;
+    preset RubberBandEffectElasticity = 1.0;
+    preset ResetSpace = -1;
+    preset ResetDelay = 200;
   }
 
   $rect <340,130,540,170>
@@ -1090,8 +1065,8 @@ class colorSelection : Core::Group
     var string greenString = string(GreenSlider.CurrentValue);
     var string blueString = string(BlueSlider.CurrentValue);
 
-    var string colorString = string(redString + ";" + greenString + ";" + blueString + ";");
-    Application::Device.LedSetMethod("col", colorString, "array");
+    var string colorString = string("0;" + redString + ";" + greenString + ";" + blueString + ";");
+    Application::Device.LedSetMethod("col", colorString, "rgb");
   }
 }
 

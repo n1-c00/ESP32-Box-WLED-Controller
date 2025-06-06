@@ -134,9 +134,10 @@
    with the handlers during the design time. */
 EW_DEFINE_FIELDS( CoreSlideTouchHandler, CoreRectView )
   EW_VARIABLE( timer,           CoreTimer )
-  EW_PROPERTY( OnStart,         XSlot )
+  EW_PROPERTY( OnEnd,           XSlot )
   EW_VARIABLE( state,           XUInt32 )
   EW_VARIABLE( activeFinger,    XInt32 )
+  EW_VARIABLE( frictFactor,     XFloat )
   EW_VARIABLE( refTime,         XUInt32 )
   EW_VARIABLE( initOffset,      XPoint )
   EW_VARIABLE( endY,            XInt32 )
@@ -151,7 +152,12 @@ EW_DEFINE_FIELDS( CoreSlideTouchHandler, CoreRectView )
   EW_VARIABLE( startTimeX,      XUInt32 )
   EW_VARIABLE( HittingPos,      XPoint )
   EW_VARIABLE( Delta,           XPoint )
+  EW_PROPERTY( MaxOffset,       XPoint )
   EW_PROPERTY( Offset,          XPoint )
+  EW_PROPERTY( RubberBandEffectElasticity, XFloat )
+  EW_PROPERTY( ResetSpace,      XInt32 )
+  EW_PROPERTY( ResetDelay,      XInt32 )
+  EW_PROPERTY( Friction,        XFloat )
   EW_VARIABLE( multiFingerDelay, XInt16 )
   EW_VARIABLE( active,          XBool )
   EW_VARIABLE( parkingY,        XBool )
@@ -274,6 +280,21 @@ void CoreSlideTouchHandler_startAnimation( CoreSlideTouchHandler _this );
 
 /* 'C' function for method : 'Core::SlideTouchHandler.timerSlot()' */
 void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sender );
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetRubberBandEffectElasticity()' */
+void CoreSlideTouchHandler_OnSetRubberBandEffectElasticity( CoreSlideTouchHandler _this, 
+  XFloat value );
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetSpace()' */
+void CoreSlideTouchHandler_OnSetResetSpace( CoreSlideTouchHandler _this, XInt32 
+  value );
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetDelay()' */
+void CoreSlideTouchHandler_OnSetResetDelay( CoreSlideTouchHandler _this, XInt32 
+  value );
+
+/* 'C' function for method : 'Core::SlideTouchHandler.OnSetFriction()' */
+void CoreSlideTouchHandler_OnSetFriction( CoreSlideTouchHandler _this, XFloat value );
 
 #ifdef __cplusplus
   }

@@ -16,7 +16,7 @@ resource Resources::Font Font
   attr fontrowdistance RowDistance;
 }
 
-$rect <240,-20,440,20>
+$rect <230,-20,430,20>
 inline Inline
 {
   /*
@@ -203,18 +203,6 @@ class DeviceClass : Templates::DeviceClass
     attr Bounds = <1160,0,1710,400>;
   }
 
-  // The object 'SystemEvent' represents an individual system event. When the system \
-  // event is triggered all associated system event handler are notified automatically.
-  // 
-  // The method 'TriggerEvent' method is intended to be called by the device to notify \
-  // the GUI application about the particular system event represented by the object \
-  // 'SystemEvent'. This method exists for your convenience only and is optional. \
-  // See inline documentation inside the method.
-  note legend Note2
-  {
-    attr Bounds = <1160,410,1660,590>;
-  }
-
   // The object 'SystemEventHandler' is a handler of a particular system event. When \
   // the system event is triggered, the handler calls the associated slot method \
   // 'onEvent' automatically. Within the 'onEvent' method you can react to the event. \
@@ -312,7 +300,6 @@ class DeviceClass : Templates::DeviceClass
   $member Note1
   $member Note
   $member LedSetMethod
-  $member Note2
   $member Note5
   $member brightnessValue
   $member EWUpdateSlider
@@ -399,23 +386,28 @@ class Application : Core::Root
   $rect <340,70,540,110>
   slot Slot
   {
-    currentView = !currentView;
-    if ( currentView ){
-      SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
-     }
-     else{
-      SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
-     }
+      currentView = !currentView;
+      if ( currentView ){
+        SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
+       }
+       else{
+        SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
+       }
   }
 
   $rect <20,20,160,60>
   object Core::SlideTouchHandler SlideTouchHandler
   {
     preset Bounds = <0,0,320,240>;
+    preset MaxOffset = <320,240>;
     preset OnSlide = null;
-    preset OnEnd = null;
-    preset OnStart = Slot;
+    preset OnEnd = Slot;
+    preset OnStart = null;
     preset SlideVert = false;
+    preset RubberBandEffectElasticity = 5.0;
+    preset ResetSpace = -1;
+    preset ResetDelay = 200;
+    preset Friction = 1.0;
   }
 
   $rect <340,130,540,170>
@@ -1074,8 +1066,8 @@ class colorSelection : Core::Group
     var string greenString = string(GreenSlider.CurrentValue);
     var string blueString = string(BlueSlider.CurrentValue);
 
-    var string colorString = string(redString + ";" + greenString + ";" + blueString + ";");
-    Application::Device.LedSetMethod("col", colorString, "array");
+    var string colorString = string("0;" + redString + ";" + greenString + ";" + blueString + ";");
+    Application::Device.LedSetMethod("col", colorString, "rgb");
   }
 }
 

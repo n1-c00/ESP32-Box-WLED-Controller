@@ -4,13 +4,30 @@ static char *TAG = "HTTP";
 
 int http_POST(char *json_string)
 {
-    TAG = "HTTP_POST";
-
     struct sockaddr_in dest_addr;
     int s;
+    int result = -1; // Default to error
     char request[2048];
 
-    // Create the complete HTTP request with headers and body
+    // Create socket
+    s = socket(AF_INET, SOCK_STREAM, 0);
+    if(s < 0) {
+        ESP_LOGE(TAG, "... Failed to allocate socket.");
+        return -1;
+    }
+
+    // Initialize the server address structure
+    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = htons(atoi(WEB_PORT));
+
+    // Connect to the server
+    if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
+        ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
+        goto cleanup;
+    }
+
+    // Create the complete HTTP request
     snprintf(request, sizeof(request),
         "POST " WEB_PATH " HTTP/1.0\r\n"
         "Host: " WEB_SERVER ":" WEB_PORT "\r\n"
@@ -20,107 +37,89 @@ int http_POST(char *json_string)
         "\r\n"
         "%s",
         strlen(json_string), json_string);
-    //ESP_LOGI(TAG, "... request: %s", request);
-    
-    // Initialize the server address structure
-    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
-    dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = htons(atoi(WEB_PORT));
 
-    // Create socket
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if(s < 0) {
-        ESP_LOGE(TAG, "... Failed to allocate socket.");
-        return -1;
-    }
-    //ESP_LOGI(TAG, "... allocated socket");
-
-    // Connect to the server
-    if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
-       ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
-        close(s);
-        return -1;
-    }
-
-    //ESP_LOGI(TAG, "... connected");
-
-    if (write(s, request, strlen(request)) < 0) { // Changed REQUEST to request
+    // Send the request
+    if (write(s, request, strlen(request)) < 0) {
         ESP_LOGE(TAG, "... socket send failed");
-        close(s);
-        return -1;
+        goto cleanup;
     }
+
     ESP_LOGI(TAG, "... socket send success");
-    return 0; // Return 0 to indicate success
+    result = 0; // Success!
+
+cleanup:
+    if (s >= 0) {
+        close(s);
+    }
+    return result;
 }
 
 
 int http_GET(char *buffer, int size)
 {
-    TAG = "HTTP_GET";
-
     struct sockaddr_in dest_addr;
-    int s, r;
+    int s = -1; // Initialize to invalid
+    int r;
     char responsecode[4];
-    int ret_responsecode;
-    
-    // Initialize the server address structure
-    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
-    dest_addr.sin_family = AF_INET;
-    dest_addr.sin_port = htons(atoi(WEB_PORT));
-    
-    /* Create a suitable HTTP-GET request out of from the URL*/
+    int ret_responsecode = 0; // Default error code
+
+    /* Create a suitable HTTP-GET request */
     static char *REQUEST = "GET " WEB_PATH " HTTP/1.0\r\n"
         "Host: "WEB_SERVER":"WEB_PORT"\r\n"
         "User-Agent: esp-idf/1.0 esp32\r\n"
         "\r\n";
 
-    //ESP_LOGI(TAG, "... request: %s", REQUEST);
-
     // Create socket
     s = socket(AF_INET, SOCK_STREAM, 0);
     if(s < 0) {
         ESP_LOGE(TAG, "... Failed to allocate socket.");
-        return 0;
+        goto cleanup;
     }
-    //ESP_LOGI(TAG, "... allocated socket");
+
+    // Initialize address structure
+    dest_addr.sin_addr.s_addr = inet_addr(WEB_SERVER);
+    dest_addr.sin_family = AF_INET;
+    dest_addr.sin_port = htons(atoi(WEB_PORT));
 
     // Connect to the server
     if(connect(s, (struct sockaddr *)&dest_addr, sizeof(dest_addr)) != 0) {
         ESP_LOGE(TAG, "... socket connect failed errno=%d", errno);
-        close(s);
-        return 0;
+        goto cleanup;
     }
 
-    ESP_LOGI(TAG, "... connected");
-
+    // Send request
     if (write(s, REQUEST, strlen(REQUEST)) < 0) {
         ESP_LOGE(TAG, "... socket send failed");
-        return 0;
+        goto cleanup;
     }
-    //ESP_LOGI(TAG, "... socket send success");
 
+    // Set socket timeout
     struct timeval receiving_timeout;
     receiving_timeout.tv_sec = 5;
     receiving_timeout.tv_usec = 0;
     if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &receiving_timeout,
             sizeof(receiving_timeout)) < 0) {
         ESP_LOGE(TAG, "... failed to set socket receiving timeout");
-        close(s);
-        return 0;
+        goto cleanup;
     }
-    //ESP_LOGI(TAG, "... set socket receiving timeout success");
 
-    /* Fetch the first line of the HTTP response */
-    bzero(buffer, size);              //clear the buffer
+    // Read response
+    bzero(buffer, size);
     r = read(s, buffer, size-1);
-    
-    /*extract the response code out of the first line of response*/
+    if (r <= 0) {
+        ESP_LOGE(TAG, "... error reading response");
+        goto cleanup;
+    }
+
+    // Parse response code
     sscanf(buffer, "HTTP/%*s %3s", responsecode);
     ret_responsecode = atoi(responsecode);
     ESP_LOGI(TAG, "Response code: %d", ret_responsecode);
 
-    //close the socket and return the response
-    ESP_LOGI(TAG, "... done reading from socket. Last read return=%d errno=%d.", r, errno);
-    close(s);
+cleanup:
+    if (s >= 0) {
+        close(s);
+        ESP_LOGI(TAG, "... socket closed");
+    }
     return ret_responsecode;
 }

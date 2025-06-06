@@ -1,9 +1,9 @@
 $version 1.0
 
-attr active = Application::DeviceClass;
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.EWUpdateColor;
+attr currentCodeInspector = Application::Application.Slot;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -40,6 +40,7 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
+  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-309,-41>;
   attr zoom = 0.75;
@@ -60,8 +61,21 @@ view class Application::colorSelection
 
 view class Application::DeviceClass
 {
+  attr scrollTo = <777,10>;
+  attr zoom = 0.75;
+}
+
+view class Application::Application
+{
   attr enableWireMode = false;
-  attr scrollTo = <591,10>;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
+}
+
+view class Core::SlideTouchHandler
+{
+  attr enableWireMode = false;
+  attr scrollTo = <-7,-7>;
   attr zoom = 0.75;
 }
 
@@ -69,14 +83,30 @@ codeview Application::colorSelection.ColorSlot
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <74,4>;
-  attr codeSelStart = <74,4>;
+  attr codeSelEnd = <57,5>;
+  attr codeSelStart = <57,5>;
 }
 
 codeview Application::DeviceClass.EWUpdateColor
 {
   attr codeColSelect = false;
-  attr codeFirstPos = <0,8>;
+  attr codeFirstPos = <0,9>;
   attr codeSelEnd = <11,16>;
   attr codeSelStart = <11,16>;
+}
+
+codeview Application::DeviceClass.LedSetMethod
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
+}
+
+codeview Application::Application.Slot
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <4,6>;
+  attr codeSelStart = <4,6>;
 }

@@ -55,21 +55,22 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
 
 /* Constant values used in this 'C' module only. */
 static const XRect _Const0000 = {{ 0, 0 }, { 320, 240 }};
-static const XRect _Const0001 = {{ 108, 43 }, { 212, 102 }};
-static const XRect _Const0002 = {{ 60, 135 }, { 260, 195 }};
-static const XStringRes _Const0003 = { _StringsDefault0, 0x0003 };
-static const XStringRes _Const0004 = { _StringsDefault0, 0x0007 };
-static const XStringRes _Const0005 = { _StringsDefault0, 0x000D };
-static const XStringRes _Const0006 = { _StringsDefault0, 0x0013 };
-static const XStringRes _Const0007 = { _StringsDefault0, 0x001A };
-static const XStringRes _Const0008 = { _StringsDefault0, 0x001F };
-static const XRect _Const0009 = {{ 40, 20 }, { 100, 220 }};
-static const XRect _Const000A = {{ 131, 20 }, { 190, 220 }};
-static const XRect _Const000B = {{ 220, 20 }, { 285, 220 }};
-static const XStringRes _Const000C = { _StringsDefault0, 0x0024 };
-static const XStringRes _Const000D = { _StringsDefault0, 0x0028 };
-static const XStringRes _Const000E = { _StringsDefault0, 0x002B };
-static const XStringRes _Const000F = { _StringsDefault0, 0x0030 };
+static const XPoint _Const0001 = { 320, 240 };
+static const XRect _Const0002 = {{ 108, 43 }, { 212, 102 }};
+static const XRect _Const0003 = {{ 60, 135 }, { 260, 195 }};
+static const XStringRes _Const0004 = { _StringsDefault0, 0x0003 };
+static const XStringRes _Const0005 = { _StringsDefault0, 0x0007 };
+static const XStringRes _Const0006 = { _StringsDefault0, 0x000D };
+static const XStringRes _Const0007 = { _StringsDefault0, 0x0013 };
+static const XStringRes _Const0008 = { _StringsDefault0, 0x001A };
+static const XStringRes _Const0009 = { _StringsDefault0, 0x001F };
+static const XRect _Const000A = {{ 40, 20 }, { 100, 220 }};
+static const XRect _Const000B = {{ 131, 20 }, { 190, 220 }};
+static const XRect _Const000C = {{ 220, 20 }, { 285, 220 }};
+static const XStringRes _Const000D = { _StringsDefault0, 0x0024 };
+static const XStringRes _Const000E = { _StringsDefault0, 0x0028 };
+static const XStringRes _Const000F = { _StringsDefault0, 0x002B };
+static const XStringRes _Const0010 = { _StringsDefault0, 0x0030 };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -93,11 +94,17 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   CoreRectView__OnSetBounds( &_this->colorSelection, _Const0000 );
   CoreRectView__OnSetBounds( &_this->homeScreen, _Const0000 );
   CoreRectView__OnSetBounds( &_this->SlideTouchHandler, _Const0000 );
+  _this->SlideTouchHandler.MaxOffset = _Const0001;
   _this->SlideTouchHandler.SlideVert = 0;
+  CoreSlideTouchHandler_OnSetRubberBandEffectElasticity( &_this->SlideTouchHandler, 
+  5.0f );
+  CoreSlideTouchHandler_OnSetResetSpace( &_this->SlideTouchHandler, -1 );
+  CoreSlideTouchHandler_OnSetResetDelay( &_this->SlideTouchHandler, 200 );
+  CoreSlideTouchHandler_OnSetFriction( &_this->SlideTouchHandler, 1.0f );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->colorSelection ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->homeScreen ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->SlideTouchHandler ), 0 );
-  _this->SlideTouchHandler.OnStart = EwNewSlot( _this, ApplicationApplication_Slot );
+  _this->SlideTouchHandler.OnEnd = EwNewSlot( _this, ApplicationApplication_Slot );
 
   /* Call the user defined constructor */
   ApplicationApplication_Init( _this, aArg );
@@ -495,11 +502,11 @@ void ApplicationhomeScreen__Init( ApplicationhomeScreen _this, XObject aLink, XH
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0001 );
+  CoreRectView__OnSetBounds( &_this->toggleLightButton, _Const0002 );
   WidgetSetToggleButton_OnSetLabelOn( &_this->toggleLightButton, 0 );
   WidgetSetToggleButton_OnSetLabelOff( &_this->toggleLightButton, 0 );
   WidgetSetToggleButton_OnSetLabel( &_this->toggleLightButton, 0 );
-  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0002 );
+  CoreRectView__OnSetBounds( &_this->BrightnessSlider, _Const0003 );
   WidgetSetHorizontalSlider_OnSetMaxValue( &_this->BrightnessSlider, 255 );
   WidgetSetHorizontalSlider_OnSetCurrentValue( &_this->BrightnessSlider, 40 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
@@ -555,7 +562,7 @@ void ApplicationhomeScreen_LightOnSlot( ApplicationhomeScreen _this, XObject sen
   EW_UNUSED_ARG( sender );
 
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0003 ), EwLoadString( &_Const0004 ), EwLoadString( &_Const0005 ));
+  EwLoadString( &_Const0004 ), EwLoadString( &_Const0005 ), EwLoadString( &_Const0006 ));
 }
 
 /* 'C' function for method : 'Application::homeScreen.LightOffSlot()' */
@@ -566,7 +573,7 @@ void ApplicationhomeScreen_LightOffSlot( ApplicationhomeScreen _this, XObject se
   EW_UNUSED_ARG( sender );
 
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0003 ), EwLoadString( &_Const0006 ), EwLoadString( &_Const0005 ));
+  EwLoadString( &_Const0004 ), EwLoadString( &_Const0007 ), EwLoadString( &_Const0006 ));
 }
 
 /* 'C' function for method : 'Application::homeScreen.BrightnessSlot()' */
@@ -581,7 +588,7 @@ void ApplicationhomeScreen_BrightnessSlot( ApplicationhomeScreen _this, XObject
   brightnessString = EwNewStringInt( WidgetSetHorizontalSlider_OnGetCurrentValue( 
   &_this->BrightnessSlider ), 0, 10 );
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const0007 ), brightnessString, EwLoadString( &_Const0008 ));
+  EwLoadString( &_Const0008 ), brightnessString, EwLoadString( &_Const0009 ));
 }
 
 /* Variants derived from the class : 'Application::homeScreen' */
@@ -632,11 +639,11 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
   /* ... and initialize objects, variables, properties, etc. */
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
-  CoreRectView__OnSetBounds( &_this->RedSlider, _Const0009 );
+  CoreRectView__OnSetBounds( &_this->RedSlider, _Const000A );
   WidgetSetVerticalSlider_OnSetMaxValue( &_this->RedSlider, 254 );
-  CoreRectView__OnSetBounds( &_this->GreenSlider, _Const000A );
+  CoreRectView__OnSetBounds( &_this->GreenSlider, _Const000B );
   WidgetSetVerticalSlider_OnSetMaxValue( &_this->GreenSlider, 254 );
-  CoreRectView__OnSetBounds( &_this->BlueSlider, _Const000B );
+  CoreRectView__OnSetBounds( &_this->BlueSlider, _Const000C );
   WidgetSetVerticalSlider_OnSetMaxValue( &_this->BlueSlider, 254 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->RedSlider ), 0 );
@@ -710,11 +717,11 @@ void ApplicationcolorSelection_ColorSlot( ApplicationcolorSelection _this, XObje
   blueString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->BlueSlider ), 
   0, 10 );
   colorString = EwConcatString( EwConcatString( EwConcatString( EwConcatString( 
-  EwConcatString( EwConcatString( EwLoadString( &_Const000C ), redString ), EwLoadString( 
-  &_Const000D )), greenString ), EwLoadString( &_Const000D )), blueString ), EwLoadString( 
-  &_Const000D ));
+  EwConcatString( EwConcatString( EwLoadString( &_Const000D ), redString ), EwLoadString( 
+  &_Const000E )), greenString ), EwLoadString( &_Const000E )), blueString ), EwLoadString( 
+  &_Const000E ));
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const000E ), colorString, EwLoadString( &_Const000F ));
+  EwLoadString( &_Const000F ), colorString, EwLoadString( &_Const0010 ));
 }
 
 /* Variants derived from the class : 'Application::colorSelection' */
