@@ -61,7 +61,6 @@ Method defined in Embedded Wizard.
 ************************************************************************/
 void _EWUpdateSliderPROC()
 {
-
     /* Obtain access to the Device Interface instance */
     ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
                                                     ApplicationDeviceClass );
@@ -69,7 +68,7 @@ void _EWUpdateSliderPROC()
     /* Get the value of the "bri" parameter from the JSON object */
     cJSON *bri = cJSON_GetObjectItem(gWledJson, "bri");
     /* Invoke the function to trigger the event */
-    ApplicationDeviceClass__EWUpdateSlider( device, bri->valueint );
+    ApplicationDeviceClass_EWUpdateSlider( device, bri->valueint );
 }
 void _EWUpdateButtonPROC()
 {
@@ -80,22 +79,30 @@ void _EWUpdateButtonPROC()
     /* Get the value of the "on" parameter from the JSON object */
     cJSON *on = cJSON_GetObjectItem(gWledJson, "on");
     /* Invoke the function to trigger the event */
-    ApplicationDeviceClass__EWUpdateButton( device, cJSON_IsTrue(on) );
+    ApplicationDeviceClass_EWUpdateButton( device, cJSON_IsTrue(on) );
 }
-// void _EWUpdateColorPROC()
-// {
-//     int r = 0; 
-//     int g = 0; 
-//     int b = 0;
-//     /* Obtain access to the Device Interface instance */
-//     ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
-//                                                     ApplicationDeviceClass );
+void _EWUpdateColorPROC()
+{
+    int r = 0; 
+    int g = 0; 
+    int b = 0;
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
 
-//     /* Get the value of the rgb-array and seperate it into r, g, b values */
+    /* Get the value of the rgb-array and seperate it into r, g, b values */
+    cJSON *segments = cJSON_GetObjectItem(gWledJson, "seg");
+    cJSON *firstSeg = cJSON_GetArrayItem(segments, 0);
+    cJSON *array = cJSON_GetObjectItem(firstSeg, "col");
+    cJSON *color = cJSON_GetArrayItem(array, 0);
 
-//     /*Invoke the function to trigger the event*/
-//     ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
-// }
+    r = cJSON_GetArrayItem(color, 0)->valueint; // Get the red value
+    g = cJSON_GetArrayItem(color, 1)->valueint; // Get the green value
+    b = cJSON_GetArrayItem(color, 2)->valueint; // Get the blue value
+
+    /*Invoke the function to trigger the event*/
+    ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
+}
 /***********************************************************************
 Initialize the JSON object at startup with a HTTP request or a default 
 JSON object.
@@ -133,6 +140,10 @@ void JsonInit()
     }
 
     ESP_LOGI(TAG, "Set light state to: %s", json_start);
+    
+    EwInvoke(_EWUpdateSliderPROC, 0); // Update the slider with the current brightness
+    EwInvoke(_EWUpdateButtonPROC, 0); // Update the button with the current on/off state
+    EwInvoke(_EWUpdateColorPROC, 0); // Update the color with the current RGB values
 }
 
 /***********************************************************************
@@ -298,6 +309,53 @@ static void _wled_getStatus_task(void *pvParameters)
         }
 
         // Compare "col" parameter
+        cJSON *segments_gWled = cJSON_GetObjectItem(gWledJson, "seg");
+        cJSON *segments_nWled = cJSON_GetObjectItem(nWledJson, "seg");
+        cJSON *firstSeg_gWled = cJSON_GetArrayItem(segments_gWled, 0);
+        cJSON *firstSeg_nWled = cJSON_GetArrayItem(segments_nWled, 0);
+        cJSON *array_gWled = cJSON_GetObjectItem(firstSeg_gWled, "col");
+        cJSON *array_nWled = cJSON_GetObjectItem(firstSeg_nWled, "col");
+
+        // Convert JSON arrays to strings for comparison
+        char* gWled_str = cJSON_PrintUnformatted(array_gWled);
+        char* nWled_str = cJSON_PrintUnformatted(array_nWled);
+
+        // Log the strings for debugging
+        ESP_LOGI(TAG, "Comparing colors: gWledJson=%s, nWledJson=%s", 
+                  gWled_str ? gWled_str : "NULL", 
+                  nWled_str ? nWled_str : "NULL");
+
+        // Compare the strings and trigger if they don't match
+        if (gWled_str && nWled_str && strcmp(gWled_str, nWled_str) != 0) {
+            // Don't forget to free the allocated strings when appropriate
+            free(gWled_str);
+            free(nWled_str);
+            cJSON *color_gWled = cJSON_GetArrayItem(array_gWled, 0);
+            cJSON *color_nWled = cJSON_GetArrayItem(array_nWled, 0);
+            
+            cJSON_ReplaceItemInArray(color_gWled,
+                                    0, 
+                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 0)->valueint));
+            cJSON_ReplaceItemInArray(color_gWled,
+                                    1,
+                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 1)->valueint));
+            cJSON_ReplaceItemInArray(color_gWled,
+                                    2,
+                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 2)->valueint));
+
+            ESP_LOGI(TAG, "Color changed: gWledJson=[%d, %d, %d], nWledJson=[%d, %d, %d]",
+                    cJSON_GetArrayItem(color_gWled, 0)->valueint,
+                    cJSON_GetArrayItem(color_gWled, 1)->valueint,
+                    cJSON_GetArrayItem(color_gWled, 2)->valueint,
+
+                    cJSON_GetArrayItem(color_nWled, 0)->valueint,
+                    cJSON_GetArrayItem(color_nWled, 1)->valueint,
+                    cJSON_GetArrayItem(color_nWled, 2)->valueint);
+                
+            // Update the local JSON object with the new color values
+            cJSON_ReplaceItemInObject(firstSeg_gWled, "col", color_gWled);
+            EwInvoke(_EWUpdateColorPROC, 0);
+            }   
 
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
@@ -362,7 +420,7 @@ void app_main(void)
 
     
     /* Start the GUI task */
-    xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
+    xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 6, NULL );
 
     /* Put the wled task into the event-loop*/
     xTaskCreate(&_wled_send_task, "wled_send_task", 4096, NULL, 5, NULL);

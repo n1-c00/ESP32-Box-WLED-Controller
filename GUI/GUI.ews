@@ -3,7 +3,7 @@ $version 1.0
 attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::Application.Slot;
+attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -40,7 +40,6 @@ view unit Application
 {
   attr aspectRatio = 1.0;
   attr enableGrid = true;
-  attr enableWireMode = false;
   attr grid = 10;
   attr scrollTo = <-309,-41>;
   attr zoom = 0.75;
@@ -48,6 +47,7 @@ view unit Application
 
 view class Application::homeScreen
 {
+  attr enableWireMode = false;
   attr scrollTo = <-9,7>;
   attr zoom = 0.75;
 }
@@ -61,6 +61,7 @@ view class Application::colorSelection
 
 view class Application::DeviceClass
 {
+  attr enableWireMode = false;
   attr scrollTo = <777,10>;
   attr zoom = 0.75;
 }
@@ -74,7 +75,6 @@ view class Application::Application
 
 view class Core::SlideTouchHandler
 {
-  attr enableWireMode = false;
   attr scrollTo = <-7,-7>;
   attr zoom = 0.75;
 }
@@ -109,4 +109,12 @@ codeview Application::Application.Slot
   attr codeFirstPos = <0,0>;
   attr codeSelEnd = <4,6>;
   attr codeSelStart = <4,6>;
+}
+
+codeview Application::DeviceClass.EWUpdateSlider
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <29,5>;
+  attr codeSelStart = <29,5>;
 }
