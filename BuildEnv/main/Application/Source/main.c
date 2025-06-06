@@ -321,9 +321,9 @@ static void _wled_getStatus_task(void *pvParameters)
         char* nWled_str = cJSON_PrintUnformatted(array_nWled);
 
         // Log the strings for debugging
-        ESP_LOGI(TAG, "Comparing colors: gWledJson=%s, nWledJson=%s", 
-                  gWled_str ? gWled_str : "NULL", 
-                  nWled_str ? nWled_str : "NULL");
+        // ESP_LOGI(TAG, "Comparing colors: gWledJson=%s, nWledJson=%s", 
+        //           gWled_str ? gWled_str : "NULL", 
+        //           nWled_str ? nWled_str : "NULL");
 
         // Compare the strings and trigger if they don't match
         if (gWled_str && nWled_str && strcmp(gWled_str, nWled_str) != 0) {
@@ -333,15 +333,15 @@ static void _wled_getStatus_task(void *pvParameters)
             cJSON *color_gWled = cJSON_GetArrayItem(array_gWled, 0);
             cJSON *color_nWled = cJSON_GetArrayItem(array_nWled, 0);
             
-            cJSON_ReplaceItemInArray(color_gWled,
-                                    0, 
-                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 0)->valueint));
-            cJSON_ReplaceItemInArray(color_gWled,
-                                    1,
-                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 1)->valueint));
-            cJSON_ReplaceItemInArray(color_gWled,
-                                    2,
-                                    cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 2)->valueint));
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         0, 
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 0)->valueint));
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         1,
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 1)->valueint));
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         2,
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 2)->valueint));
 
             ESP_LOGI(TAG, "Color changed: gWledJson=[%d, %d, %d], nWledJson=[%d, %d, %d]",
                     cJSON_GetArrayItem(color_gWled, 0)->valueint,
@@ -353,7 +353,7 @@ static void _wled_getStatus_task(void *pvParameters)
                     cJSON_GetArrayItem(color_nWled, 2)->valueint);
                 
             // Update the local JSON object with the new color values
-            cJSON_ReplaceItemInObject(firstSeg_gWled, "col", color_gWled);
+            cJSON_ReplaceItemInArray(color_gWled, 0, color_nWled);
             EwInvoke(_EWUpdateColorPROC, 0);
             }   
 

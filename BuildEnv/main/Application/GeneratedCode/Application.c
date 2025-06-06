@@ -32,6 +32,7 @@
 #include "_CoreGroup.h"
 #include "_CoreSlideTouchHandler.h"
 #include "_CoreView.h"
+#include "_ResourcesBitmap.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetHorizontalSlider.h"
 #include "_WidgetSetHorizontalSliderConfig.h"
@@ -67,10 +68,11 @@ static const XStringRes _Const0009 = { _StringsDefault0, 0x001F };
 static const XRect _Const000A = {{ 40, 20 }, { 100, 220 }};
 static const XRect _Const000B = {{ 131, 20 }, { 190, 220 }};
 static const XRect _Const000C = {{ 220, 20 }, { 285, 220 }};
-static const XStringRes _Const000D = { _StringsDefault0, 0x0024 };
-static const XStringRes _Const000E = { _StringsDefault0, 0x0028 };
-static const XStringRes _Const000F = { _StringsDefault0, 0x002B };
-static const XStringRes _Const0010 = { _StringsDefault0, 0x0030 };
+static const XPoint _Const000D = { 59, 68 };
+static const XStringRes _Const000E = { _StringsDefault0, 0x0024 };
+static const XStringRes _Const000F = { _StringsDefault0, 0x0028 };
+static const XStringRes _Const0010 = { _StringsDefault0, 0x002B };
+static const XStringRes _Const0011 = { _StringsDefault0, 0x0030 };
 
 /* Initializer for the class 'Application::Application' */
 void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, XHandle aArg )
@@ -632,6 +634,9 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
   WidgetSetVerticalSlider__Init( &_this->RedSlider, &_this->_.XObject, 0 );
   WidgetSetVerticalSlider__Init( &_this->GreenSlider, &_this->_.XObject, 0 );
   WidgetSetVerticalSlider__Init( &_this->BlueSlider, &_this->_.XObject, 0 );
+  WidgetSetVerticalSliderConfig__Init( &_this->verticalSliderConfigRed, &_this->_.XObject, 0 );
+  WidgetSetVerticalSliderConfig__Init( &_this->verticalSliderConfigGreen, &_this->_.XObject, 0 );
+  WidgetSetVerticalSliderConfig__Init( &_this->verticalSliderConfigBlue, &_this->_.XObject, 0 );
 
   /* Setup the VMT pointer */
   _this->_.VMT = EW_CLASS( ApplicationcolorSelection );
@@ -640,11 +645,114 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
   CoreRectView__OnSetBounds( _this, _Const0000 );
   CoreRectView__OnSetBounds( &_this->Rectangle, _Const0000 );
   CoreRectView__OnSetBounds( &_this->RedSlider, _Const000A );
-  WidgetSetVerticalSlider_OnSetMaxValue( &_this->RedSlider, 254 );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->RedSlider, 255 );
+  WidgetSetVerticalSlider_OnSetCurrentValue( &_this->RedSlider, 100 );
   CoreRectView__OnSetBounds( &_this->GreenSlider, _Const000B );
-  WidgetSetVerticalSlider_OnSetMaxValue( &_this->GreenSlider, 254 );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->GreenSlider, 255 );
   CoreRectView__OnSetBounds( &_this->BlueSlider, _Const000C );
-  WidgetSetVerticalSlider_OnSetMaxValue( &_this->BlueSlider, 254 );
+  WidgetSetVerticalSlider_OnSetMaxValue( &_this->BlueSlider, 255 );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatPeriod( &_this->verticalSliderConfigRed, 
+  100 );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatDelay( &_this->verticalSliderConfigRed, 
+  500 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameActive( &_this->verticalSliderConfigRed, 
+  3 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameFocused( &_this->verticalSliderConfigRed, 
+  2 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDisabled( &_this->verticalSliderConfigRed, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDefault( &_this->verticalSliderConfigRed, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginTop( &_this->verticalSliderConfigRed, 
+  -5 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginBottom( &_this->verticalSliderConfigRed, 
+  -2 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameActive( &_this->verticalSliderConfigRed, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameFocused( &_this->verticalSliderConfigRed, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDisabled( &_this->verticalSliderConfigRed, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDefault( &_this->verticalSliderConfigRed, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameActive( &_this->verticalSliderConfigRed, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameFocused( &_this->verticalSliderConfigRed, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDisabled( &_this->verticalSliderConfigRed, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDefault( &_this->verticalSliderConfigRed, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetWidgetMinSize( &_this->verticalSliderConfigRed, 
+  _Const000D );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatPeriod( &_this->verticalSliderConfigGreen, 
+  100 );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatDelay( &_this->verticalSliderConfigGreen, 
+  500 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameActive( &_this->verticalSliderConfigGreen, 
+  3 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameFocused( &_this->verticalSliderConfigGreen, 
+  2 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDisabled( &_this->verticalSliderConfigGreen, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDefault( &_this->verticalSliderConfigGreen, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginTop( &_this->verticalSliderConfigGreen, 
+  -5 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginBottom( &_this->verticalSliderConfigGreen, 
+  -2 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameActive( &_this->verticalSliderConfigGreen, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameFocused( &_this->verticalSliderConfigGreen, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDisabled( &_this->verticalSliderConfigGreen, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDefault( &_this->verticalSliderConfigGreen, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameActive( &_this->verticalSliderConfigGreen, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameFocused( &_this->verticalSliderConfigGreen, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDisabled( &_this->verticalSliderConfigGreen, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDefault( &_this->verticalSliderConfigGreen, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetWidgetMinSize( &_this->verticalSliderConfigGreen, 
+  _Const000D );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatPeriod( &_this->verticalSliderConfigBlue, 
+  100 );
+  WidgetSetVerticalSliderConfig_OnSetKeyRepeatDelay( &_this->verticalSliderConfigBlue, 
+  500 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameActive( &_this->verticalSliderConfigBlue, 
+  3 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameFocused( &_this->verticalSliderConfigBlue, 
+  2 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDisabled( &_this->verticalSliderConfigBlue, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetThumbFrameDefault( &_this->verticalSliderConfigBlue, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginTop( &_this->verticalSliderConfigBlue, 
+  -5 );
+  WidgetSetVerticalSliderConfig_OnSetThumbMarginBottom( &_this->verticalSliderConfigBlue, 
+  -2 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameActive( &_this->verticalSliderConfigBlue, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameFocused( &_this->verticalSliderConfigBlue, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDisabled( &_this->verticalSliderConfigBlue, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDefault( &_this->verticalSliderConfigBlue, 
+  0 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameActive( &_this->verticalSliderConfigBlue, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameFocused( &_this->verticalSliderConfigBlue, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDisabled( &_this->verticalSliderConfigBlue, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDefault( &_this->verticalSliderConfigBlue, 
+  1 );
+  WidgetSetVerticalSliderConfig_OnSetWidgetMinSize( &_this->verticalSliderConfigBlue, 
+  _Const000D );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->Rectangle ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->RedSlider ), 0 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->GreenSlider ), 0 );
@@ -653,20 +761,89 @@ void ApplicationcolorSelection__Init( ApplicationcolorSelection _this, XObject a
   WidgetSetVerticalSlider_OnSetOutlet( &_this->RedSlider, EwNewRef( EwGetAutoObject( 
   &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetredValue, 
   ApplicationDeviceClass_OnSetredValue ));
-  WidgetSetVerticalSlider_OnSetAppearance( &_this->RedSlider, EwGetAutoObject( &WidgetSetVerticalSlider_Lime_Large, 
-  WidgetSetVerticalSliderConfig ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->RedSlider, &_this->verticalSliderConfigRed );
   _this->GreenSlider.OnEnd = EwNewSlot( _this, ApplicationcolorSelection_ColorSlot );
   WidgetSetVerticalSlider_OnSetOutlet( &_this->GreenSlider, EwNewRef( EwGetAutoObject( 
   &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetgreenValue, 
   ApplicationDeviceClass_OnSetgreenValue ));
-  WidgetSetVerticalSlider_OnSetAppearance( &_this->GreenSlider, EwGetAutoObject( 
-  &WidgetSetVerticalSlider_Lime_Large, WidgetSetVerticalSliderConfig ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->GreenSlider, &_this->verticalSliderConfigGreen );
   _this->BlueSlider.OnEnd = EwNewSlot( _this, ApplicationcolorSelection_ColorSlot );
   WidgetSetVerticalSlider_OnSetOutlet( &_this->BlueSlider, EwNewRef( EwGetAutoObject( 
   &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetblueValue, 
   ApplicationDeviceClass_OnSetblueValue ));
-  WidgetSetVerticalSlider_OnSetAppearance( &_this->BlueSlider, EwGetAutoObject( 
-  &WidgetSetVerticalSlider_Lime_Large, WidgetSetVerticalSliderConfig ));
+  WidgetSetVerticalSlider_OnSetAppearance( &_this->BlueSlider, &_this->verticalSliderConfigBlue );
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapActive( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationThumbKnobLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapFocused( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationThumbKnobLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDisabled( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationThumbKnobLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDefault( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationThumbKnobLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapActive( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapFocused( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDisabled( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDefault( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapActive( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapFocused( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDisabled( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDefault( &_this->verticalSliderConfigRed, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeRed, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapActive( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationThumbKnobLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapFocused( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationThumbKnobLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDisabled( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationThumbKnobLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDefault( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationThumbKnobLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapActive( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapFocused( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDisabled( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDefault( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapActive( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapFocused( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDisabled( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDefault( &_this->verticalSliderConfigGreen, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeGreen, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapActive( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationThumbKnobLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapFocused( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationThumbKnobLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDisabled( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationThumbKnobLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDefault( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationThumbKnobLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapActive( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapFocused( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDisabled( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDefault( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapActive( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapFocused( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDisabled( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
+  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDefault( &_this->verticalSliderConfigBlue, 
+  EwLoadResource( &ApplicationVerticalSliderTrackLargeBlue, ResourcesBitmap ));
 }
 
 /* Re-Initializer for the class 'Application::colorSelection' */
@@ -680,6 +857,9 @@ void ApplicationcolorSelection__ReInit( ApplicationcolorSelection _this )
   WidgetSetVerticalSlider__ReInit( &_this->RedSlider );
   WidgetSetVerticalSlider__ReInit( &_this->GreenSlider );
   WidgetSetVerticalSlider__ReInit( &_this->BlueSlider );
+  WidgetSetVerticalSliderConfig__ReInit( &_this->verticalSliderConfigRed );
+  WidgetSetVerticalSliderConfig__ReInit( &_this->verticalSliderConfigGreen );
+  WidgetSetVerticalSliderConfig__ReInit( &_this->verticalSliderConfigBlue );
 }
 
 /* Finalizer method for the class 'Application::colorSelection' */
@@ -693,6 +873,9 @@ void ApplicationcolorSelection__Done( ApplicationcolorSelection _this )
   WidgetSetVerticalSlider__Done( &_this->RedSlider );
   WidgetSetVerticalSlider__Done( &_this->GreenSlider );
   WidgetSetVerticalSlider__Done( &_this->BlueSlider );
+  WidgetSetVerticalSliderConfig__Done( &_this->verticalSliderConfigRed );
+  WidgetSetVerticalSliderConfig__Done( &_this->verticalSliderConfigGreen );
+  WidgetSetVerticalSliderConfig__Done( &_this->verticalSliderConfigBlue );
 
   /* Don't forget to deinitialize the super class ... */
   CoreGroup__Done( &_this->_.Super );
@@ -717,11 +900,11 @@ void ApplicationcolorSelection_ColorSlot( ApplicationcolorSelection _this, XObje
   blueString = EwNewStringInt( WidgetSetVerticalSlider_OnGetCurrentValue( &_this->BlueSlider ), 
   0, 10 );
   colorString = EwConcatString( EwConcatString( EwConcatString( EwConcatString( 
-  EwConcatString( EwConcatString( EwLoadString( &_Const000D ), redString ), EwLoadString( 
-  &_Const000E )), greenString ), EwLoadString( &_Const000E )), blueString ), EwLoadString( 
-  &_Const000E ));
+  EwConcatString( EwConcatString( EwLoadString( &_Const000E ), redString ), EwLoadString( 
+  &_Const000F )), greenString ), EwLoadString( &_Const000F )), blueString ), EwLoadString( 
+  &_Const000F ));
   ApplicationDeviceClass_LedSetMethod( EwGetAutoObject( &ApplicationDevice, ApplicationDeviceClass ), 
-  EwLoadString( &_Const000F ), colorString, EwLoadString( &_Const0010 ));
+  EwLoadString( &_Const0010 ), colorString, EwLoadString( &_Const0011 ));
 }
 
 /* Variants derived from the class : 'Application::colorSelection' */
@@ -750,5 +933,41 @@ EW_DEFINE_CLASS( ApplicationcolorSelection, CoreGroup, Rectangle, _.VMT, _.VMT,
   CoreGroup_UpdateViewState,
   CoreGroup_InvalidateArea,
 EW_END_OF_CLASS( ApplicationcolorSelection )
+
+/* Include a file containing the bitmap resource : 'Application::VerticalSliderTrackLargeRed' */
+#include "_ApplicationVerticalSliderTrackLargeRed.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::VerticalSliderTrackLargeRed' */
+EW_RES_WITHOUT_VARIANTS( ApplicationVerticalSliderTrackLargeRed )
+
+/* Include a file containing the bitmap resource : 'Application::VerticalSliderTrackLargeGreen' */
+#include "_ApplicationVerticalSliderTrackLargeGreen.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::VerticalSliderTrackLargeGreen' */
+EW_RES_WITHOUT_VARIANTS( ApplicationVerticalSliderTrackLargeGreen )
+
+/* Include a file containing the bitmap resource : 'Application::VerticalSliderTrackLargeBlue' */
+#include "_ApplicationVerticalSliderTrackLargeBlue.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::VerticalSliderTrackLargeBlue' */
+EW_RES_WITHOUT_VARIANTS( ApplicationVerticalSliderTrackLargeBlue )
+
+/* Include a file containing the bitmap resource : 'Application::ThumbKnobLargeRed' */
+#include "_ApplicationThumbKnobLargeRed.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::ThumbKnobLargeRed' */
+EW_RES_WITHOUT_VARIANTS( ApplicationThumbKnobLargeRed )
+
+/* Include a file containing the bitmap resource : 'Application::ThumbKnobLargeGreen' */
+#include "_ApplicationThumbKnobLargeGreen.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::ThumbKnobLargeGreen' */
+EW_RES_WITHOUT_VARIANTS( ApplicationThumbKnobLargeGreen )
+
+/* Include a file containing the bitmap resource : 'Application::ThumbKnobLargeBlue' */
+#include "_ApplicationThumbKnobLargeBlue.h"
+
+/* Table with links to derived variants of the bitmap resource : 'Application::ThumbKnobLargeBlue' */
+EW_RES_WITHOUT_VARIANTS( ApplicationThumbKnobLargeBlue )
 
 /* Embedded Wizard */

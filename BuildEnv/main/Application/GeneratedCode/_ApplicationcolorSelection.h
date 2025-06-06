@@ -45,6 +45,7 @@
 #include "_CoreGroup.h"
 #include "_ViewsRectangle.h"
 #include "_WidgetSetVerticalSlider.h"
+#include "_WidgetSetVerticalSliderConfig.h"
 
 /* Forward declaration of the class Application::colorSelection */
 #ifndef _ApplicationcolorSelection_
@@ -95,6 +96,9 @@ EW_DEFINE_FIELDS( ApplicationcolorSelection, CoreGroup )
   EW_OBJECT  ( RedSlider,       WidgetSetVerticalSlider )
   EW_OBJECT  ( GreenSlider,     WidgetSetVerticalSlider )
   EW_OBJECT  ( BlueSlider,      WidgetSetVerticalSlider )
+  EW_OBJECT  ( verticalSliderConfigRed, WidgetSetVerticalSliderConfig )
+  EW_OBJECT  ( verticalSliderConfigGreen, WidgetSetVerticalSliderConfig )
+  EW_OBJECT  ( verticalSliderConfigBlue, WidgetSetVerticalSliderConfig )
 EW_END_OF_FIELDS( ApplicationcolorSelection )
 
 /* Virtual Method Table (VMT) for the class : 'Application::colorSelection' */

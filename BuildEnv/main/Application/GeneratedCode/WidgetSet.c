@@ -49,28 +49,27 @@
 #include "WidgetSet.h"
 
 /* Constant values used in this 'C' module only. */
-static const XPoint _Const0000 = { 59, 68 };
-static const XPoint _Const0001 = { 68, 59 };
-static const XColor _Const0002 = { 0x6C, 0x6E, 0x70, 0xFF };
-static const XColor _Const0003 = { 0xA8, 0xAB, 0xAB, 0xFF };
-static const XColor _Const0004 = { 0xA8, 0xAB, 0xAB, 0xAA };
-static const XPoint _Const0005 = { 104, 59 };
-static const XColor _Const0006 = { 0x00, 0x00, 0x00, 0xFF };
-static const XColor _Const0007 = { 0xFF, 0xFF, 0xFF, 0xFF };
-static const XRect _Const0008 = {{ 0, 0 }, { 50, 200 }};
-static const XPoint _Const0009 = { 0, 200 };
-static const XPoint _Const000A = { 50, 200 };
-static const XPoint _Const000B = { 50, 0 };
-static const XPoint _Const000C = { 0, 0 };
-static const XRect _Const000D = {{ 0, 0 }, { 0, 0 }};
-static const XRect _Const000E = {{ -8, -8 }, { 9, 9 }};
-static const XRect _Const000F = {{ 0, 0 }, { 200, 50 }};
-static const XPoint _Const0010 = { 0, 50 };
-static const XPoint _Const0011 = { 200, 50 };
-static const XPoint _Const0012 = { 200, 0 };
-static const XRect _Const0013 = {{ 0, 0 }, { 150, 50 }};
-static const XPoint _Const0014 = { 150, 50 };
-static const XPoint _Const0015 = { 150, 0 };
+static const XPoint _Const0000 = { 68, 59 };
+static const XColor _Const0001 = { 0x6C, 0x6E, 0x70, 0xFF };
+static const XColor _Const0002 = { 0xA8, 0xAB, 0xAB, 0xFF };
+static const XColor _Const0003 = { 0xA8, 0xAB, 0xAB, 0xAA };
+static const XPoint _Const0004 = { 104, 59 };
+static const XColor _Const0005 = { 0x00, 0x00, 0x00, 0xFF };
+static const XColor _Const0006 = { 0xFF, 0xFF, 0xFF, 0xFF };
+static const XRect _Const0007 = {{ 0, 0 }, { 50, 200 }};
+static const XPoint _Const0008 = { 0, 200 };
+static const XPoint _Const0009 = { 50, 200 };
+static const XPoint _Const000A = { 50, 0 };
+static const XPoint _Const000B = { 0, 0 };
+static const XRect _Const000C = {{ 0, 0 }, { 0, 0 }};
+static const XRect _Const000D = {{ -8, -8 }, { 9, 9 }};
+static const XRect _Const000E = {{ 0, 0 }, { 200, 50 }};
+static const XPoint _Const000F = { 0, 50 };
+static const XPoint _Const0010 = { 200, 50 };
+static const XPoint _Const0011 = { 200, 0 };
+static const XRect _Const0012 = {{ 0, 0 }, { 150, 50 }};
+static const XPoint _Const0013 = { 150, 50 };
+static const XPoint _Const0014 = { 150, 0 };
 
 /* Include a file containing the bitmap resource : 'WidgetSet::HorizontalSliderTrackLarge' */
 #include "_WidgetSetHorizontalSliderTrackLarge.h"
@@ -89,72 +88,6 @@ EW_RES_WITHOUT_VARIANTS( WidgetSetSwitchLarge )
 
 /* Table with links to derived variants of the bitmap resource : 'WidgetSet::ThumbKnobLarge' */
 EW_RES_WITHOUT_VARIANTS( WidgetSetThumbKnobLarge )
-
-/* Include a file containing the bitmap resource : 'WidgetSet::VerticalSliderTrackLarge' */
-#include "_WidgetSetVerticalSliderTrackLarge.h"
-
-/* Table with links to derived variants of the bitmap resource : 'WidgetSet::VerticalSliderTrackLarge' */
-EW_RES_WITHOUT_VARIANTS( WidgetSetVerticalSliderTrackLarge )
-
-/* This autoobject provides the default customization for the 'vertical slider' 
-   widget (WidgetSet::VerticalSlider) in its large size variant. */
-EW_DEFINE_AUTOOBJECT( WidgetSetVerticalSlider_Lime_Large, WidgetSetVerticalSliderConfig )
-
-/* Initializer for the auto object 'WidgetSet::VerticalSlider_Lime_Large' */
-void WidgetSetVerticalSlider_Lime_Large__Init( WidgetSetVerticalSliderConfig _this )
-{
-  WidgetSetVerticalSliderConfig_OnSetKeyRepeatPeriod( _this, 100 );
-  WidgetSetVerticalSliderConfig_OnSetKeyRepeatDelay( _this, 500 );
-  WidgetSetVerticalSliderConfig_OnSetThumbMarginTop( _this, -5 );
-  WidgetSetVerticalSliderConfig_OnSetThumbMarginBottom( _this, -2 );
-  WidgetSetVerticalSliderConfig_OnSetThumbFrameActive( _this, 3 );
-  WidgetSetVerticalSliderConfig_OnSetThumbFrameFocused( _this, 2 );
-  WidgetSetVerticalSliderConfig_OnSetThumbFrameDisabled( _this, 0 );
-  WidgetSetVerticalSliderConfig_OnSetThumbFrameDefault( _this, 1 );
-  WidgetSetVerticalSliderConfig_OnSetThumbBitmapActive( _this, EwLoadResource( &WidgetSetThumbKnobLarge, 
-  ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetThumbBitmapFocused( _this, EwLoadResource( 
-  &WidgetSetThumbKnobLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDisabled( _this, EwLoadResource( 
-  &WidgetSetThumbKnobLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetThumbBitmapDefault( _this, EwLoadResource( 
-  &WidgetSetThumbKnobLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameActive( _this, 0 );
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameFocused( _this, 0 );
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDisabled( _this, 0 );
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveFrameDefault( _this, 0 );
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapActive( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapFocused( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDisabled( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackAboveBitmapDefault( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameActive( _this, 1 );
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameFocused( _this, 1 );
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDisabled( _this, 1 );
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowFrameDefault( _this, 1 );
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapActive( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapFocused( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDisabled( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetTrackBelowBitmapDefault( _this, EwLoadResource( 
-  &WidgetSetVerticalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetVerticalSliderConfig_OnSetWidgetMinSize( _this, _Const0000 );
-}
-
-/* Re-Initializer for the auto object 'WidgetSet::VerticalSlider_Lime_Large' */
-void WidgetSetVerticalSlider_Lime_Large__ReInit( WidgetSetVerticalSliderConfig _this )
-{
-  EW_UNUSED_ARG( _this );
-}
-
-/* Table with links to derived variants of the auto object : 'WidgetSet::VerticalSlider_Lime_Large' */
-EW_DEFINE_AUTOOBJECT_VARIANTS( WidgetSetVerticalSlider_Lime_Large )
-EW_END_OF_AUTOOBJECT_VARIANTS( WidgetSetVerticalSlider_Lime_Large )
 
 /* This autoobject provides the default customization for the 'horizontal slider' 
    widget (WidgetSet::HorizontalSlider) in its large size variant. */
@@ -203,7 +136,7 @@ void WidgetSetHorizontalSlider_Lime_Large__Init( WidgetSetHorizontalSliderConfig
   &WidgetSetHorizontalSliderTrackLarge, ResourcesBitmap ));
   WidgetSetHorizontalSliderConfig_OnSetTrackLeftBitmapDefault( _this, EwLoadResource( 
   &WidgetSetHorizontalSliderTrackLarge, ResourcesBitmap ));
-  WidgetSetHorizontalSliderConfig_OnSetWidgetMinSize( _this, _Const0001 );
+  WidgetSetHorizontalSliderConfig_OnSetWidgetMinSize( _this, _Const0000 );
 }
 
 /* Re-Initializer for the auto object 'WidgetSet::HorizontalSlider_Lime_Large' */
@@ -224,23 +157,23 @@ EW_DEFINE_AUTOOBJECT( WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig )
 /* Initializer for the auto object 'WidgetSet::Switch_Lime_Large' */
 void WidgetSetSwitch_Lime_Large__Init( WidgetSetToggleButtonConfig _this )
 {
-  WidgetSetToggleButtonConfig_OnSetLabelOnColorActive( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetLabelOnColorFocused( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetLabelOnColorDisabled( _this, _Const0003 );
-  WidgetSetToggleButtonConfig_OnSetLabelOnColorDefault( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetLabelOffColorActive( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetLabelOffColorFocused( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetLabelOffColorDisabled( _this, _Const0003 );
-  WidgetSetToggleButtonConfig_OnSetLabelOffColorDefault( _this, _Const0002 );
+  WidgetSetToggleButtonConfig_OnSetLabelOnColorActive( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetLabelOnColorFocused( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetLabelOnColorDisabled( _this, _Const0002 );
+  WidgetSetToggleButtonConfig_OnSetLabelOnColorDefault( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetLabelOffColorActive( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetLabelOffColorFocused( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetLabelOffColorDisabled( _this, _Const0002 );
+  WidgetSetToggleButtonConfig_OnSetLabelOffColorDefault( _this, _Const0001 );
   WidgetSetToggleButtonConfig_OnSetLabelMarginRight( _this, 110 );
-  WidgetSetToggleButtonConfig_OnSetIconOnTintActive( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetIconOnTintFocused( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetIconOnTintDisabled( _this, _Const0004 );
-  WidgetSetToggleButtonConfig_OnSetIconOnTintDefault( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetIconOffTintActive( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetIconOffTintFocused( _this, _Const0002 );
-  WidgetSetToggleButtonConfig_OnSetIconOffTintDisabled( _this, _Const0004 );
-  WidgetSetToggleButtonConfig_OnSetIconOffTintDefault( _this, _Const0002 );
+  WidgetSetToggleButtonConfig_OnSetIconOnTintActive( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetIconOnTintFocused( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetIconOnTintDisabled( _this, _Const0003 );
+  WidgetSetToggleButtonConfig_OnSetIconOnTintDefault( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetIconOffTintActive( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetIconOffTintFocused( _this, _Const0001 );
+  WidgetSetToggleButtonConfig_OnSetIconOffTintDisabled( _this, _Const0003 );
+  WidgetSetToggleButtonConfig_OnSetIconOffTintDefault( _this, _Const0001 );
   WidgetSetToggleButtonConfig_OnSetIconMarginRight( _this, 110 );
   WidgetSetToggleButtonConfig_OnSetLabelAlignment( _this, ViewsTextAlignmentAlignHorzLeft 
   | ViewsTextAlignmentAlignVertCenter );
@@ -275,7 +208,7 @@ void WidgetSetSwitch_Lime_Large__Init( WidgetSetToggleButtonConfig _this )
   &WidgetSetSwitchLarge, ResourcesBitmap ));
   WidgetSetToggleButtonConfig_OnSetFaceOffBitmapDefault( _this, EwLoadResource( 
   &WidgetSetSwitchLarge, ResourcesBitmap ));
-  WidgetSetToggleButtonConfig_OnSetWidgetMinSize( _this, _Const0005 );
+  WidgetSetToggleButtonConfig_OnSetWidgetMinSize( _this, _Const0004 );
 }
 
 /* Re-Initializer for the auto object 'WidgetSet::Switch_Lime_Large' */
@@ -1059,22 +992,22 @@ void WidgetSetToggleButtonConfig__Init( WidgetSetToggleButtonConfig _this, XObje
   _this->_.VMT = EW_CLASS( WidgetSetToggleButtonConfig );
 
   /* ... and initialize objects, variables, properties, etc. */
-  _this->LabelOnColorActive = _Const0006;
-  _this->LabelOnColorFocused = _Const0006;
-  _this->LabelOnColorDisabled = _Const0006;
-  _this->LabelOnColorDefault = _Const0006;
-  _this->LabelOffColorActive = _Const0006;
-  _this->LabelOffColorFocused = _Const0006;
-  _this->LabelOffColorDisabled = _Const0006;
-  _this->LabelOffColorDefault = _Const0006;
-  _this->IconOnTintActive = _Const0007;
-  _this->IconOnTintFocused = _Const0007;
-  _this->IconOnTintDisabled = _Const0007;
-  _this->IconOnTintDefault = _Const0007;
-  _this->IconOffTintActive = _Const0007;
-  _this->IconOffTintFocused = _Const0007;
-  _this->IconOffTintDisabled = _Const0007;
-  _this->IconOffTintDefault = _Const0007;
+  _this->LabelOnColorActive = _Const0005;
+  _this->LabelOnColorFocused = _Const0005;
+  _this->LabelOnColorDisabled = _Const0005;
+  _this->LabelOnColorDefault = _Const0005;
+  _this->LabelOffColorActive = _Const0005;
+  _this->LabelOffColorFocused = _Const0005;
+  _this->LabelOffColorDisabled = _Const0005;
+  _this->LabelOffColorDefault = _Const0005;
+  _this->IconOnTintActive = _Const0006;
+  _this->IconOnTintFocused = _Const0006;
+  _this->IconOnTintDisabled = _Const0006;
+  _this->IconOnTintDefault = _Const0006;
+  _this->IconOffTintActive = _Const0006;
+  _this->IconOffTintFocused = _Const0006;
+  _this->IconOffTintDisabled = _Const0006;
+  _this->IconOffTintDefault = _Const0006;
   _this->LabelAlignment = ViewsTextAlignmentAlignHorzCenter | ViewsTextAlignmentAlignVertCenter;
   _this->IconAlignment = ViewsImageAlignmentAlignHorzCenter | ViewsImageAlignmentAlignVertCenter;
   _this->FaceLayout = CoreLayoutAlignToBottom | CoreLayoutAlignToLeft | CoreLayoutAlignToRight 
@@ -1629,7 +1562,7 @@ void WidgetSetVerticalSlider__Init( WidgetSetVerticalSlider _this, XObject aLink
   _this->_.VMT = EW_CLASS( WidgetSetVerticalSlider );
 
   /* ... and initialize objects, variables, properties, etc. */
-  CoreRectView__OnSetBounds( _this, _Const0008 );
+  CoreRectView__OnSetBounds( _this, _Const0007 );
   CoreTimer_OnSetPeriod( &_this->RepetitionTimer, 0 );
   CoreTimer_OnSetBegin( &_this->RepetitionTimer, 50 );
   _this->KeyHandlerDown.Filter = CoreKeyCodeDown;
@@ -1637,10 +1570,10 @@ void WidgetSetVerticalSlider__Init( WidgetSetVerticalSlider _this, XObject aLink
   CoreView_OnSetLayout((CoreView)&_this->TouchHandler, CoreLayoutAlignToBottom | 
   CoreLayoutAlignToLeft | CoreLayoutAlignToRight | CoreLayoutAlignToTop | CoreLayoutResizeHorz 
   | CoreLayoutResizeVert );
-  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const0009 );
-  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const000A );
-  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const000B );
-  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000C );
+  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const0008 );
+  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const0009 );
+  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const000A );
+  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000B );
   CoreSimpleTouchHandler_OnSetRetargetOffset( &_this->TouchHandler, 16 );
   CoreSimpleTouchHandler_OnSetMaxStrikeCount( &_this->TouchHandler, 100 );
   _this->MaxValue = 100;
@@ -1911,7 +1844,7 @@ void WidgetSetVerticalSlider_UpdateViewState( WidgetSetVerticalSlider _this, XSe
     }
 
     ViewsFrame_OnSetAnimated( _this->frameView2, (XBool)( frameNo < 0 ));
-    ViewsFrame_OnSetColor( _this->frameView2, _Const0007 );
+    ViewsFrame_OnSetColor( _this->frameView2, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -1969,7 +1902,7 @@ void WidgetSetVerticalSlider_UpdateViewState( WidgetSetVerticalSlider _this, XSe
     }
 
     ViewsFrame_OnSetAnimated( _this->frameView3, (XBool)( frameNo < 0 ));
-    ViewsFrame_OnSetColor( _this->frameView3, _Const0007 );
+    ViewsFrame_OnSetColor( _this->frameView3, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -2027,7 +1960,7 @@ void WidgetSetVerticalSlider_UpdateViewState( WidgetSetVerticalSlider _this, XSe
     }
 
     ViewsImage_OnSetAnimated( _this->imageView, (XBool)( frameNo < 0 ));
-    ViewsImage_OnSetColor( _this->imageView, _Const0007 );
+    ViewsImage_OnSetColor( _this->imageView, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -2097,12 +2030,12 @@ void WidgetSetVerticalSlider_UpdateViewState( WidgetSetVerticalSlider _this, XSe
 
   if (( _this->imageView != 0 ) && ( _this->imageView->Bitmap != 0 ))
   {
-    XRect thumbArea = EwNewRect2Point( _Const000C, _this->imageView->Bitmap->FrameSize );
+    XRect thumbArea = EwNewRect2Point( _Const000B, _this->imageView->Bitmap->FrameSize );
     CoreRectView__OnSetBounds( _this->imageView, EwMoveRectPos( EwMoveRectNeg( thumbArea, 
     EwGetRectCenter( thumbArea )), EwNewPoint( EwGetRectW( area ) / 2, newThumbPos )));
   }
 
-  r = _Const000D;
+  r = _Const000C;
 
   if ( _this->imageView != 0 )
     r = EwUnionRect( r, _this->imageView->Super1.Bounds );
@@ -2359,7 +2292,7 @@ void WidgetSetVerticalSlider_onPressTouch( WidgetSetVerticalSlider _this, XObjec
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  touchArea = EwMoveRectPos( _Const000E, _this->TouchHandler.CurrentPos );
+  touchArea = EwMoveRectPos( _Const000D, _this->TouchHandler.CurrentPos );
   hasThumb = 0;
   insideThumb = 0;
 
@@ -2519,7 +2452,7 @@ void WidgetSetHorizontalSlider__Init( WidgetSetHorizontalSlider _this, XObject a
   _this->_.VMT = EW_CLASS( WidgetSetHorizontalSlider );
 
   /* ... and initialize objects, variables, properties, etc. */
-  CoreRectView__OnSetBounds( _this, _Const000F );
+  CoreRectView__OnSetBounds( _this, _Const000E );
   CoreTimer_OnSetPeriod( &_this->RepetitionTimer, 0 );
   CoreTimer_OnSetBegin( &_this->RepetitionTimer, 50 );
   _this->KeyHandlerLeft.Filter = CoreKeyCodeLeft;
@@ -2527,10 +2460,10 @@ void WidgetSetHorizontalSlider__Init( WidgetSetHorizontalSlider _this, XObject a
   CoreView_OnSetLayout((CoreView)&_this->TouchHandler, CoreLayoutAlignToBottom | 
   CoreLayoutAlignToLeft | CoreLayoutAlignToRight | CoreLayoutAlignToTop | CoreLayoutResizeHorz 
   | CoreLayoutResizeVert );
-  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const0010 );
-  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const0011 );
-  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const0012 );
-  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000C );
+  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const000F );
+  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const0010 );
+  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const0011 );
+  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000B );
   CoreSimpleTouchHandler_OnSetRetargetOffset( &_this->TouchHandler, 16 );
   CoreSimpleTouchHandler_OnSetMaxStrikeCount( &_this->TouchHandler, 100 );
   _this->MaxValue = 100;
@@ -2802,7 +2735,7 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
     }
 
     ViewsFrame_OnSetAnimated( _this->frameView2, (XBool)( frameNo < 0 ));
-    ViewsFrame_OnSetColor( _this->frameView2, _Const0007 );
+    ViewsFrame_OnSetColor( _this->frameView2, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -2860,7 +2793,7 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
     }
 
     ViewsFrame_OnSetAnimated( _this->frameView3, (XBool)( frameNo < 0 ));
-    ViewsFrame_OnSetColor( _this->frameView3, _Const0007 );
+    ViewsFrame_OnSetColor( _this->frameView3, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -2918,7 +2851,7 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
     }
 
     ViewsImage_OnSetAnimated( _this->imageView, (XBool)( frameNo < 0 ));
-    ViewsImage_OnSetColor( _this->imageView, _Const0007 );
+    ViewsImage_OnSetColor( _this->imageView, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;
@@ -2988,13 +2921,13 @@ void WidgetSetHorizontalSlider_UpdateViewState( WidgetSetHorizontalSlider _this,
 
   if (( _this->imageView != 0 ) && ( _this->imageView->Bitmap != 0 ))
   {
-    XRect thumbArea = EwNewRect2Point( _Const000C, _this->imageView->Bitmap->FrameSize );
+    XRect thumbArea = EwNewRect2Point( _Const000B, _this->imageView->Bitmap->FrameSize );
     CoreRectView__OnSetBounds( _this->imageView, EwMoveRectPos( EwMoveRectNeg( thumbArea, 
     EwGetRectCenter( thumbArea )), EwNewPoint( newThumbPos, EwGetRectH( area ) / 
     2 )));
   }
 
-  r = _Const000D;
+  r = _Const000C;
 
   if ( _this->imageView != 0 )
     r = EwUnionRect( r, _this->imageView->Super1.Bounds );
@@ -3253,7 +3186,7 @@ void WidgetSetHorizontalSlider_onPressTouch( WidgetSetHorizontalSlider _this, XO
   /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
   EW_UNUSED_ARG( sender );
 
-  touchArea = EwMoveRectPos( _Const000E, _this->TouchHandler.CurrentPos );
+  touchArea = EwMoveRectPos( _Const000D, _this->TouchHandler.CurrentPos );
   hasThumb = 0;
   insideThumb = 0;
 
@@ -3413,14 +3346,14 @@ void WidgetSetToggleButton__Init( WidgetSetToggleButton _this, XObject aLink, XH
   _this->_.VMT = EW_CLASS( WidgetSetToggleButton );
 
   /* ... and initialize objects, variables, properties, etc. */
-  CoreRectView__OnSetBounds( _this, _Const0013 );
+  CoreRectView__OnSetBounds( _this, _Const0012 );
   CoreTimer_OnSetPeriod( &_this->FlashTimer, 0 );
   CoreTimer_OnSetBegin( &_this->FlashTimer, 50 );
   _this->KeyHandler.Filter = CoreKeyCodeEnter;
-  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const0010 );
-  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const0014 );
-  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const0015 );
-  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000C );
+  CoreQuadView_OnSetPoint4((CoreQuadView)&_this->TouchHandler, _Const000F );
+  CoreQuadView_OnSetPoint3((CoreQuadView)&_this->TouchHandler, _Const0013 );
+  CoreQuadView_OnSetPoint2((CoreQuadView)&_this->TouchHandler, _Const0014 );
+  CoreQuadView_OnSetPoint1((CoreQuadView)&_this->TouchHandler, _Const000B );
   CoreSimpleTouchHandler_OnSetRetargetOffset( &_this->TouchHandler, 16 );
   CoreSimpleTouchHandler_OnSetMaxStrikeCount( &_this->TouchHandler, 100 );
   CoreGroup_Add((CoreGroup)_this, ((CoreView)&_this->TouchHandler ), 0 );
@@ -3686,7 +3619,7 @@ void WidgetSetToggleButton_UpdateViewState( WidgetSetToggleButton _this, XSet aS
     }
 
     ViewsFrame_OnSetAnimated( _this->frameView, (XBool)( frameNo < 0 ));
-    ViewsFrame_OnSetColor( _this->frameView, _Const0007 );
+    ViewsFrame_OnSetColor( _this->frameView, _Const0006 );
 
     if ( frameNo < 0 )
       frameNo = 0;

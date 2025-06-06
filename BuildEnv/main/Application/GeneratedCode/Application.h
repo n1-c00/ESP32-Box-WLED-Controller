@@ -47,6 +47,24 @@
 #include "_ApplicationcolorSelection.h"
 #include "_ApplicationhomeScreen.h"
 
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationVerticalSliderTrackLargeRed )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationVerticalSliderTrackLargeGreen )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationVerticalSliderTrackLargeBlue )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationThumbKnobLargeRed )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationThumbKnobLargeGreen )
+
+/* Bitmap resource used per default by the Widgets customized for the large size. */
+EW_DECLARE_BITMAP_RES( ApplicationThumbKnobLargeBlue )
+
 /* User defined auto object: 'Application::Device' */
 EW_DECLARE_AUTOOBJECT( ApplicationDevice, ApplicationDeviceClass )
 
