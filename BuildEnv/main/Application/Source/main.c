@@ -78,8 +78,9 @@ void _EWUpdateButtonPROC()
 
     /* Get the value of the "on" parameter from the JSON object */
     cJSON *on = cJSON_GetObjectItem(gWledJson, "on");
-    /* Invoke the function to trigger the event */
-    ApplicationDeviceClass_EWUpdateButton( device, cJSON_IsTrue(on) );
+    
+    // FEHLEND: Der Aufruf der EW-Funktion!
+    ApplicationDeviceClass_EWUpdateButton( device, on->valueint );
 }
 void _EWUpdateColorPROC()
 {
