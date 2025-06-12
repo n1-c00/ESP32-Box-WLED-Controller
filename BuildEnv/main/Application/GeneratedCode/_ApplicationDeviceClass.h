@@ -122,27 +122,6 @@ XBool ApplicationDeviceClass_OnGetbuttonValue( ApplicationDeviceClass _this );
 void ApplicationDeviceClass_OnSetbuttonValue( ApplicationDeviceClass _this, XBool 
   value );
 
-/* Default onget method for the property 'redValue' */
-XInt32 ApplicationDeviceClass_OnGetredValue( ApplicationDeviceClass _this );
-
-/* Default onset method for the property 'redValue' */
-void ApplicationDeviceClass_OnSetredValue( ApplicationDeviceClass _this, XInt32 
-  value );
-
-/* Default onget method for the property 'greenValue' */
-XInt32 ApplicationDeviceClass_OnGetgreenValue( ApplicationDeviceClass _this );
-
-/* Default onset method for the property 'greenValue' */
-void ApplicationDeviceClass_OnSetgreenValue( ApplicationDeviceClass _this, XInt32 
-  value );
-
-/* Default onget method for the property 'blueValue' */
-XInt32 ApplicationDeviceClass_OnGetblueValue( ApplicationDeviceClass _this );
-
-/* Default onset method for the property 'blueValue' */
-void ApplicationDeviceClass_OnSetblueValue( ApplicationDeviceClass _this, XInt32 
-  value );
-
 #ifdef __cplusplus
   }
 #endif

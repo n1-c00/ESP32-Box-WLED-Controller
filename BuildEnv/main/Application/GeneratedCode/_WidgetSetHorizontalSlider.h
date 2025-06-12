@@ -47,34 +47,16 @@
 #include "_CoreSimpleTouchHandler.h"
 #include "_CoreTimer.h"
 
-/* Forward declaration of the class Core::DialogContext */
-#ifndef _CoreDialogContext_
-  EW_DECLARE_CLASS( CoreDialogContext )
-#define _CoreDialogContext_
-#endif
-
 /* Forward declaration of the class Core::LayoutContext */
 #ifndef _CoreLayoutContext_
   EW_DECLARE_CLASS( CoreLayoutContext )
 #define _CoreLayoutContext_
 #endif
 
-/* Forward declaration of the class Core::TaskQueue */
-#ifndef _CoreTaskQueue_
-  EW_DECLARE_CLASS( CoreTaskQueue )
-#define _CoreTaskQueue_
-#endif
-
 /* Forward declaration of the class Core::View */
 #ifndef _CoreView_
   EW_DECLARE_CLASS( CoreView )
 #define _CoreView_
-#endif
-
-/* Forward declaration of the class Effects::Fader */
-#ifndef _EffectsFader_
-  EW_DECLARE_CLASS( EffectsFader )
-#define _EffectsFader_
 #endif
 
 /* Forward declaration of the class Views::Frame */
@@ -196,7 +178,6 @@ EW_DEFINE_METHODS( WidgetSetHorizontalSlider, CoreGroup )
   EW_METHOD( ChangeViewState,   void )( CoreGroup _this, XSet aSetState, XSet aClearState )
   EW_METHOD( OnSetBounds,       void )( WidgetSetHorizontalSlider _this, XRect value )
   EW_METHOD( OnSetFocus,        void )( CoreGroup _this, CoreView value )
-  EW_METHOD( OnSetOpacity,      void )( CoreGroup _this, XInt32 value )
   EW_METHOD( DispatchEvent,     XObject )( CoreGroup _this, CoreEvent aEvent )
   EW_METHOD( BroadcastEvent,    XObject )( CoreGroup _this, CoreEvent aEvent, XSet 
     aFilter )

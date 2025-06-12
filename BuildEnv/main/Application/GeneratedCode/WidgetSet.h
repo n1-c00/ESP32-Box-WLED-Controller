@@ -46,8 +46,6 @@
 #include "_WidgetSetHorizontalSliderConfig.h"
 #include "_WidgetSetToggleButton.h"
 #include "_WidgetSetToggleButtonConfig.h"
-#include "_WidgetSetVerticalSlider.h"
-#include "_WidgetSetVerticalSliderConfig.h"
 #include "_WidgetSetWidgetConfig.h"
 
 /* Bitmap resource used per default by the Widgets customized for the large size. */

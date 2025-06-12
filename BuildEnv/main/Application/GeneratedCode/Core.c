@@ -29,7 +29,6 @@
 #include "_CoreCursorEvent.h"
 #include "_CoreCursorGrabEvent.h"
 #include "_CoreCursorHit.h"
-#include "_CoreDialogContext.h"
 #include "_CoreDragEvent.h"
 #include "_CoreEvent.h"
 #include "_CoreGroup.h"
@@ -43,19 +42,10 @@
 #include "_CoreResource.h"
 #include "_CoreRoot.h"
 #include "_CoreSimpleTouchHandler.h"
-#include "_CoreSlideTouchHandler.h"
-#include "_CoreTask.h"
-#include "_CoreTaskQueue.h"
 #include "_CoreTimer.h"
 #include "_CoreView.h"
-#include "_EffectsEffectTimerClass.h"
-#include "_EffectsFader.h"
-#include "_EffectsFaderTask.h"
-#include "_EffectsShowHideTransition.h"
-#include "_EffectsTransition.h"
 #include "_GraphicsCanvas.h"
 #include "Core.h"
-#include "Effects.h"
 
 /* Strings for the language 'Default'. */
 EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
@@ -64,64 +54,31 @@ EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault0[] =
   0x0077, 0x0020, 0x0064, 0x006F, 0x0065, 0x0073, 0x0020, 0x006E, 0x006F, 0x0074,
   0x0020, 0x0062, 0x0065, 0x006C, 0x006F, 0x006E, 0x0067, 0x0020, 0x0074, 0x006F,
   0x0020, 0x0074, 0x0068, 0x0069, 0x0073, 0x0020, 0x0067, 0x0072, 0x006F, 0x0075,
-  0x0070, 0x0000, 0xC557, 0x0054, 0x0068, 0x0065, 0x0020, 0x0064, 0x0069, 0x0061,
-  0x006C, 0x006F, 0x0067, 0x0020, 0x0063, 0x006F, 0x006D, 0x0070, 0x006F, 0x006E,
-  0x0065, 0x006E, 0x0074, 0x0020, 0x0069, 0x0073, 0x0020, 0x0061, 0x006C, 0x0072,
-  0x0065, 0x0061, 0x0064, 0x0079, 0x0020, 0x0070, 0x0072, 0x0065, 0x0073, 0x0065,
-  0x006E, 0x0074, 0x0065, 0x0064, 0x0000, 0xC557, 0x004E, 0x006F, 0x0020, 0x0066,
-  0x0061, 0x0064, 0x0065, 0x0072, 0x0020, 0x0074, 0x006F, 0x0020, 0x0070, 0x0065,
-  0x0072, 0x0066, 0x006F, 0x0072, 0x006D, 0x0020, 0x0074, 0x0068, 0x0065, 0x0020,
-  0x0066, 0x0061, 0x0064, 0x0065, 0x002D, 0x0069, 0x006E, 0x002F, 0x006F, 0x0075,
-  0x0074, 0x0020, 0x006F, 0x0070, 0x0065, 0x0072, 0x0061, 0x0074, 0x0069, 0x006F,
-  0x006E, 0x0000, 0xC557, 0x0054, 0x0072, 0x0079, 0x0069, 0x006E, 0x0067, 0x0020,
-  0x0074, 0x006F, 0x0020, 0x0075, 0x0073, 0x0065, 0x0020, 0x0074, 0x0068, 0x0065,
-  0x0020, 0x0073, 0x0061, 0x006D, 0x0065, 0x0020, 0x0066, 0x0061, 0x0064, 0x0065,
-  0x0072, 0x0020, 0x0074, 0x0077, 0x0069, 0x0063, 0x0065, 0x0000, 0xC557, 0x0054,
-  0x0072, 0x0079, 0x0069, 0x006E, 0x0067, 0x0020, 0x0074, 0x006F, 0x0020, 0x0066,
-  0x0061, 0x0064, 0x0065, 0x002D, 0x0069, 0x006E, 0x002F, 0x006F, 0x0075, 0x0074,
-  0x0020, 0x0061, 0x0020, 0x0067, 0x0072, 0x006F, 0x0075, 0x0070, 0x0020, 0x0077,
-  0x0068, 0x0069, 0x0063, 0x0068, 0x0020, 0x0062, 0x0065, 0x006C, 0x006F, 0x006E,
-  0x0067, 0x0073, 0x0020, 0x0074, 0x006F, 0x0020, 0x0061, 0x006E, 0x006F, 0x0074,
-  0x0068, 0x0065, 0x0072, 0x0020, 0x006F, 0x0077, 0x006E, 0x0065, 0x0072, 0x0000,
-  0xC557, 0x004E, 0x006F, 0x0020, 0x0076, 0x0069, 0x0065, 0x0077, 0x0020, 0x0074,
-  0x006F, 0x0020, 0x0072, 0x0065, 0x0073, 0x0074, 0x0061, 0x0063, 0x006B, 0x0000,
-  0xC557, 0x0056, 0x0069, 0x0065, 0x0077, 0x0020, 0x0069, 0x0073, 0x0020, 0x006E,
-  0x006F, 0x0074, 0x0020, 0x0069, 0x006E, 0x0020, 0x0074, 0x0068, 0x0069, 0x0073,
-  0x0020, 0x0067, 0x0072, 0x006F, 0x0075, 0x0070, 0x0000, 0xC557, 0x004E, 0x006F,
-  0x0020, 0x0076, 0x0069, 0x0065, 0x0077, 0x0020, 0x0074, 0x006F, 0x0020, 0x0072,
-  0x0065, 0x006D, 0x006F, 0x0076, 0x0065, 0x0000, 0xC557, 0x004E, 0x006F, 0x0020,
-  0x0076, 0x0069, 0x0065, 0x0077, 0x0020, 0x0074, 0x006F, 0x0020, 0x0061, 0x0064,
-  0x0064, 0x0000, 0xC557, 0x0056, 0x0069, 0x0065, 0x0077, 0x0020, 0x0061, 0x006C,
-  0x0072, 0x0065, 0x0061, 0x0064, 0x0079, 0x0020, 0x0069, 0x006E, 0x0020, 0x0061,
-  0x0020, 0x0067, 0x0072, 0x006F, 0x0075, 0x0070, 0x0000, 0xC557, 0x0052, 0x0065,
-  0x0063, 0x0075, 0x0072, 0x0073, 0x0069, 0x0076, 0x0065, 0x0020, 0x0069, 0x006E,
-  0x0076, 0x0061, 0x006C, 0x0069, 0x0064, 0x0061, 0x0074, 0x0065, 0x0020, 0x0064,
-  0x0075, 0x0072, 0x0069, 0x006E, 0x0067, 0x0020, 0x0061, 0x0063, 0x0074, 0x0069,
-  0x0076, 0x0065, 0x0020, 0x0075, 0x0070, 0x0064, 0x0061, 0x0074, 0x0065, 0x0020,
-  0x0063, 0x0079, 0x0063, 0x006C, 0x0065, 0x002E, 0x0000, 0xC557, 0x0054, 0x0068,
-  0x0065, 0x0020, 0x004B, 0x0065, 0x0079, 0x0050, 0x0072, 0x0065, 0x0073, 0x0073,
-  0x0048, 0x0061, 0x006E, 0x0064, 0x006C, 0x0065, 0x0072, 0x0020, 0x0069, 0x0073,
-  0x0020, 0x0065, 0x006D, 0x0062, 0x0065, 0x0064, 0x0064, 0x0065, 0x0064, 0x0020,
-  0x0077, 0x0069, 0x0074, 0x0068, 0x0069, 0x006E, 0x0020, 0x0061, 0x006E, 0x0020,
-  0x006F, 0x0062, 0x006A, 0x0065, 0x0063, 0x0074, 0x0020, 0x006E, 0x006F, 0x0074,
-  0x0020, 0x0062, 0x0065, 0x0069, 0x006E, 0x0067, 0x0020, 0x0064, 0x0065, 0x0072,
-  0x0069, 0x0076, 0x0065, 0x0064, 0x0020, 0x0066, 0x0072, 0x006F, 0x006D, 0x0020,
-  0x0043, 0x006F, 0x0072, 0x0065, 0x003A, 0x003A, 0x0047, 0x0072, 0x006F, 0x0075,
-  0x0070, 0x002E, 0x0000, 0xC557, 0x0054, 0x0072, 0x0079, 0x0069, 0x006E, 0x0067,
-  0x0020, 0x0074, 0x006F, 0x0020, 0x0063, 0x0061, 0x006E, 0x0063, 0x0065, 0x006C,
-  0x0020, 0x0061, 0x0020, 0x0074, 0x0061, 0x0073, 0x006B, 0x0020, 0x006E, 0x006F,
-  0x0074, 0x0020, 0x0062, 0x0065, 0x006C, 0x006F, 0x006E, 0x0067, 0x0069, 0x006E,
-  0x0067, 0x0020, 0x0074, 0x006F, 0x0020, 0x0074, 0x0068, 0x0069, 0x0073, 0x0020,
-  0x0071, 0x0075, 0x0065, 0x0075, 0x0065, 0x0021, 0x0000
-};
-
-/* Strings for the language 'Default'. */
-EW_CONST_STRING_PRAGMA static const unsigned short _StringsDefault1[] =
-{
-  0xFFFF, 0xFFFF, 0xC557, 0x0054, 0x0072, 0x0079, 0x0069, 0x006E, 0x0067, 0x0020,
-  0x0074, 0x006F, 0x0020, 0x0065, 0x006E, 0x0071, 0x0075, 0x0065, 0x0075, 0x0065,
-  0x0020, 0x0061, 0x0020, 0x0074, 0x0061, 0x0073, 0x006B, 0x0020, 0x0074, 0x0077,
-  0x0069, 0x0063, 0x0065, 0x0021, 0x0000
+  0x0070, 0x0000, 0xC557, 0x004E, 0x006F, 0x0020, 0x0076, 0x0069, 0x0065, 0x0077,
+  0x0020, 0x0074, 0x006F, 0x0020, 0x0072, 0x0065, 0x0073, 0x0074, 0x0061, 0x0063,
+  0x006B, 0x0000, 0xC557, 0x0056, 0x0069, 0x0065, 0x0077, 0x0020, 0x0069, 0x0073,
+  0x0020, 0x006E, 0x006F, 0x0074, 0x0020, 0x0069, 0x006E, 0x0020, 0x0074, 0x0068,
+  0x0069, 0x0073, 0x0020, 0x0067, 0x0072, 0x006F, 0x0075, 0x0070, 0x0000, 0xC557,
+  0x004E, 0x006F, 0x0020, 0x0076, 0x0069, 0x0065, 0x0077, 0x0020, 0x0074, 0x006F,
+  0x0020, 0x0072, 0x0065, 0x006D, 0x006F, 0x0076, 0x0065, 0x0000, 0xC557, 0x004E,
+  0x006F, 0x0020, 0x0076, 0x0069, 0x0065, 0x0077, 0x0020, 0x0074, 0x006F, 0x0020,
+  0x0061, 0x0064, 0x0064, 0x0000, 0xC557, 0x0056, 0x0069, 0x0065, 0x0077, 0x0020,
+  0x0061, 0x006C, 0x0072, 0x0065, 0x0061, 0x0064, 0x0079, 0x0020, 0x0069, 0x006E,
+  0x0020, 0x0061, 0x0020, 0x0067, 0x0072, 0x006F, 0x0075, 0x0070, 0x0000, 0xC557,
+  0x0052, 0x0065, 0x0063, 0x0075, 0x0072, 0x0073, 0x0069, 0x0076, 0x0065, 0x0020,
+  0x0069, 0x006E, 0x0076, 0x0061, 0x006C, 0x0069, 0x0064, 0x0061, 0x0074, 0x0065,
+  0x0020, 0x0064, 0x0075, 0x0072, 0x0069, 0x006E, 0x0067, 0x0020, 0x0061, 0x0063,
+  0x0074, 0x0069, 0x0076, 0x0065, 0x0020, 0x0075, 0x0070, 0x0064, 0x0061, 0x0074,
+  0x0065, 0x0020, 0x0063, 0x0079, 0x0063, 0x006C, 0x0065, 0x002E, 0x0000, 0xC557,
+  0x0054, 0x0068, 0x0065, 0x0020, 0x004B, 0x0065, 0x0079, 0x0050, 0x0072, 0x0065,
+  0x0073, 0x0073, 0x0048, 0x0061, 0x006E, 0x0064, 0x006C, 0x0065, 0x0072, 0x0020,
+  0x0069, 0x0073, 0x0020, 0x0065, 0x006D, 0x0062, 0x0065, 0x0064, 0x0064, 0x0065,
+  0x0064, 0x0020, 0x0077, 0x0069, 0x0074, 0x0068, 0x0069, 0x006E, 0x0020, 0x0061,
+  0x006E, 0x0020, 0x006F, 0x0062, 0x006A, 0x0065, 0x0063, 0x0074, 0x0020, 0x006E,
+  0x006F, 0x0074, 0x0020, 0x0062, 0x0065, 0x0069, 0x006E, 0x0067, 0x0020, 0x0064,
+  0x0065, 0x0072, 0x0069, 0x0076, 0x0065, 0x0064, 0x0020, 0x0066, 0x0072, 0x006F,
+  0x006D, 0x0020, 0x0043, 0x006F, 0x0072, 0x0065, 0x003A, 0x003A, 0x0047, 0x0072,
+  0x006F, 0x0075, 0x0070, 0x002E, 0x0000
 };
 
 /* Constant values used in this 'C' module only. */
@@ -130,21 +87,15 @@ static const XRect _Const0001 = {{ 0, 0 }, { 0, 0 }};
 static const XStringRes _Const0002 = { _StringsDefault0, 0x0003 };
 static const XPoint _Const0003 = { 320, 240 };
 static const XStringRes _Const0004 = { _StringsDefault0, 0x002B };
-static const XStringRes _Const0005 = { _StringsDefault0, 0x0056 };
-static const XStringRes _Const0006 = { _StringsDefault0, 0x0085 };
-static const XStringRes _Const0007 = { _StringsDefault0, 0x00A9 };
-static const XStringRes _Const0008 = { _StringsDefault0, 0x00E7 };
-static const XStringRes _Const0009 = { _StringsDefault0, 0x00FB };
-static const XStringRes _Const000A = { _StringsDefault0, 0x0116 };
-static const XStringRes _Const000B = { _StringsDefault0, 0x0129 };
-static const XStringRes _Const000C = { _StringsDefault0, 0x0139 };
-static const XColor _Const000D = { 0x00, 0x00, 0x00, 0x00 };
-static const XStringRes _Const000E = { _StringsDefault0, 0x0152 };
-static const XRect _Const000F = {{ -8, -8 }, { 9, 9 }};
-static const XRect _Const0010 = {{ 0, 0 }, { 1, 1 }};
-static const XStringRes _Const0011 = { _StringsDefault0, 0x0184 };
-static const XStringRes _Const0012 = { _StringsDefault0, 0x01DA };
-static const XStringRes _Const0013 = { _StringsDefault1, 0x0003 };
+static const XStringRes _Const0005 = { _StringsDefault0, 0x003F };
+static const XStringRes _Const0006 = { _StringsDefault0, 0x005A };
+static const XStringRes _Const0007 = { _StringsDefault0, 0x006D };
+static const XStringRes _Const0008 = { _StringsDefault0, 0x007D };
+static const XColor _Const0009 = { 0x00, 0x00, 0x00, 0x00 };
+static const XStringRes _Const000A = { _StringsDefault0, 0x0096 };
+static const XRect _Const000B = {{ -8, -8 }, { 9, 9 }};
+static const XRect _Const000C = {{ 0, 0 }, { 1, 1 }};
+static const XStringRes _Const000D = { _StringsDefault0, 0x00C8 };
 
 #ifndef EW_DONT_CHECK_INDEX
   /* This function is used to check the indices when accessing an array.
@@ -656,8 +607,7 @@ void CoreView_ChangeViewState( CoreView _this, XSet aSetState, XSet aClearState 
       & CoreViewStateModal ) == CoreViewStateModal )) && ((( _this->Owner != 0 ) 
       && !(( _this->Owner->Super2.viewState & CoreViewStateEnabled ) == CoreViewStateEnabled )) 
       || (((( _this->viewState & CoreViewStateDialog ) == CoreViewStateDialog ) 
-      && ( _this->Owner != 0 )) && ((CoreView)_this->Owner->dialogStack->group != 
-      _this ))))
+      && ( _this->Owner != 0 )) && ((CoreView)0 != _this ))))
     CoreView__ChangeViewState( _this, 0, CoreViewStateEnabled );
 }
 
@@ -1632,7 +1582,6 @@ void CoreGroup__Init( CoreGroup _this, XObject aLink, XHandle aArg )
   /* ... and initialize objects, variables, properties, etc. */
   _this->Super2.viewState = CoreViewStateAlphaBlended | CoreViewStateEnabled | CoreViewStateFocusable 
   | CoreViewStatePreEnabled | CoreViewStateTouchable | CoreViewStateVisible;
-  _this->Opacity = 255;
 
   /* Call the user defined constructor */
   CoreGroup_Init( _this, aArg );
@@ -1670,7 +1619,7 @@ void CoreGroup_Init( CoreGroup _this, XHandle aArg )
 void CoreGroup_Draw( CoreGroup _this, GraphicsCanvas aCanvas, XRect aClip, XPoint 
   aOffset, XInt32 aOpacity, XBool aBlend )
 {
-  aOpacity = (( aOpacity + 1 ) * _this->Opacity ) >> 8;
+  aOpacity = (( aOpacity + 1 ) * 255 ) >> 8;
   aBlend = (XBool)( aBlend && (( _this->Super2.viewState & CoreViewStateAlphaBlended ) 
   == CoreViewStateAlphaBlended ));
   CoreGroup_drawContent( _this, aCanvas, aClip, EwMovePointPos( aOffset, _this->Super1.Bounds.Point1 ), 
@@ -1750,8 +1699,6 @@ CoreCursorHit CoreGroup_CursorHitTest( CoreGroup _this, XRect aArea, XInt32 aFin
   CoreCursorHit found = 0;
   XRect area = _Const0001;
   CoreView form = 0;
-  XBool lock = (XBool)(( _this->fadersQueue != 0 ) && (( _this->fadersQueue->current 
-    != 0 ) || ( _this->fadersQueue->first != 0 )));
 
   if ( EwIsRectEmpty( EwIntersectRect( aArea, _this->Super1.Bounds )))
     return 0;
@@ -1798,7 +1745,7 @@ CoreCursorHit CoreGroup_CursorHitTest( CoreGroup _this, XRect aArea, XInt32 aFin
         && !(( view->viewState & CoreViewStateRunningFader ) == CoreViewStateRunningFader )) 
         && !(( view->viewState & CoreViewStatePendingFader ) == CoreViewStatePendingFader )) 
         && ( !(( view->viewState & CoreViewStateDialog ) == CoreViewStateDialog ) 
-        || (((CoreView)_this->dialogStack->group == view ) && !lock ))))
+        || ((CoreView)0 == view ))))
     {
       XRect extent = CoreView__GetExtent( view );
       CoreView dedicatedView = aDedicatedView;
@@ -1929,17 +1876,6 @@ void CoreGroup_ChangeViewState( CoreGroup _this, XSet aSetState, XSet aClearStat
       CoreView__ChangeViewState( _this->Focus, 0, CoreViewStateFocused );
   }
 
-  if (( _this->dialogStack != 0 ) && (( deltaState & CoreViewStateFocused ) == CoreViewStateFocused ))
-  {
-    if ((( _this->Super2.viewState & CoreViewStateFocused ) == CoreViewStateFocused ) 
-        && (( _this->dialogStack->group->Super2.viewState & ( CoreViewStateEnabled 
-        | CoreViewStateFocusable )) == ( CoreViewStateEnabled | CoreViewStateFocusable )))
-      CoreView__ChangeViewState( _this->dialogStack->group, CoreViewStateFocused, 
-      0 );
-    else
-      CoreView__ChangeViewState( _this->dialogStack->group, 0, CoreViewStateFocused );
-  }
-
   if ((( deltaState & CoreViewStateEnabled ) == CoreViewStateEnabled ))
   {
     CoreView view;
@@ -1948,7 +1884,7 @@ void CoreGroup_ChangeViewState( CoreGroup _this, XSet aSetState, XSet aClearStat
       if (((( view->viewState & ( CoreViewStateDeriveEnabledState | CoreViewStatePreEnabled )) 
           == ( CoreViewStateDeriveEnabledState | CoreViewStatePreEnabled )) && !(( 
           view->viewState & CoreViewStateModal ) == CoreViewStateModal )) && ( !(( 
-          view->viewState & CoreViewStateDialog ) == CoreViewStateDialog ) || ((CoreView)_this->dialogStack->group 
+          view->viewState & CoreViewStateDialog ) == CoreViewStateDialog ) || ((CoreView)0 
           == view )))
         CoreView__ChangeViewState( view, aSetState & CoreViewStateEnabled, aClearState 
         & CoreViewStateEnabled );
@@ -2224,49 +2160,6 @@ void CoreGroup__OnSetFocus( void* _this, CoreView value )
   ((CoreGroup)_this)->_.VMT->OnSetFocus((CoreGroup)_this, value );
 }
 
-/* 'C' function for method : 'Core::Group.OnSetEnabled()' */
-void CoreGroup_OnSetEnabled( CoreGroup _this, XBool value )
-{
-  if ( value )
-    CoreView__ChangeViewState( _this, CoreViewStatePreEnabled, 0 );
-  else
-    CoreView__ChangeViewState( _this, 0, CoreViewStatePreEnabled );
-}
-
-/* 'C' function for method : 'Core::Group.OnSetOpacity()' */
-void CoreGroup_OnSetOpacity( CoreGroup _this, XInt32 value )
-{
-  if ( value > 255 )
-    value = 255;
-
-  if ( value < 0 )
-    value = 0;
-
-  if ( value == _this->Opacity )
-    return;
-
-  _this->Opacity = value;
-
-  if (( _this->Super2.Owner != 0 ) && (( _this->Super2.viewState & CoreViewStateVisible ) 
-      == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this->Super2.Owner, CoreView__GetClipping( _this ));
-}
-
-/* Wrapper function for the virtual method : 'Core::Group.OnSetOpacity()' */
-void CoreGroup__OnSetOpacity( void* _this, XInt32 value )
-{
-  ((CoreGroup)_this)->_.VMT->OnSetOpacity((CoreGroup)_this, value );
-}
-
-/* 'C' function for method : 'Core::Group.OnSetVisible()' */
-void CoreGroup_OnSetVisible( CoreGroup _this, XBool value )
-{
-  if ( value )
-    CoreView__ChangeViewState( _this, CoreViewStateVisible, 0 );
-  else
-    CoreView__ChangeViewState( _this, 0, CoreViewStateVisible );
-}
-
 /* The method ExtendClipping() enhances the clipping area of the affected group 
    so that all contents lying outside its original @Bounds area can be displayed 
    on the screen. Enhancement of the clipping area is typically necessary when the 
@@ -2505,322 +2398,6 @@ XPoint CoreGroup__GetMinimalSize( void* _this )
   return CoreGroup_GetMinimalSize((CoreGroup)_this );
 }
 
-/* The method SwitchToDialog() schedules an operation to show in context of 'this' 
-   component another component passed in the parameter aDialogGroup. The operation 
-   to show the component is performed with an animation specified in the parameter 
-   aPresentTransition. If the parameter aPresentTransition is 'null', the show operation 
-   uses the default transition presenting the new dialog component instantly in 
-   the center of 'this' component without performing any smooth animation effects. 
-   Calling the method SwitchToDialog() causes the new dialog component to replace 
-   the entry on top of an internal stack containing all dialogs existing at the 
-   moment in context of 'this' owner component. The dialog component on top of the 
-   stack is considered as the active dialog - the dialog, the user may interact 
-   with. Other dialogs lying in the background are automatically deactivated and 
-   they are suppressed from being able to receive and process user inputs. If not 
-   needed anymore, the dialog component can be hidden again by calling the method 
-   @DismissDialog() or SwitchToDialog(), which causes the corresponding dialog stack 
-   entry to be removed or replaced. Accordingly, with the method @PresentDialog() 
-   new dialog component can be pushed on top of this stack overlaying all other 
-   dialogs in the background. If there was already an active dialog component presented 
-   in context of 'this' owner, this old component looses its active state and it 
-   is dismissed.
-   With the parameter aDismissTransition you can specify the animation to perform 
-   when the just presented dialog component is dismissed again, which is caused 
-   when calling the method @DismissDialog() or SwitchToDialog(). If the parameter 
-   aDismissTransition is 'null', the dialog will disappear with the same transition 
-   as used to show it (resulting from the parameter aPresentTransition).
-   With the parameter aOverlayTransition you determine an optional animation to 
-   apply on the just presented component when a further dialog component is presented 
-   overlying it (by using the method @PresentDialog()). In this way you can control, 
-   whether and how the component should disappear when a new component is presented 
-   above it. With the parameter aRestoreTransition you specify the opposite animation 
-   to perform when after dismissing the overlaying component, the component in the 
-   background becomes active again.
-   Usually, when presenting a new component by using the method SwitchToDialog(), 
-   the previously presented component disappears with the dismiss transition specified 
-   at its own presentation time (see the parameter aDismissTransition). This behavior 
-   can be overridden by specifying in the parameter aOverrideDismissTransition other 
-   animation to hide the old component.
-   Switching the dialog in foreground may affect the visibility state of the dialog 
-   component lying further in the background. In particular, the component in the 
-   background will schedule a restore transition as expected to be after the dialog 
-   in foreground is dismissed, and an overlay transition as resulting from the just 
-   presented new dialog component. Which transitions are performed results primarily 
-   from the parameters aOverlayTransition and aRestoreTransition specified at the 
-   presentation time of the background dialog component and the parameter aOverrideRestoreTransition 
-   specified at the presentation time of the overlaying (just dismissed) dialog 
-   component. Furthermore, you can override this behavior by specifying other animations 
-   in the parameters aOverrideOverlayTransition and aOverrideRestoreTransition in 
-   the invocation of the method SwitchToDialog().
-   The both parameters aComplete and aCancel can be provided with references to 
-   slot methods, which are signaled as soon as the present operation is finished 
-   (aComplete) or it has been canceled (aCancel) due to other transition being scheduled 
-   for the same GUI component aDialogGroup making the actual operation obsolete.
-   The present operation is enqueued, so calling SwitchToDialog(), @PresentDialog() 
-   and @DismissDialog() several times in sequence for different components in context 
-   of 'this' owner component causes the resulting transitions to be executed strictly 
-   one after another. This behavior can be changed by passing the value 'true' in 
-   the parameter aCombine. In this case, the new operation will be executed together 
-   with last prepared but not yet started operation. In this manner several independent 
-   transitions can run simultaneously. */
-void CoreGroup_SwitchToDialog( CoreGroup _this, CoreGroup aDialogGroup, EffectsTransition 
-  aPresentTransition, EffectsTransition aDismissTransition, EffectsTransition aOverlayTransition, 
-  EffectsTransition aRestoreTransition, EffectsTransition aOverrideDismissTransition, 
-  EffectsTransition aOverrideOverlayTransition, EffectsTransition aOverrideRestoreTransition, 
-  XSlot aComplete, XSlot aCancel, XBool aCombine )
-{
-  CoreDialogContext oldDialog;
-  CoreDialogContext nextDialog;
-  CoreDialogContext newDialog;
-  EffectsTransition dismissTransition;
-  EffectsTransition restoreTransition;
-  EffectsTransition overlayTransition;
-
-  if ( _this->dialogStack == 0 )
-  {
-    CoreGroup_PresentDialog( _this, aDialogGroup, aPresentTransition, aDismissTransition, 
-    aOverlayTransition, aRestoreTransition, 0, 0, aComplete, aCancel, aCombine );
-    return;
-  }
-
-  oldDialog = _this->dialogStack;
-  nextDialog = oldDialog->next;
-
-  if ((( aDialogGroup->Super2.viewState & CoreViewStateDialog ) == CoreViewStateDialog ) 
-      && ( _this->dialogStack->group != aDialogGroup ))
-  {
-    EwThrow( EwLoadString( &_Const0004 ));
-    return;
-  }
-
-  newDialog = EwNewObject( CoreDialogContext, 0 );
-  dismissTransition = oldDialog->dismissTransition;
-  restoreTransition = 0;
-  overlayTransition = 0;
-
-  if ( nextDialog != 0 )
-  {
-    restoreTransition = nextDialog->restoreTransition;
-    overlayTransition = nextDialog->overlayTransition;
-  }
-
-  if (( nextDialog != 0 ) && ( oldDialog->overrideRestoreTransition != 0 ))
-    restoreTransition = oldDialog->overrideRestoreTransition;
-
-  if (( nextDialog != 0 ) && ( aOverrideOverlayTransition != 0 ))
-    overlayTransition = aOverrideOverlayTransition;
-
-  if ( aOverrideDismissTransition != 0 )
-    dismissTransition = aOverrideDismissTransition;
-
-  if ( aPresentTransition == 0 )
-    aPresentTransition = ((EffectsTransition)EwGetAutoObject( &EffectsShowHideCentered, 
-    EffectsShowHideTransition ));
-
-  if ( aDismissTransition == 0 )
-    aDismissTransition = aPresentTransition;
-
-  if ( aRestoreTransition == 0 )
-    aRestoreTransition = aOverlayTransition;
-
-  if ( aOverlayTransition == 0 )
-    aOverlayTransition = aRestoreTransition;
-
-  newDialog->dismissTransition = aDismissTransition;
-  newDialog->overlayTransition = aOverlayTransition;
-  newDialog->restoreTransition = aRestoreTransition;
-  newDialog->overrideRestoreTransition = aOverrideRestoreTransition;
-  newDialog->group = aDialogGroup;
-  newDialog->next = _this->dialogStack->next;
-  _this->dialogStack->next = 0;
-  _this->dialogStack = newDialog;
-
-  if ( _this->Focus == (CoreView)aDialogGroup )
-    CoreGroup__OnSetFocus( _this, 0 );
-
-  CoreView__ChangeViewState( oldDialog->group, 0, CoreViewStateDialog | CoreViewStateFocused );
-
-  if ((( _this->Super2.viewState & CoreViewStateFocused ) == CoreViewStateFocused ) 
-      && (( aDialogGroup->Super2.viewState & CoreViewStateFocusable ) == CoreViewStateFocusable ))
-    CoreView__ChangeViewState( aDialogGroup, CoreViewStateDialog | CoreViewStateFocused, 
-    0 );
-  else
-    CoreView__ChangeViewState( aDialogGroup, CoreViewStateDialog, 0 );
-
-  if ( overlayTransition != 0 )
-  {
-    CoreGroup_FadeGroup( _this, nextDialog->group, EffectsTransition__CreateOverlayFader( 
-    overlayTransition ), EwNullSlot, EwNullSlot, aCombine );
-    CoreGroup_FadeGroup( _this, oldDialog->group, EffectsTransition__CreateDismissFader( 
-    dismissTransition ), EwNullSlot, EwNullSlot, 1 );
-    CoreGroup_FadeGroup( _this, newDialog->group, EffectsTransition__CreatePresentFader( 
-    aPresentTransition ), aComplete, aCancel, 1 );
-  }
-  else
-    if ( restoreTransition != 0 )
-    {
-      CoreGroup_FadeGroup( _this, nextDialog->group, EffectsTransition__CreateRestoreFader( 
-      restoreTransition ), EwNullSlot, EwNullSlot, aCombine );
-      CoreGroup_FadeGroup( _this, oldDialog->group, EffectsTransition__CreateDismissFader( 
-      dismissTransition ), EwNullSlot, EwNullSlot, 1 );
-      CoreGroup_FadeGroup( _this, newDialog->group, EffectsTransition__CreatePresentFader( 
-      aPresentTransition ), aComplete, aCancel, 1 );
-    }
-    else
-      if ( dismissTransition != 0 )
-      {
-        CoreGroup_FadeGroup( _this, oldDialog->group, EffectsTransition__CreateDismissFader( 
-        dismissTransition ), EwNullSlot, EwNullSlot, aCombine );
-        CoreGroup_FadeGroup( _this, newDialog->group, EffectsTransition__CreatePresentFader( 
-        aPresentTransition ), aComplete, aCancel, 1 );
-      }
-      else
-        CoreGroup_FadeGroup( _this, newDialog->group, EffectsTransition__CreatePresentFader( 
-        aPresentTransition ), aComplete, aCancel, aCombine );
-}
-
-/* The method PresentDialog() schedules an operation to show in context of 'this' 
-   component another component passed in the parameter aDialogGroup. The operation 
-   to show the component is performed with an animation specified in the parameter 
-   aPresentTransition. If the parameter aPresentTransition is 'null', the show operation 
-   uses the default transition presenting the new dialog component instantly in 
-   the center of 'this' component without performing any smooth animation effects. 
-   Calling the method PresentDialog() causes the new dialog component to be pushed 
-   on top of an internal stack containing all dialogs existing at the moment in 
-   context of 'this' owner component. The dialog component on top of the stack is 
-   considered as the active dialog - the dialog, the user may interact with. Other 
-   dialogs lying in the background are automatically deactivated and they are suppressed 
-   from being able to receive and process user inputs. If not needed anymore, the 
-   dialog component can be hidden again by calling the method @DismissDialog() or 
-   @SwitchToDialog(), which causes the corresponding dialog stack entry to be removed 
-   or replaced. Accordingly, if there was already an active dialog component presented 
-   in context of 'this' owner, this old component looses its active state and it 
-   is overlaid by the new component.
-   With the parameter aDismissTransition you can specify the animation to perform 
-   when the just presented dialog component is dismissed again, which is caused 
-   when calling the method @DismissDialog() or @SwitchToDialog(). If the parameter 
-   aDismissTransition is 'null', the dialog will disappear with the same transition 
-   as used to show it (resulting from the parameter aPresentTransition).
-   With the parameter aOverlayTransition you determine an optional animation to 
-   apply on the just presented component when a further dialog component is presented 
-   overlying it. In this way you can control, whether and how the component should 
-   disappear when a new component is presented above it. With the parameter aRestoreTransition 
-   you specify the opposite animation to perform when after dismissing the overlaying 
-   component, the component in the background becomes active again. When calling 
-   PresentDialog(), you can override these originally specified transitions to overlay 
-   and restore the component in the background. With the parameter aOverrideOverlayTransition 
-   you can specify the animation to hide the component in the background instead 
-   of using the animation specified at its own presentation time. Similarly, with 
-   the parameter aOverrideRestoreTransition you can specify another animation to 
-   use when the component in the background restores its active state again.
-   The both parameters aComplete and aCancel can be provided with references to 
-   slot methods, which are signaled as soon as the present operation is finished 
-   (aComplete) or it has been canceled (aCancel) due to other transition being scheduled 
-   for the same GUI component aDialogGroup making the actual operation obsolete.
-   The present operation is enqueued, so calling PresentDialog(), @SwitchToDialog() 
-   and @DismissDialog() several times in sequence for different components in context 
-   of 'this' owner component causes the resulting transitions to be executed strictly 
-   one after another. This behavior can be changed by passing the value 'true' in 
-   the parameter aCombine. In this case, the new operation will be executed together 
-   with last prepared but not yet started operation. In this manner several independent 
-   transitions can run simultaneously. */
-void CoreGroup_PresentDialog( CoreGroup _this, CoreGroup aDialogGroup, EffectsTransition 
-  aPresentTransition, EffectsTransition aDismissTransition, EffectsTransition aOverlayTransition, 
-  EffectsTransition aRestoreTransition, EffectsTransition aOverrideOverlayTransition, 
-  EffectsTransition aOverrideRestoreTransition, XSlot aComplete, XSlot aCancel, 
-  XBool aCombine )
-{
-  CoreDialogContext dialog;
-  EffectsTransition overlayTransition;
-
-  if ( aDialogGroup == 0 )
-    return;
-
-  if (( _this->dialogStack != 0 ) && ( _this->dialogStack->group == aDialogGroup ))
-  {
-    CoreGroup_SwitchToDialog( _this, aDialogGroup, aPresentTransition, aDismissTransition, 
-    aOverlayTransition, aRestoreTransition, 0, aOverrideOverlayTransition, aOverrideRestoreTransition, 
-    aComplete, aCancel, aCombine );
-    return;
-  }
-
-  if ((( aDialogGroup->Super2.viewState & CoreViewStateDialog ) == CoreViewStateDialog ))
-  {
-    EwThrow( EwLoadString( &_Const0004 ));
-    return;
-  }
-
-  dialog = EwNewObject( CoreDialogContext, 0 );
-
-  if (( _this->dialogStack != 0 ) && ( _this->dialogStack->overlayTransition == 
-      0 ))
-  {
-    if ( aOverrideRestoreTransition == 0 )
-      aOverrideRestoreTransition = aOverrideOverlayTransition;
-
-    if ( aOverrideOverlayTransition == 0 )
-      aOverrideOverlayTransition = aOverrideRestoreTransition;
-  }
-
-  overlayTransition = 0;
-
-  if ( _this->dialogStack != 0 )
-    overlayTransition = _this->dialogStack->overlayTransition;
-
-  if (( _this->dialogStack != 0 ) && ( aOverrideOverlayTransition != 0 ))
-    overlayTransition = aOverrideOverlayTransition;
-
-  if ( aPresentTransition == 0 )
-    aPresentTransition = ((EffectsTransition)EwGetAutoObject( &EffectsShowHideCentered, 
-    EffectsShowHideTransition ));
-
-  if ( aDismissTransition == 0 )
-    aDismissTransition = aPresentTransition;
-
-  if ( aRestoreTransition == 0 )
-    aRestoreTransition = aOverlayTransition;
-
-  if ( aOverlayTransition == 0 )
-    aOverlayTransition = aRestoreTransition;
-
-  dialog->dismissTransition = aDismissTransition;
-  dialog->overlayTransition = aOverlayTransition;
-  dialog->restoreTransition = aRestoreTransition;
-  dialog->overrideRestoreTransition = aOverrideRestoreTransition;
-
-  if ( _this->Focus == (CoreView)aDialogGroup )
-    CoreGroup__OnSetFocus( _this, 0 );
-
-  if (( _this->dialogStack != 0 ) && (( _this->dialogStack->group->Super2.viewState 
-      & CoreViewStateDeriveEnabledState ) == CoreViewStateDeriveEnabledState ))
-    CoreView__ChangeViewState( _this->dialogStack->group, 0, CoreViewStateEnabled );
-
-  if ( _this->dialogStack != 0 )
-    CoreView__ChangeViewState( _this->dialogStack->group, 0, CoreViewStateFocused );
-
-  if ((( _this->Super2.viewState & CoreViewStateFocused ) == CoreViewStateFocused ) 
-      && (( aDialogGroup->Super2.viewState & CoreViewStateFocusable ) == CoreViewStateFocusable ))
-    CoreView__ChangeViewState( aDialogGroup, CoreViewStateDialog | CoreViewStateFocused, 
-    0 );
-  else
-    CoreView__ChangeViewState( aDialogGroup, CoreViewStateDialog, 0 );
-
-  dialog->group = aDialogGroup;
-  dialog->next = _this->dialogStack;
-  _this->dialogStack = dialog;
-
-  if ( overlayTransition != 0 )
-  {
-    CoreGroup_FadeGroup( _this, _this->dialogStack->next->group, EffectsTransition__CreateOverlayFader( 
-    overlayTransition ), EwNullSlot, EwNullSlot, aCombine );
-    CoreGroup_FadeGroup( _this, aDialogGroup, EffectsTransition__CreatePresentFader( 
-    aPresentTransition ), aComplete, aCancel, 1 );
-  }
-  else
-    CoreGroup_FadeGroup( _this, aDialogGroup, EffectsTransition__CreatePresentFader( 
-    aPresentTransition ), aComplete, aCancel, aCombine );
-}
-
 /* The method LocalPosition() converts the given position aPoint from the screen 
    coordinate space to the coordinate space of this component and returns the calculated 
    position. In the case the component isn't visible within the application, the 
@@ -2854,8 +2431,6 @@ XObject CoreGroup_DispatchEvent( CoreGroup _this, CoreEvent aEvent )
   CoreView view = _this->Focus;
   CoreGroup grp = EwCastObject( view, CoreGroup );
   XObject handled = 0;
-  XBool lock = (XBool)(( _this->fadersQueue != 0 ) && (( _this->fadersQueue->current 
-    != 0 ) || ( _this->fadersQueue->first != 0 )));
 
   if (( view != 0 ) && (((( view->viewState & CoreViewStateDialog ) == CoreViewStateDialog ) 
       || (( view->viewState & CoreViewStateRunningFader ) == CoreViewStateRunningFader )) 
@@ -2865,13 +2440,10 @@ XObject CoreGroup_DispatchEvent( CoreGroup _this, CoreEvent aEvent )
     grp = 0;
   }
 
-  if (( _this->dialogStack != 0 ) && !lock )
-    handled = CoreGroup__DispatchEvent( _this->dialogStack->group, aEvent );
-
-  if (( handled == 0 ) && ( grp != 0 ))
+  if ( grp != 0 )
     handled = CoreGroup__DispatchEvent( grp, aEvent );
   else
-    if (( handled == 0 ) && ( view != 0 ))
+    if ( view != 0 )
       handled = CoreView__HandleEvent( view, aEvent );
 
   if ( handled == 0 )
@@ -3124,152 +2696,6 @@ CoreView CoreGroup_FindSiblingView( CoreGroup _this, CoreView aView, XSet aFilte
   return 0;
 }
 
-/* The method FadeGroup() schedules an operation to fade-in or fade-out the GUI 
-   component passed in the parameter aGroup in context of 'this' GUI component. 
-   The kind of the fade-in/out animation is determined by the fader object specified 
-   in the parameter aFader. In this manner, depending on the used fader, individual 
-   transitions to show or hide the GUI component can be determined.
-   The operation is enqueued, so calling FadeGroup() several times in sequence for 
-   different groups in context of 'this' owner component causes the resulting transitions 
-   to be executed strictly one after another. This behavior can be changed by passing 
-   the value 'true' in the parameter aCombine. In this case, the new operation will 
-   be executed together with last prepared but not yet started operation. In this 
-   manner several independent transitions can run simultaneously.
-   If the affected GUI component aGroup is already scheduled for an animation, but 
-   this animation is not yet started, the new animation aFader replaces this old 
-   one, so that always only one animation per affected GUI component is pending 
-   for execution.
-   The both parameters aComplete and aCancel can be provided with references to 
-   slot methods, which are signaled as soon as the transition is finished (aComplete) 
-   or it has been canceled (aCancel) because of a newer transition being scheduled 
-   for the same GUI component aGroup. */
-void CoreGroup_FadeGroup( CoreGroup _this, CoreGroup aGroup, EffectsFader aFader, 
-  XSlot aComplete, XSlot aCancel, XBool aCombine )
-{
-  if ( aGroup == 0 )
-    return;
-
-  if ( aFader == 0 )
-  {
-    EwThrow( EwLoadString( &_Const0005 ));
-    return;
-  }
-
-  if ((( aFader->Group != 0 ) || ( aFader->Owner != 0 )) || ( aFader->task != 0 ))
-  {
-    EwThrow( EwLoadString( &_Const0006 ));
-    return;
-  }
-
-  if (( aGroup->Super2.Owner != 0 ) && ( aGroup->Super2.Owner != _this ))
-  {
-    EwThrow( EwLoadString( &_Const0007 ));
-    return;
-  }
-
-  if ( _this->fadersQueue == 0 )
-    _this->fadersQueue = EwNewObject( CoreTaskQueue, 0 );
-
-  aFader->Owner = _this;
-  aFader->Group = aGroup;
-  aFader->onCancel = aCancel;
-  aFader->onComplete = aComplete;
-
-  if ( aGroup->pendingFader != 0 )
-    EffectsFaderTask_RemoveFader( aGroup->pendingFader->task, aGroup->pendingFader );
-
-  aGroup->pendingFader = aFader;
-  aGroup->Super2.viewState = aGroup->Super2.viewState | CoreViewStatePendingFader;
-
-  if (( aCombine && ( _this->fadersQueue->last != 0 )) && !CoreTask_IsCurrent( _this->fadersQueue->last ))
-    EffectsFaderTask_AddFader( EwCastObject( _this->fadersQueue->last, EffectsFaderTask ), 
-    aFader );
-  else
-  {
-    EffectsFaderTask task = EwNewObject( EffectsFaderTask, 0 );
-    EffectsFaderTask_AddFader( task, aFader );
-    CoreTaskQueue_ScheduleTask( _this->fadersQueue, ((CoreTask)task ), 0 );
-  }
-}
-
-/* The method RestackTop() elevates the view aView to the top of its component. 
-   After this operation the view is usually not covered by any sibling views. This 
-   method modifies the Z-order of the view. The effective stacking position of the 
-   view can additionally be affected by the value of the view's property @StackingPriority. 
-   Concrete, the view can't be be arranged in front of any sibling view configured 
-   with higher @StackingPriority value. In such case calling the method RestackTop() 
-   will arrange the view just behind the sibling view with next higher @StackingPriority 
-   value.
-   Please note, changing the Z-order of views within a component containing a Core::Outline 
-   view can cause this outline to update its automatic row or column formation. */
-void CoreGroup_RestackTop( CoreGroup _this, CoreView aView )
-{
-  CoreView after;
-  XInt32 sg;
-
-  if ( aView == 0 )
-  {
-    EwThrow( EwLoadString( &_Const0008 ));
-    return;
-  }
-
-  if ( aView->Owner != _this )
-  {
-    EwThrow( EwLoadString( &_Const0009 ));
-    return;
-  }
-
-  if ( aView->next == 0 )
-    return;
-
-  after = _this->last;
-  sg = aView->StackingPriority;
-
-  while (( after != 0 ) && ( after->StackingPriority > sg ))
-    after = after->prev;
-
-  if ((( after == aView ) || ( after == 0 )) || ( after->next == aView ))
-    return;
-
-  if ((( aView->viewState & ( CoreViewStateEmbedded | CoreViewStateVisible )) == 
-      ( CoreViewStateEmbedded | CoreViewStateVisible )))
-  {
-    if (( aView->prev != 0 ) && ( aView->layoutContext != 0 ))
-      aView->prev->viewState = aView->prev->viewState | CoreViewStateRequestLayout;
-
-    aView->viewState = aView->viewState | CoreViewStateRequestLayout;
-    _this->Super2.viewState = _this->Super2.viewState | CoreViewStatePendingLayout;
-    EwPostSignal( EwNewSlot( _this, CoreGroup_updateComponentWithDelay ), ((XObject)_this ));
-  }
-
-  if ((( aView->viewState & CoreViewStateIsOutline ) == CoreViewStateIsOutline ))
-  {
-    if ( aView->prev != 0 )
-      aView->prev->viewState = aView->prev->viewState | CoreViewStateRequestLayout;
-
-    _this->Super2.viewState = _this->Super2.viewState | CoreViewStatePendingLayout;
-    EwPostSignal( EwNewSlot( _this, CoreGroup_updateComponentWithDelay ), ((XObject)_this ));
-  }
-
-  if ( aView->prev != 0 )
-    aView->prev->next = aView->next;
-  else
-    _this->first = aView->next;
-
-  aView->next->prev = aView->prev;
-  aView->prev = after;
-  aView->next = after->next;
-  after->next = aView;
-
-  if ( aView->next != 0 )
-    aView->next->prev = aView;
-  else
-    _this->last = aView;
-
-  if ((( aView->viewState & CoreViewStateVisible ) == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this, CoreView__GetClipping( aView ));
-}
-
 /* The method Restack() changes the Z-order of views in the component. Depending 
    on the parameter aOrder the method will elevate or lower the given view aView. 
    If aOrder is negative, the view will be lowered to the background. If aOrder 
@@ -3292,13 +2718,13 @@ void CoreGroup_Restack( CoreGroup _this, CoreView aView, XInt32 aOrder )
 
   if ( aView == 0 )
   {
-    EwThrow( EwLoadString( &_Const0008 ));
+    EwThrow( EwLoadString( &_Const0004 ));
     return;
   }
 
   if ( aView->Owner != _this )
   {
-    EwThrow( EwLoadString( &_Const0009 ));
+    EwThrow( EwLoadString( &_Const0005 ));
     return;
   }
 
@@ -3398,13 +2824,13 @@ void CoreGroup_Remove( CoreGroup _this, CoreView aView )
 {
   if ( aView == 0 )
   {
-    EwThrow( EwLoadString( &_Const000A ));
+    EwThrow( EwLoadString( &_Const0006 ));
     return;
   }
 
   if ( aView->Owner != _this )
   {
-    EwThrow( EwLoadString( &_Const0009 ));
+    EwThrow( EwLoadString( &_Const0005 ));
     return;
   }
 
@@ -3478,13 +2904,13 @@ void CoreGroup_Add( CoreGroup _this, CoreView aView, XInt32 aOrder )
 
   if ( aView == 0 )
   {
-    EwThrow( EwLoadString( &_Const000B ));
+    EwThrow( EwLoadString( &_Const0007 ));
     return;
   }
 
   if ( aView->Owner != 0 )
   {
-    EwThrow( EwLoadString( &_Const000C ));
+    EwThrow( EwLoadString( &_Const0008 ));
     return;
   }
 
@@ -3583,8 +3009,8 @@ EW_DEFINE_CLASS_VARIANTS( CoreGroup )
 EW_END_OF_CLASS_VARIANTS( CoreGroup )
 
 /* Virtual Method Table (VMT) for the class : 'Core::Group' */
-EW_DEFINE_CLASS( CoreGroup, CoreRectView, first, first, Opacity, Opacity, Opacity, 
-                 Opacity, "Core::Group" )
+EW_DEFINE_CLASS( CoreGroup, CoreRectView, first, first, extClipLeft, extClipLeft, 
+                 extClipLeft, extClipLeft, "Core::Group" )
   CoreRectView_initLayoutContext,
   CoreView_GetRoot,
   CoreGroup_Draw,
@@ -3598,7 +3024,6 @@ EW_DEFINE_CLASS( CoreGroup, CoreRectView, first, first, Opacity, Opacity, Opacit
   CoreGroup_ChangeViewState,
   CoreGroup_OnSetBounds,
   CoreGroup_OnSetFocus,
-  CoreGroup_OnSetOpacity,
   CoreGroup_DispatchEvent,
   CoreGroup_BroadcastEvent,
   CoreGroup_UpdateViewState,
@@ -3690,8 +3115,8 @@ void CoreRoot_Draw( CoreRoot _this, GraphicsCanvas aCanvas, XRect aClip, XPoint
 
   if ( !fullScreenUpdate )
     GraphicsCanvas_FillRectangle( aCanvas, aClip, EwMoveRectPos( EwMoveRectPos( 
-    aClip, aOffset ), _this->Super2.Bounds.Point1 ), _Const000D, _Const000D, _Const000D, 
-    _Const000D, 0 );
+    aClip, aOffset ), _this->Super2.Bounds.Point1 ), _Const0009, _Const0009, _Const0009, 
+    _Const0009, 0 );
 
   CoreGroup_Draw((CoreGroup)_this, aCanvas, aClip, aOffset, aOpacity, aBlend );
 }
@@ -3727,18 +3152,6 @@ void CoreRoot_OnSetFocus( CoreRoot _this, CoreView value )
 {
   if (( value != (CoreView)0 ) || ( value == 0 ))
     CoreGroup_OnSetFocus((CoreGroup)_this, value );
-}
-
-/* 'C' function for method : 'Core::Root.OnSetOpacity()' */
-void CoreRoot_OnSetOpacity( CoreRoot _this, XInt32 value )
-{
-  XInt32 oldValue = _this->Super1.Opacity;
-
-  CoreGroup_OnSetOpacity((CoreGroup)_this, value );
-
-  if ((( oldValue != _this->Super1.Opacity ) && ( _this->Super3.Owner == 0 )) && 
-      (( _this->Super3.viewState & CoreViewStateVisible ) == CoreViewStateVisible ))
-    CoreGroup__InvalidateArea( _this, EwGetRectORect( _this->Super2.Bounds ));
 }
 
 /* The method DispatchEvent() feeds the component with the event passed in the parameter 
@@ -3813,7 +3226,7 @@ void CoreRoot_InvalidateArea( CoreRoot _this, XRect aArea )
 
   if ( _this->updateLock > 0 )
   {
-    EwThrow( EwLoadString( &_Const000E ));
+    EwThrow( EwLoadString( &_Const000A ));
     return;
   }
 
@@ -4617,10 +4030,10 @@ XBool CoreRoot_DriveMultiTouchHitting( CoreRoot _this, XBool aDown, XInt32 aFing
     else
       _this->cursorSequelCounter[ EwCheckIndex( aFinger, 10 )] = 0;
 
-    _this->cursorSequelArea[ EwCheckIndex( aFinger, 10 )] = EwMoveRectPos( _Const000F, 
+    _this->cursorSequelArea[ EwCheckIndex( aFinger, 10 )] = EwMoveRectPos( _Const000B, 
     aPos );
     _this->cursorHittingTime[ EwCheckIndex( aFinger, 10 )] = ticksCount;
-    hit = CoreView__CursorHitTest( _this, EwMoveRectPos( _Const000F, aPos ), aFinger, 
+    hit = CoreView__CursorHitTest( _this, EwMoveRectPos( _Const000B, aPos ), aFinger, 
     _this->cursorSequelCounter[ EwCheckIndex( aFinger, 10 )] + 1, 0, 0, 0 );
 
     if ( hit != 0 )
@@ -4750,7 +4163,7 @@ CoreView CoreRoot_RetargetCursorWithReason( CoreRoot _this, CoreView aNewTarget,
   if ( _this->cursorTargetView[ EwCheckIndex( _this->cursorFinger, 10 )] == 0 )
     return 0;
 
-  hit = CoreView__CursorHitTest( _this, EwMoveRectPos( _Const000F, _this->cursorLastPos[ 
+  hit = CoreView__CursorHitTest( _this, EwMoveRectPos( _Const000B, _this->cursorLastPos[ 
   EwCheckIndex( _this->cursorFinger, 10 )]), _this->cursorFinger, 1, aNewTarget, 
   aStartView, aRetargetReason );
 
@@ -4931,7 +4344,6 @@ EW_DEFINE_CLASS( CoreRoot, CoreGroup, cursorHoldTimer, keyLastTarget, keyLastCod
   CoreRoot_ChangeViewState,
   CoreGroup_OnSetBounds,
   CoreRoot_OnSetFocus,
-  CoreRoot_OnSetOpacity,
   CoreRoot_DispatchEvent,
   CoreRoot_BroadcastEvent,
   CoreGroup_UpdateViewState,
@@ -5874,7 +5286,7 @@ XObject CoreSimpleTouchHandler_HandleEvent( CoreSimpleTouchHandler _this, CoreEv
     if ( root != 0 )
     {
       CoreView startView = (( _this->Super2.prev != 0 )? _this->Super2.prev : ((CoreView)_this->Super2.Owner ));
-      hit = CoreView__CursorHitTest( root, EwMoveRectPos( _Const0010, event1->GlobalCurrentPos ), 
+      hit = CoreView__CursorHitTest( root, EwMoveRectPos( _Const000C, event1->GlobalCurrentPos ), 
       event1->Finger, event1->StrikeCount, 0, startView, 0 );
     }
 
@@ -6159,959 +5571,6 @@ EW_DEFINE_CLASS( CoreSimpleTouchHandler, CoreQuadView, OnDrag, OnDrag, OnDrag, s
   CoreView_ChangeViewState,
 EW_END_OF_CLASS( CoreSimpleTouchHandler )
 
-/* Initializer for the class 'Core::SlideTouchHandler' */
-void CoreSlideTouchHandler__Init( CoreSlideTouchHandler _this, XObject aLink, XHandle aArg )
-{
-  /* At first initialize the super class ... */
-  CoreRectView__Init( &_this->_.Super, aLink, aArg );
-
-  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreSlideTouchHandler );
-
-  /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( CoreSlideTouchHandler );
-
-  /* ... and initialize objects, variables, properties, etc. */
-  _this->Super2.viewState = CoreViewStateAlphaBlended | CoreViewStateEnabled | CoreViewStateFastReshape 
-  | CoreViewStatePreEnabled | CoreViewStateTouchable | CoreViewStateVisible;
-  _this->frictFactor = 5000.0f;
-  _this->SlideVert = 1;
-  _this->RubberBandEffectElasticity = 5.0f;
-  _this->ResetSpace = -1;
-  _this->ResetDelay = 200;
-  _this->Friction = 0.5f;
-}
-
-/* Re-Initializer for the class 'Core::SlideTouchHandler' */
-void CoreSlideTouchHandler__ReInit( CoreSlideTouchHandler _this )
-{
-  /* At first re-initialize the super class ... */
-  CoreRectView__ReInit( &_this->_.Super );
-}
-
-/* Finalizer method for the class 'Core::SlideTouchHandler' */
-void CoreSlideTouchHandler__Done( CoreSlideTouchHandler _this )
-{
-  /* Finalize this class */
-  _this->_.Super._.VMT = EW_CLASS( CoreRectView );
-
-  /* Don't forget to deinitialize the super class ... */
-  CoreRectView__Done( &_this->_.Super );
-}
-
-/* The method Draw() is invoked automatically if parts of the view should be redrawn 
-   on the screen. This can occur when e.g. the view has been moved or the appearance 
-   of the view has changed before.
-   Draw() is invoked automatically by the framework, you will never need to invoke 
-   this method directly. However you can request an invocation of this method by 
-   calling the method InvalidateArea() of the views @Owner. Usually this is also 
-   unnecessary unless you are developing your own view.
-   The passed parameters determine the drawing destination aCanvas and the area 
-   to redraw aClip in the coordinate space of the canvas. The parameter aOffset 
-   contains the displacement between the origin of the views owner and the origin 
-   of the canvas. You will need it to convert views coordinates into these of the 
-   canvas.
-   The parameter aOpacity contains the opacity descended from this view's @Owner. 
-   It lies in range 0 .. 255. If the view implements its own 'Opacity', 'Color', 
-   etc. properties, the Draw() method should calculate the resulting real opacity 
-   by mixing the values of these properties with the one passed in aOpacity parameter.
-   The parameter aBlend contains the blending mode descended from this view's @Owner. 
-   It determines, whether the view should be drawn with alpha-blending active or 
-   not. If aBlend is false, the outputs of the view should overwrite the corresponding 
-   pixel in the drawing destination aCanvas. If aBlend is true, the outputs should 
-   be mixed with the pixel already stored in aCanvas. For this purpose all Graphics 
-   Engine functions provide a parameter to specify the mode for the respective drawing 
-   operation. If the view implements its own 'Blend' property, the Draw() method 
-   should calculate the resulting real blend mode by using logical AND operation 
-   of the value of the property and the one passed in aBlend parameter. */
-void CoreSlideTouchHandler_Draw( CoreSlideTouchHandler _this, GraphicsCanvas aCanvas, 
-  XRect aClip, XPoint aOffset, XInt32 aOpacity, XBool aBlend )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
-  EW_UNUSED_ARG( aBlend );
-  EW_UNUSED_ARG( aOpacity );
-  EW_UNUSED_ARG( aOffset );
-  EW_UNUSED_ARG( aClip );
-  EW_UNUSED_ARG( aCanvas );
-}
-
-/* The method HandleEvent() is invoked automatically if the view has received an 
-   event. For example, touching the view on the touch screen can cause the view 
-   to receive a Core::CursorEvent event. Within this method the view can evaluate 
-   the event and react to it.
-   Whether the event has been handled by the view or not is determined by the return 
-   value. To sign an event as handled HandleEvent() should return a valid object 
-   (e.g. 'this'). If the event has not been handled, 'null' should be returned.
-   Depending on the kind of the event, the framework can continue dispatching of 
-   still unhandled events. For example, keyboard events (Core::KeyEvent class) are 
-   automatically delivered to the superior @Owner of the receiver view if this view 
-   has ignored the event.
-   HandleEvent() is invoked automatically by the framework, so you never should 
-   need to invoke it directly. However you can prepare and post new events by using 
-   the methods DispatchEvent() and BroadcastEvent() of the application class Core::Root. */
-XObject CoreSlideTouchHandler_HandleEvent( CoreSlideTouchHandler _this, CoreEvent 
-  aEvent )
-{
-  CoreCursorEvent event1 = EwCastObject( aEvent, CoreCursorEvent );
-  CoreDragEvent event2 = EwCastObject( aEvent, CoreDragEvent );
-  CoreCursorGrabEvent event3 = EwCastObject( aEvent, CoreCursorGrabEvent );
-  XBool press;
-  XBool hold;
-  XBool timeout;
-  XBool release;
-  XBool drag;
-
-  press = (XBool)((( event1 != 0 ) && event1->Down ) && ( event1->HoldPeriod == 
-  0 ));
-  hold = (XBool)((( event1 != 0 ) && event1->Down ) && ( event1->HoldPeriod > 0 ));
-  timeout = (XBool)((( event1 != 0 ) && event1->Down ) && ( event1->HoldPeriod > 
-  _this->multiFingerDelay ));
-  release = (XBool)(( event1 != 0 ) && !event1->Down );
-  drag = (XBool)( event2 != 0 );
-
-  if ( press )
-    _this->multiFingerDelay = (XInt16)( event1->AutoDeflected? 0 : 100 );
-
-  if ( press )
-  {
-    XInt32 noOfFingers = 0;
-    XUInt32 fingers;
-    _this->state = _this->state | ( 1 << event1->Finger );
-
-    for ( fingers = _this->state & 4095; fingers > 0; fingers = fingers >> 1 )
-      if (( fingers & 1 ) != 0 )
-        noOfFingers = noOfFingers + 1;
-
-    if ( noOfFingers == 1 )
-      _this->state = ( _this->state | 16777216 ) | ( 4096 << event1->Finger );
-  }
-
-  if ( release && ( _this->state < 16777216 ))
-  {
-    CoreRoot root = CoreView__GetRoot( _this );
-    CoreCursorHit hit = 0;
-
-    if ( root != 0 )
-    {
-      CoreView startView = (( _this->Super2.prev != 0 )? _this->Super2.prev : ((CoreView)_this->Super2.Owner ));
-      hit = CoreView__CursorHitTest( root, EwMoveRectPos( _Const0010, event1->GlobalCurrentPos ), 
-      event1->Finger, event1->StrikeCount, 0, startView, 0 );
-    }
-
-    if ( hit != 0 )
-    {
-      XPoint cp = CoreGroup_LocalPosition( hit->View->Owner, event1->GlobalCurrentPos );
-      XInt32 i;
-
-      for ( i = 0; i < 10; i++ )
-        if ( !!( _this->state & ( 1 << i )))
-          CoreView__HandleEvent( hit->View, ((CoreEvent)CoreCursorEvent_InitializeDown( 
-          EwNewObject( CoreCursorEvent, 0 ), i, cp, event1->StrikeCount, _Const0000, 
-          1, event1->GlobalCurrentPos )));
-
-      for ( i = 0; i < 10; i++ )
-        if ( !!( _this->state & ( 1 << i )))
-          CoreView__HandleEvent( hit->View, ((CoreEvent)CoreCursorEvent_InitializeUp( 
-          EwNewObject( CoreCursorEvent, 0 ), i, cp, cp, 0, event1->StrikeCount, 
-          _Const0000, 0, event1->GlobalCurrentPos, event1->GlobalCurrentPos )));
-    }
-  }
-
-  if ( release )
-    _this->state = ( _this->state & ~( 1 << event1->Finger )) | 33554432;
-
-  if ( timeout && ( _this->state < 16777216 ))
-    _this->state = _this->state | 67108864;
-
-  if ( release && event1->AutoDeflected )
-    _this->state = _this->state | 67108864;
-
-  if ( release && (( _this->state & 16777215 ) == 0 ))
-    _this->state = 0;
-
-  if ( hold && ( _this->state >= 67108864 ))
-  {
-    CoreRoot root = CoreView__GetRoot( _this );
-
-    if (( root != 0 ) && !( CoreRoot_RetargetCursorWithReason( root, 0, ((CoreView)_this ), 
-        ((CoreView)_this ), 0 ) != 0 ))
-      CoreRoot_RetargetCursorWithReason( root, 0, ((CoreView)_this ), 0, 0 );
-  }
-
-  if (( hold && (( _this->state & 16777216 ) != 0 )) && (( _this->state & 33554432 ) 
-      != 0 ))
-  {
-    hold = 0;
-    release = 1;
-  }
-
-  if (( event1 != 0 ) && (( _this->state & ( 4096 << event1->Finger )) == 0 ))
-    return ((XObject)_this );
-
-  if (( event2 != 0 ) && (( _this->state & ( 4096 << event2->Finger )) == 0 ))
-    return ((XObject)_this );
-
-  if ( release && (( _this->state & 16777216 ) == 0 ))
-    return ((XObject)_this );
-
-  if ((( press || drag ) || hold ) && (( _this->state < 16777216 ) || ( _this->state 
-      >= 33554432 )))
-    return ((XObject)_this );
-
-  if ( release )
-    _this->state = _this->state & 4261416959U;
-
-  if ( release && (( _this->state & 16777215 ) == 0 ))
-    _this->state = 0;
-
-  if (( event3 != 0 ) && ( event3->Target == (CoreView)_this ))
-    return 0;
-
-  if ((( event3 != 0 ) && event3->Down ) && ( _this->active || !_this->Sliding ))
-    return 0;
-
-  if ((( event3 != 0 ) && event3->Down ) && !EwIsPointInRect( _this->Super1.Bounds, 
-      CoreGroup_LocalPosition( _this->Super2.Owner, event3->GlobalCurrentPos )))
-    return 0;
-
-  if ((( event3 != 0 ) && !event3->Down ) && ( !_this->active || ( _this->activeFinger 
-      != event3->Finger )))
-    return 0;
-
-  if ((( event1 == 0 ) && ( event2 == 0 )) && ( event3 == 0 ))
-    return 0;
-
-  if ( event1 != 0 )
-  {
-    _this->active = (XBool)( press || hold );
-    _this->activeFinger = event1->Finger;
-    _this->HittingPos = event1->HittingPos;
-  }
-
-  if ( event2 != 0 )
-    _this->activeFinger = event2->Finger;
-
-  if ( event3 != 0 )
-  {
-    _this->active = event3->Down;
-    _this->activeFinger = event3->Finger;
-  }
-
-  if (( event3 != 0 ) && event3->Down )
-  {
-    CoreSlideTouchHandler_stopAnimation( _this );
-    _this->speedX = (((XFloat)( event3->Super1.Time - _this->startTimeX ) * 0.001f ) 
-    * _this->accelerationX ) + _this->speedX;
-    _this->speedY = (((XFloat)( event3->Super1.Time - _this->startTimeY ) * 0.001f ) 
-    * _this->accelerationY ) + _this->speedY;
-
-    if ( _this->parkingX )
-      _this->speedX = 0.0f;
-
-    if ( _this->parkingY )
-      _this->speedY = 0.0f;
-
-    _this->accelerationX = 0.0f;
-    _this->accelerationY = 0.0f;
-    _this->parkingX = 0;
-    _this->parkingY = 0;
-    _this->initOffset = _this->Offset;
-    _this->refTime = event3->Super1.Time;
-    return ((XObject)_this );
-  }
-
-  if ( press )
-  {
-    CoreSlideTouchHandler_stopAnimation( _this );
-    _this->speedX = (((XFloat)( event1->Super1.Time - _this->startTimeX ) * 0.001f ) 
-    * _this->accelerationX ) + _this->speedX;
-    _this->speedY = (((XFloat)( event1->Super1.Time - _this->startTimeY ) * 0.001f ) 
-    * _this->accelerationY ) + _this->speedY;
-
-    if ( _this->parkingX || !_this->Sliding )
-      _this->speedX = 0.0f;
-
-    if ( _this->parkingY || !_this->Sliding )
-      _this->speedY = 0.0f;
-
-    _this->accelerationX = 0.0f;
-    _this->accelerationY = 0.0f;
-    _this->parkingX = 0;
-    _this->parkingY = 0;
-
-    if ( !_this->Sliding )
-      _this->Sliding = 1;
-
-    _this->initOffset = _this->Offset;
-    _this->refTime = event1->Super1.Time;
-  }
-
-  if ( event2 != 0 )
-  {
-    XPoint delta = EwMovePointNeg( event2->CurrentPos, event2->HittingPos );
-    XPoint newOffset = _this->Offset;
-    newOffset.X = ( _this->initOffset.X + delta.X );
-
-    if ( _this->SlideVert )
-      newOffset.Y = ( _this->initOffset.Y + delta.Y );
-
-    if ( newOffset.X < 0 )
-      newOffset.X = ( newOffset.X / 2 );
-    else
-      if ( newOffset.X > _this->MaxOffset.X )
-        newOffset.X = ( _this->MaxOffset.X + (( newOffset.X - _this->MaxOffset.X ) 
-        / 2 ));
-
-    if ( newOffset.Y < 0 )
-      newOffset.Y = ( newOffset.Y / 2 );
-    else
-      if ( newOffset.Y > _this->MaxOffset.Y )
-        newOffset.Y = ( _this->MaxOffset.Y + (( newOffset.Y - _this->MaxOffset.Y ) 
-        / 2 ));
-
-    if ( EwCompPoint( newOffset, _this->Offset ))
-    {
-      _this->Delta = EwMovePointNeg( newOffset, _this->Offset );
-      _this->Offset = newOffset;
-    }
-  }
-
-  if ((( event3 != 0 ) && !event3->Down ) && (( event3->Super1.Time - _this->refTime ) 
-      >= (XUInt32)_this->ResetDelay ))
-  {
-    _this->speedX = 0.0f;
-    _this->speedY = 0.0f;
-  }
-
-  if ( hold && (( event1->Super1.Time - _this->refTime ) >= (XUInt32)_this->ResetDelay ))
-  {
-    _this->speedX = 0.0f;
-    _this->speedY = 0.0f;
-  }
-
-  if ( release && ( _this->ResetSpace >= 0 ))
-  {
-    XPoint d = EwMovePointNeg( event1->CurrentPos, event1->HittingPos );
-
-    if ((( d.X * d.X ) + ( d.Y * d.Y )) <= ( _this->ResetSpace * _this->ResetSpace ))
-    {
-      _this->speedX = 0.0f;
-      _this->speedY = 0.0f;
-    }
-  }
-
-  if (( event2 != 0 ) && ( event2->Super1.Time > _this->refTime ))
-  {
-    XPoint delta = event2->Offset;
-    XFloat invTime = 1000.0f / (XFloat)( event2->Super1.Time - _this->refTime );
-    XFloat newSpeedX;
-    XFloat newSpeedY = 0.0f;
-    newSpeedX = (XFloat)delta.X * invTime;
-
-    if ( _this->SlideVert )
-      newSpeedY = (XFloat)delta.Y * invTime;
-
-    if (( newSpeedX * _this->speedX ) < 0.0f )
-      _this->speedX = 0.0f;
-
-    if (( newSpeedY * _this->speedY ) < 0.0f )
-      _this->speedY = 0.0f;
-
-    _this->speedX = ( _this->speedX + newSpeedX ) * 0.5f;
-    _this->speedY = ( _this->speedY + newSpeedY ) * 0.5f;
-    _this->refTime = event2->Super1.Time;
-  }
-
-  if ( !release && ( event3 == 0 ))
-    return ((XObject)_this );
-
-  if (( event1 != 0 ) && event1->AutoDeflected )
-  {
-    _this->speedX = 0.0f;
-    _this->speedY = 0.0f;
-  }
-
-  if (( _this->Offset.X <= 0 ) || ( _this->Offset.X >= _this->MaxOffset.X ))
-    _this->speedX = 0.0f;
-  else
-    if ( _this->speedX == 0.0f )
-    {
-      XInt32 targetX = _this->Offset.X;
-      XInt32 snapN = 0;
-      XInt32 snapP = _this->MaxOffset.X;
-
-      if ( targetX < 0 )
-        snapP = 0;
-      else
-        if ( targetX > snapP )
-          snapN = _this->MaxOffset.X;
-        else
-        {
-          snapN = targetX;
-          snapP = targetX;
-        }
-
-      if (( snapN - targetX ) <= ( targetX - snapP ))
-        targetX = snapN;
-      else
-        targetX = snapP;
-
-      if ( targetX != _this->Offset.X )
-      {
-        XFloat distance = (XFloat)( targetX - _this->Offset.X );
-
-        if ( distance > 0.0f )
-          _this->speedX = EwMathSqrt(( distance * 2.0f ) * _this->frictFactor ) 
-          + 20.0f;
-
-        if ( distance < 0.0f )
-          _this->speedX = -EwMathSqrt(( -distance * 2.0f ) * _this->frictFactor ) 
-          - 20.0f;
-
-        _this->accelerationX = ( 400.0f - ( _this->speedX * _this->speedX )) / ( 
-        2.0f * distance );
-        _this->endX = targetX;
-      }
-    }
-    else
-    {
-      XFloat speedX2 = _this->speedX * _this->speedX;
-      XFloat distance = speedX2 / ( 2.0f * _this->frictFactor );
-      XInt32 targetX = _this->Offset.X;
-      XInt32 targetX0;
-      XInt32 snapN;
-      XInt32 snapP;
-
-      if ( _this->speedX > 0.0f )
-        targetX = targetX + (XInt32)distance;
-
-      if ( _this->speedX < 0.0f )
-        targetX = targetX - (XInt32)distance;
-
-      if ( targetX > _this->MaxOffset.X )
-        targetX = _this->MaxOffset.X;
-      else
-        if ( targetX < 0 )
-          targetX = 0;
-
-      targetX0 = targetX;
-      snapN = 0;
-      snapP = _this->MaxOffset.X;
-
-      if ( targetX < 0 )
-        snapP = 0;
-      else
-        if ( targetX > snapP )
-          snapN = _this->MaxOffset.X;
-        else
-        {
-          snapN = targetX;
-          snapP = targetX;
-        }
-
-      if ( _this->speedX > 0.0f )
-      {
-        if ( snapP <= _this->Offset.X )
-          targetX = snapN;
-        else
-          if (( targetX - snapP ) < ( snapN - targetX ))
-            targetX = snapP;
-          else
-            targetX = snapN;
-      }
-      else
-        if ( snapN >= _this->Offset.X )
-          targetX = snapP;
-        else
-          if (( targetX - snapP ) > ( snapN - targetX ))
-            targetX = snapN;
-          else
-            targetX = snapP;
-
-      if ( targetX != _this->Offset.X )
-      {
-        distance = (XFloat)( targetX - _this->Offset.X );
-
-        if ( targetX != targetX0 )
-        {
-          XFloat snapDist = (XFloat)( targetX - targetX0 );
-
-          if ( snapDist > 0.0f )
-            _this->speedX = _this->speedX + EwMathSqrt(( snapDist * 2.0f ) * _this->frictFactor );
-
-          if ( snapDist < 0.0f )
-            _this->speedX = _this->speedX - EwMathSqrt(( -snapDist * 2.0f ) * _this->frictFactor );
-        }
-
-        if ( _this->speedX > 0.0f )
-          _this->speedX = _this->speedX + 20.0f;
-
-        if ( _this->speedX < 0.0f )
-          _this->speedX = _this->speedX - 20.0f;
-
-        _this->accelerationX = ( 400.0f - ( _this->speedX * _this->speedX )) / ( 
-        2.0f * distance );
-        _this->endX = targetX;
-      }
-      else
-        _this->speedX = 0.0f;
-    }
-
-  if (( _this->Offset.Y <= 0 ) || ( _this->Offset.Y >= _this->MaxOffset.Y ))
-    _this->speedY = 0.0f;
-  else
-    if ( _this->speedY == 0.0f )
-    {
-      XInt32 targetY = _this->Offset.Y;
-      XInt32 snapN = 0;
-      XInt32 snapP = _this->MaxOffset.Y;
-
-      if ( targetY < 0 )
-        snapP = 0;
-      else
-        if ( targetY > snapP )
-          snapN = _this->MaxOffset.Y;
-        else
-        {
-          snapN = targetY;
-          snapP = targetY;
-        }
-
-      if (( snapN - targetY ) <= ( targetY - snapP ))
-        targetY = snapN;
-      else
-        targetY = snapP;
-
-      if ( targetY != _this->Offset.Y )
-      {
-        XFloat distance = (XFloat)( targetY - _this->Offset.Y );
-
-        if ( distance > 0.0f )
-          _this->speedY = EwMathSqrt(( distance * 2.0f ) * _this->frictFactor ) 
-          + 20.0f;
-
-        if ( distance < 0.0f )
-          _this->speedY = -EwMathSqrt(( -distance * 2.0f ) * _this->frictFactor ) 
-          - 20.0f;
-
-        _this->accelerationY = ( 400.0f - ( _this->speedY * _this->speedY )) / ( 
-        2.0f * distance );
-        _this->endY = targetY;
-      }
-    }
-    else
-    {
-      XFloat speedY2 = _this->speedY * _this->speedY;
-      XFloat distance = speedY2 / ( 2.0f * _this->frictFactor );
-      XInt32 targetY = _this->Offset.Y;
-      XInt32 targetY0;
-      XInt32 snapN;
-      XInt32 snapP;
-
-      if ( _this->speedY > 0.0f )
-        targetY = targetY + (XInt32)distance;
-
-      if ( _this->speedY < 0.0f )
-        targetY = targetY - (XInt32)distance;
-
-      if ( targetY > _this->MaxOffset.Y )
-        targetY = _this->MaxOffset.Y;
-      else
-        if ( targetY < 0 )
-          targetY = 0;
-
-      targetY0 = targetY;
-      snapN = 0;
-      snapP = _this->MaxOffset.Y;
-
-      if ( targetY < 0 )
-        snapP = 0;
-      else
-        if ( targetY > snapP )
-          snapN = _this->MaxOffset.Y;
-        else
-        {
-          snapN = targetY;
-          snapP = targetY;
-        }
-
-      if ( _this->speedY > 0.0f )
-      {
-        if ( snapP <= _this->Offset.Y )
-          targetY = snapN;
-        else
-          if (( targetY - snapP ) < ( snapN - targetY ))
-            targetY = snapP;
-          else
-            targetY = snapN;
-      }
-      else
-        if ( snapN >= _this->Offset.Y )
-          targetY = snapP;
-        else
-          if (( targetY - snapP ) > ( snapN - targetY ))
-            targetY = snapN;
-          else
-            targetY = snapP;
-
-      if ( targetY != _this->Offset.Y )
-      {
-        distance = (XFloat)( targetY - _this->Offset.Y );
-
-        if ( targetY != targetY0 )
-        {
-          XFloat snapDist = (XFloat)( targetY - targetY0 );
-
-          if ( snapDist > 0.0f )
-            _this->speedY = _this->speedY + EwMathSqrt(( snapDist * 2.0f ) * _this->frictFactor );
-
-          if ( snapDist < 0.0f )
-            _this->speedY = _this->speedY - EwMathSqrt(( -snapDist * 2.0f ) * _this->frictFactor );
-        }
-
-        if ( _this->speedY > 0.0f )
-          _this->speedY = _this->speedY + 20.0f;
-
-        if ( _this->speedY < 0.0f )
-          _this->speedY = _this->speedY - 20.0f;
-
-        _this->accelerationY = ( 400.0f - ( _this->speedY * _this->speedY )) / ( 
-        2.0f * distance );
-        _this->endY = targetY;
-      }
-      else
-        _this->speedY = 0.0f;
-    }
-
-  if ( event1 != 0 )
-    _this->startTimeX = event1->Super1.Time;
-
-  if ( event3 != 0 )
-    _this->startTimeX = event3->Super1.Time;
-
-  _this->startTimeY = _this->startTimeX;
-  _this->startX = (XFloat)_this->Offset.X;
-  _this->startY = (XFloat)_this->Offset.Y;
-  CoreSlideTouchHandler_startAnimation( _this );
-  return ((XObject)_this );
-}
-
-/* The method CursorHitTest() is invoked automatically in order to determine whether 
-   the view is interested in the receipt of cursor events or not. This method will 
-   be invoked immediately after the user has tapped the visible area of the view. 
-   If the view is not interested in the cursor event, the framework repeats this 
-   procedure for the next behind view until a willing view has been found or all 
-   views are evaluated.
-   In the implementation of the method the view can evaluate the passed aArea parameter. 
-   It determines the place where the user has tapped the view with his fingertip 
-   expressed in the coordinates of the views @Owner. The method can test e.g. whether 
-   the tapped area does intersect any touchable areas within the view, etc. The 
-   affected finger is identified in the parameter aFinger. The first finger (or 
-   the first mouse device button) has the number 0.
-   The parameter aStrikeCount determines how many times the same area has been tapped 
-   in series. This is useful to detect series of multiple touches, e.g. in case 
-   of the double click, aStrikeCount == 2.
-   The parameter aDedicatedView, if it is not 'null', restricts the event to be 
-   handled by this view only. If aDedicatedView == null, no special restriction 
-   exists.
-   The parameter aStartView, if it is not 'null', restricts the event to be handled 
-   by the specified view or another view lying behind it. In other words, views 
-   found in front of aStartView are not taken in account during the hit-test operation.
-   This method is also invoked if during an existing grab cycle the current target 
-   view has decided to resign and deflect the cursor events to another view. This 
-   is usually the case after the user has performed a gesture the current target 
-   view is not interested to process. Thereupon, the system looks for another view 
-   willing to take over the cursor event processing after the performed gesture. 
-   Which gesture has caused the operation, is specified in the parameter aRetargetReason.
-   If the view is willing to process the event, the method should create, initialize 
-   and return a new Core::CursorHit object. This object identify the willing view. 
-   Otherwise the method should return 'null'.
-   CursorHitTest() is invoked automatically by the framework, so you never should 
-   need to invoke it directly. This method is predetermined for the hit-test only. 
-   The proper processing of events should take place in the @HandleEvent() method 
-   by reacting to Core::CursorEvent and Core::DragEvent events. */
-CoreCursorHit CoreSlideTouchHandler_CursorHitTest( CoreSlideTouchHandler _this, 
-  XRect aArea, XInt32 aFinger, XInt32 aStrikeCount, CoreView aDedicatedView, CoreView 
-  aStartView, XSet aRetargetReason )
-{
-  XRect r;
-
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( aStartView );
-  EW_UNUSED_ARG( aStrikeCount );
-
-  if (( aDedicatedView != 0 ) && ( aDedicatedView != (CoreView)_this ))
-    return 0;
-
-  if ( _this->state >= 33554432 )
-    return 0;
-
-  if (( _this->state >= 16777216 ) && (( _this->state & ( 4096 << aFinger )) == 
-      0 ))
-    return 0;
-
-  if ( !_this->SlideVert && !!( aRetargetReason & ( CoreRetargetReasonWipeDown | 
-      CoreRetargetReasonWipeUp )))
-    return 0;
-
-  r = EwIntersectRect( aArea, _this->Super1.Bounds );
-
-  if ( !EwIsRectEmpty( r ))
-  {
-    XPoint center = EwGetRectCenter( aArea );
-    XPoint offset = _Const0000;
-
-    if ( center.X < r.Point1.X )
-      offset.X = ( r.Point1.X - center.X );
-
-    if ( center.X >= r.Point2.X )
-      offset.X = (( r.Point2.X - center.X ) - 1 );
-
-    if ( center.Y < r.Point1.Y )
-      offset.Y = ( r.Point1.Y - center.Y );
-
-    if ( center.Y >= r.Point2.Y )
-      offset.Y = (( r.Point2.Y - center.Y ) - 1 );
-
-    return CoreCursorHit_Initialize( EwNewObject( CoreCursorHit, 0 ), ((CoreView)_this ), 
-      offset );
-  }
-
-  return 0;
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.stopAnimation()' */
-void CoreSlideTouchHandler_stopAnimation( CoreSlideTouchHandler _this )
-{
-  if ( _this->timer != 0 )
-  {
-    EwDetachObjObserver( EwNewSlot( _this, CoreSlideTouchHandler_timerSlot ), (XObject)_this->timer, 
-      0 );
-    _this->timer = 0;
-  }
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.startAnimation()' */
-void CoreSlideTouchHandler_startAnimation( CoreSlideTouchHandler _this )
-{
-  _this->timer = ((CoreTimer)EwGetAutoObject( &EffectsEffectTimer, EffectsEffectTimerClass ));
-  EwAttachObjObserver( EwNewSlot( _this, CoreSlideTouchHandler_timerSlot ), (XObject)_this->timer, 
-    0 );
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.timerSlot()' */
-void CoreSlideTouchHandler_timerSlot( CoreSlideTouchHandler _this, XObject sender )
-{
-  XFloat timeX;
-  XFloat timeY;
-  XFloat timeX2;
-  XFloat timeY2;
-  XFloat newSpeedX;
-  XFloat newSpeedY;
-  XPoint newOffset;
-
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  if ( _this->timer == 0 )
-    return;
-
-  timeX = (XFloat)( _this->timer->Time - _this->startTimeX ) * 0.001f;
-  timeY = (XFloat)( _this->timer->Time - _this->startTimeY ) * 0.001f;
-  timeX2 = timeX * timeX;
-  timeY2 = timeY * timeY;
-  newSpeedX = ( _this->accelerationX * timeX ) + _this->speedX;
-  newSpeedY = ( _this->accelerationY * timeY ) + _this->speedY;
-  newOffset = EwNewPoint((XInt32)(((( _this->accelerationX * 0.5f ) * timeX2 ) + 
-  ( _this->speedX * timeX )) + _this->startX ), (XInt32)(((( _this->accelerationY 
-  * 0.5f ) * timeY2 ) + ( _this->speedY * timeY )) + _this->startY ));
-
-  if ( _this->parkingX && ( timeX >= 0.5f ))
-  {
-    newOffset.X = _this->endX;
-    _this->speedX = 0.0f;
-    _this->accelerationX = 0.0f;
-    _this->startX = (XFloat)newOffset.X;
-    _this->parkingX = 0;
-  }
-  else
-    if ( _this->parkingX )
-    {
-      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeX / 0.5f ), _this->RubberBandEffectElasticity );
-      newOffset.X = (XInt32)( _this->startX + (((XFloat)_this->endX - _this->startX ) 
-      * f ));
-    }
-
-  if ( _this->parkingY && ( timeY >= 0.5f ))
-  {
-    newOffset.Y = _this->endY;
-    _this->speedY = 0.0f;
-    _this->accelerationY = 0.0f;
-    _this->startY = (XFloat)newOffset.Y;
-    _this->parkingY = 0;
-  }
-  else
-    if ( _this->parkingY )
-    {
-      XFloat f = 1.0f - EwMathPow( 1.0f - ( timeY / 0.5f ), _this->RubberBandEffectElasticity );
-      newOffset.Y = (XInt32)( _this->startY + (((XFloat)_this->endY - _this->startY ) 
-      * f ));
-    }
-
-  if ((( _this->speedX > 0.0f ) && ( newSpeedX < 0.0f )) || (( _this->speedX < 0.0f ) 
-      && ( newSpeedX > 0.0f )))
-  {
-    newSpeedX = 0.0f;
-    newOffset.X = _this->Offset.X;
-  }
-
-  if ((( _this->speedY > 0.0f ) && ( newSpeedY < 0.0f )) || (( _this->speedY < 0.0f ) 
-      && ( newSpeedY > 0.0f )))
-  {
-    newSpeedY = 0.0f;
-    newOffset.Y = _this->Offset.Y;
-  }
-
-  if ( !_this->parkingX && ( newOffset.X < 0 ))
-  {
-    _this->startX = (XFloat)newOffset.X;
-    _this->endX = 0;
-    _this->startTimeX = _this->timer->Time;
-    _this->parkingX = 1;
-  }
-  else
-    if ( !_this->parkingX && ( newOffset.X > _this->MaxOffset.X ))
-    {
-      _this->startX = (XFloat)newOffset.X;
-      _this->endX = _this->MaxOffset.X;
-      _this->startTimeX = _this->timer->Time;
-      _this->parkingX = 1;
-    }
-
-  if ( !_this->parkingY && ( newOffset.Y < 0 ))
-  {
-    _this->startY = (XFloat)newOffset.Y;
-    _this->endY = 0;
-    _this->startTimeY = _this->timer->Time;
-    _this->parkingY = 1;
-  }
-  else
-    if ( !_this->parkingY && ( newOffset.Y > _this->MaxOffset.Y ))
-    {
-      _this->startY = (XFloat)newOffset.Y;
-      _this->endY = _this->MaxOffset.Y;
-      _this->startTimeY = _this->timer->Time;
-      _this->parkingY = 1;
-    }
-
-  if ((( !_this->parkingX && ( _this->speedX != 0.0f )) && ( newSpeedX > -20.0f )) 
-      && ( newSpeedX < 20.0f ))
-  {
-    newOffset.X = _this->endX;
-    _this->speedX = 0.0f;
-    _this->accelerationX = 0.0f;
-    _this->startX = (XFloat)newOffset.X;
-  }
-
-  if ((( !_this->parkingY && ( _this->speedY != 0.0f )) && ( newSpeedY > -20.0f )) 
-      && ( newSpeedY < 20.0f ))
-  {
-    newOffset.Y = _this->endY;
-    _this->speedY = 0.0f;
-    _this->accelerationY = 0.0f;
-    _this->startY = (XFloat)newOffset.Y;
-  }
-
-  if ( EwCompPoint( newOffset, _this->Offset ))
-  {
-    _this->Delta = EwMovePointNeg( newOffset, _this->Offset );
-    _this->Offset = newOffset;
-  }
-
-  if (((( _this->speedX == 0.0f ) && ( _this->speedY == 0.0f )) && !_this->parkingX ) 
-      && !_this->parkingY )
-  {
-    CoreSlideTouchHandler_stopAnimation( _this );
-    _this->Sliding = 0;
-    EwSignal( _this->OnEnd, ((XObject)_this ));
-  }
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.OnSetRubberBandEffectElasticity()' */
-void CoreSlideTouchHandler_OnSetRubberBandEffectElasticity( CoreSlideTouchHandler _this, 
-  XFloat value )
-{
-  if ( value < 1.0f )
-    value = 1.0f;
-
-  if ( value > 100.0f )
-    value = 100.0f;
-
-  _this->RubberBandEffectElasticity = value;
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetSpace()' */
-void CoreSlideTouchHandler_OnSetResetSpace( CoreSlideTouchHandler _this, XInt32 
-  value )
-{
-  if ( value < 0 )
-    value = -1;
-
-  _this->ResetSpace = value;
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.OnSetResetDelay()' */
-void CoreSlideTouchHandler_OnSetResetDelay( CoreSlideTouchHandler _this, XInt32 
-  value )
-{
-  if ( value < 0 )
-    value = 0;
-
-  _this->ResetDelay = value;
-}
-
-/* 'C' function for method : 'Core::SlideTouchHandler.OnSetFriction()' */
-void CoreSlideTouchHandler_OnSetFriction( CoreSlideTouchHandler _this, XFloat value )
-{
-  if ( value < 0.0f )
-    value = 0.0f;
-
-  if ( value > 1.0f )
-    value = 1.0f;
-
-  if ( value == _this->Friction )
-    return;
-
-  _this->Friction = value;
-
-  if ( value < ( 1e-007f ))
-    value = 1e-007f;
-
-  _this->frictFactor = value * 10000.0f;
-}
-
-/* Variants derived from the class : 'Core::SlideTouchHandler' */
-EW_DEFINE_CLASS_VARIANTS( CoreSlideTouchHandler )
-EW_END_OF_CLASS_VARIANTS( CoreSlideTouchHandler )
-
-/* Virtual Method Table (VMT) for the class : 'Core::SlideTouchHandler' */
-EW_DEFINE_CLASS( CoreSlideTouchHandler, CoreRectView, timer, timer, OnEnd, state, 
-                 state, state, "Core::SlideTouchHandler" )
-  CoreRectView_initLayoutContext,
-  CoreView_GetRoot,
-  CoreSlideTouchHandler_Draw,
-  CoreView_GetClipping,
-  CoreSlideTouchHandler_HandleEvent,
-  CoreSlideTouchHandler_CursorHitTest,
-  CoreView_AdjustDrawingArea,
-  CoreRectView_ArrangeView,
-  CoreRectView_MoveView,
-  CoreRectView_GetExtent,
-  CoreView_ChangeViewState,
-  CoreRectView_OnSetBounds,
-EW_END_OF_CLASS( CoreSlideTouchHandler )
-
 /* Initializer for the class 'Core::KeyPressHandler' */
 void CoreKeyPressHandler__Init( CoreKeyPressHandler _this, XObject aLink, XHandle aArg )
 {
@@ -7161,7 +5620,7 @@ void CoreKeyPressHandler_Init( CoreKeyPressHandler _this, XHandle aArg )
 
   if ( group == 0 )
   {
-    EwThrow( EwLoadString( &_Const0011 ));
+    EwThrow( EwLoadString( &_Const000D ));
     return;
   }
 
@@ -7345,401 +5804,6 @@ EW_END_OF_CLASS_VARIANTS( CoreLayoutQuadContext )
 EW_DEFINE_CLASS( CoreLayoutQuadContext, CoreLayoutContext, _.VMT, _.VMT, _.VMT, 
                  _.VMT, _.VMT, _.VMT, "Core::LayoutQuadContext" )
 EW_END_OF_CLASS( CoreLayoutQuadContext )
-
-/* Initializer for the class 'Core::DialogContext' */
-void CoreDialogContext__Init( CoreDialogContext _this, XObject aLink, XHandle aArg )
-{
-  /* At first initialize the super class ... */
-  XObject__Init( &_this->_.Super, aLink, aArg );
-
-  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreDialogContext );
-
-  /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( CoreDialogContext );
-}
-
-/* Re-Initializer for the class 'Core::DialogContext' */
-void CoreDialogContext__ReInit( CoreDialogContext _this )
-{
-  /* At first re-initialize the super class ... */
-  XObject__ReInit( &_this->_.Super );
-}
-
-/* Finalizer method for the class 'Core::DialogContext' */
-void CoreDialogContext__Done( CoreDialogContext _this )
-{
-  /* Finalize this class */
-  _this->_.Super._.VMT = EW_CLASS( XObject );
-
-  /* Don't forget to deinitialize the super class ... */
-  XObject__Done( &_this->_.Super );
-}
-
-/* Variants derived from the class : 'Core::DialogContext' */
-EW_DEFINE_CLASS_VARIANTS( CoreDialogContext )
-EW_END_OF_CLASS_VARIANTS( CoreDialogContext )
-
-/* Virtual Method Table (VMT) for the class : 'Core::DialogContext' */
-EW_DEFINE_CLASS( CoreDialogContext, XObject, group, group, _.VMT, _.VMT, _.VMT, 
-                 _.VMT, "Core::DialogContext" )
-EW_END_OF_CLASS( CoreDialogContext )
-
-/* Initializer for the class 'Core::TaskQueue' */
-void CoreTaskQueue__Init( CoreTaskQueue _this, XObject aLink, XHandle aArg )
-{
-  /* At first initialize the super class ... */
-  XObject__Init( &_this->_.Super, aLink, aArg );
-
-  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreTaskQueue );
-
-  /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( CoreTaskQueue );
-}
-
-/* Re-Initializer for the class 'Core::TaskQueue' */
-void CoreTaskQueue__ReInit( CoreTaskQueue _this )
-{
-  /* At first re-initialize the super class ... */
-  XObject__ReInit( &_this->_.Super );
-}
-
-/* Finalizer method for the class 'Core::TaskQueue' */
-void CoreTaskQueue__Done( CoreTaskQueue _this )
-{
-  /* Finalize this class */
-  _this->_.Super._.VMT = EW_CLASS( XObject );
-
-  /* Don't forget to deinitialize the super class ... */
-  XObject__Done( &_this->_.Super );
-}
-
-/* 'C' function for method : 'Core::TaskQueue.completeTask()' */
-void CoreTaskQueue_completeTask( CoreTaskQueue _this )
-{
-  CoreTask task;
-
-  if ( _this->current == 0 )
-    return;
-
-  task = _this->current;
-  _this->current->queue = 0;
-  _this->current = 0;
-  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
-  CoreTask__OnComplete( task, _this );
-}
-
-/* 'C' function for method : 'Core::TaskQueue.onDispatchNext()' */
-void CoreTaskQueue_onDispatchNext( CoreTaskQueue _this, XObject sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  if ( _this->current != 0 )
-    return;
-
-  if ( _this->first == 0 )
-    return;
-
-  _this->current = _this->first;
-  _this->first = _this->first->next;
-
-  if ( _this->first != 0 )
-    _this->first->prev = 0;
-  else
-    _this->last = 0;
-
-  _this->current->next = 0;
-  _this->isInOnStart = 1;
-  CoreTask__OnStart( _this->current, _this );
-  _this->isInOnStart = 0;
-}
-
-/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext3()' */
-void CoreTaskQueue_onPreDispatchNext3( CoreTaskQueue _this, XObject sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onDispatchNext ), ((XObject)_this ));
-}
-
-/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext2()' */
-void CoreTaskQueue_onPreDispatchNext2( CoreTaskQueue _this, XObject sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext3 ), ((XObject)_this ));
-}
-
-/* 'C' function for method : 'Core::TaskQueue.onPreDispatchNext1()' */
-void CoreTaskQueue_onPreDispatchNext1( CoreTaskQueue _this, XObject sender )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( sender );
-
-  EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext2 ), ((XObject)_this ));
-}
-
-/* The method CancelTask() allows the application to remove a previously registered 
-   task from the task queue. The affected task is determined by the parameter aTask.
-   If the affected task is currently executed, the task is notified to immediately 
-   finalize its work. Afterwards the queue starts the next available task. The method 
-   will throw an error if you try to cancel a task not belonging to this queue. */
-void CoreTaskQueue_CancelTask( CoreTaskQueue _this, CoreTask aTask )
-{
-  XBool wasStarted;
-
-  if (( aTask == 0 ) || ( aTask->queue == 0 ))
-    return;
-
-  if ( aTask->queue != _this )
-  {
-    EwThrow( EwLoadString( &_Const0012 ));
-    return;
-  }
-
-  wasStarted = 0;
-
-  if ( _this->current == aTask )
-  {
-    _this->current = 0;
-    wasStarted = 1;
-    EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
-  }
-  else
-  {
-    if ( aTask->next != 0 )
-      aTask->next->prev = aTask->prev;
-    else
-      _this->last = aTask->prev;
-
-    if ( aTask->prev != 0 )
-      aTask->prev->next = aTask->next;
-    else
-      _this->first = aTask->next;
-
-    aTask->prev = 0;
-    aTask->next = 0;
-  }
-
-  aTask->queue = 0;
-
-  if ( wasStarted )
-    CoreTask__OnCancel( aTask, _this );
-}
-
-/* The method ScheduleTask() registers the task passed in the parameter aTask for 
-   later execution.
-   The tasks are executed in the order in which they have been previously scheduled. 
-   If the parameter aWithPriority is false, the new task will be arranged at the 
-   end of the list with waiting tasks. If the parameter is true, the task is enqueued 
-   in front of all waiting tasks.
-   The method will throw an error if you try to schedule the same task twice. */
-void CoreTaskQueue_ScheduleTask( CoreTaskQueue _this, CoreTask aTask, XBool aWithPriority )
-{
-  if ( aTask == 0 )
-    return;
-
-  if ( aTask->queue != 0 )
-  {
-    EwThrow( EwLoadString( &_Const0013 ));
-    return;
-  }
-
-  aTask->queue = _this;
-
-  if ( aWithPriority )
-  {
-    aTask->next = _this->first;
-
-    if ( _this->first != 0 )
-      _this->first->prev = aTask;
-    else
-      _this->last = aTask;
-
-    _this->first = aTask;
-  }
-  else
-  {
-    aTask->prev = _this->last;
-
-    if ( _this->last != 0 )
-      _this->last->next = aTask;
-    else
-      _this->first = aTask;
-
-    _this->last = aTask;
-  }
-
-  if ( _this->current == 0 )
-    EwPostSignal( EwNewSlot( _this, CoreTaskQueue_onPreDispatchNext1 ), ((XObject)_this ));
-}
-
-/* Variants derived from the class : 'Core::TaskQueue' */
-EW_DEFINE_CLASS_VARIANTS( CoreTaskQueue )
-EW_END_OF_CLASS_VARIANTS( CoreTaskQueue )
-
-/* Virtual Method Table (VMT) for the class : 'Core::TaskQueue' */
-EW_DEFINE_CLASS( CoreTaskQueue, XObject, current, current, isInOnStart, isInOnStart, 
-                 isInOnStart, isInOnStart, "Core::TaskQueue" )
-EW_END_OF_CLASS( CoreTaskQueue )
-
-/* Initializer for the class 'Core::Task' */
-void CoreTask__Init( CoreTask _this, XObject aLink, XHandle aArg )
-{
-  /* At first initialize the super class ... */
-  XObject__Init( &_this->_.Super, aLink, aArg );
-
-  /* Allow the Immediate Garbage Collection to evalute the members of this class. */
-  _this->_.XObject._.GCT = EW_CLASS_GCT( CoreTask );
-
-  /* Setup the VMT pointer */
-  _this->_.VMT = EW_CLASS( CoreTask );
-}
-
-/* Re-Initializer for the class 'Core::Task' */
-void CoreTask__ReInit( CoreTask _this )
-{
-  /* At first re-initialize the super class ... */
-  XObject__ReInit( &_this->_.Super );
-}
-
-/* Finalizer method for the class 'Core::Task' */
-void CoreTask__Done( CoreTask _this )
-{
-  /* Finalize this class */
-  _this->_.Super._.VMT = EW_CLASS( XObject );
-
-  /* Don't forget to deinitialize the super class ... */
-  XObject__Done( &_this->_.Super );
-}
-
-/* The method OnComplete() is called when the task is done with its work. The default 
-   implementation of this method does nothing. You can override this method in derived 
-   task classes and implement what to do when the task is finished. For example, 
-   you can release resources used temporarily during animations.
-   To complete a task you should call explicitly the method @Complete(). The parameter 
-   aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
-   again a task to the same queue, etc. */
-void CoreTask_OnComplete( CoreTask _this, CoreTaskQueue aQueue )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
-  EW_UNUSED_ARG( aQueue );
-}
-
-/* Wrapper function for the virtual method : 'Core::Task.OnComplete()' */
-void CoreTask__OnComplete( void* _this, CoreTaskQueue aQueue )
-{
-  ((CoreTask)_this)->_.VMT->OnComplete((CoreTask)_this, aQueue );
-}
-
-/* The method OnCancel() is called when the task is canceled after being started. 
-   The default implementation of this method does nothing. You can override this 
-   method in derived task classes and implement what to do when the task is prematurely 
-   aborted. For example, you can stop running timers and effects started in the 
-   preceding @OnStart() method.
-   To cancel a task you should call explicitly the method @Cancel(). The parameter 
-   aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
-   again a task to the same queue, etc. */
-void CoreTask_OnCancel( CoreTask _this, CoreTaskQueue aQueue )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( _this );
-  EW_UNUSED_ARG( aQueue );
-}
-
-/* Wrapper function for the virtual method : 'Core::Task.OnCancel()' */
-void CoreTask__OnCancel( void* _this, CoreTaskQueue aQueue )
-{
-  ((CoreTask)_this)->_.VMT->OnCancel((CoreTask)_this, aQueue );
-}
-
-/* The method OnStart() is called at the begin of the execution of this task. The 
-   default implementation of the method simply cancels the task causing the next 
-   available task in the task queue to be started. You should override this method 
-   in derived task classes to implement what the task should do.
-   There are three typical application cases how to implement the OnStart() method:
-   - In its simplest case the entire task algorithm is implemented in the OnStart() 
-   method. In this case the method @Complete() should be called before leaving OnStart().
-   - If the task does take long time for execution by using timers or effects, you 
-   should put in OnStart() the code necessary to start the timers/effects. Don't 
-   forget to call @Complete() when all timers/effects are done.
-   - If the task is divided in many small execution steps, the OnStart() method 
-   should call @Continue() to request the @OnContinue() method to be executed after 
-   a short delay (usually after the next screen update). In @OnContinue() you can 
-   perform the next step of the task. If necessary, @OnContinue() can also request 
-   to be called again after a short delay. At the end of the task, after the last 
-   step is terminated, don't forget to call @Complete().
-   The parameter aQueue refers to the queue this task belongs to. It can be used 
-   to schedule more task to execute later. */
-void CoreTask_OnStart( CoreTask _this, CoreTaskQueue aQueue )
-{
-  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
-  EW_UNUSED_ARG( aQueue );
-
-  CoreTask_Cancel( _this );
-}
-
-/* Wrapper function for the virtual method : 'Core::Task.OnStart()' */
-void CoreTask__OnStart( void* _this, CoreTaskQueue aQueue )
-{
-  ((CoreTask)_this)->_.VMT->OnStart((CoreTask)_this, aQueue );
-}
-
-/* The method Complete() informs the task queue about the completion of this task. 
-   Thereupon the next available task in the queue can be executed. This method is 
-   usually called in context of the @OnStart() or @OnContinue() method when the 
-   task has finalized its work. Calling the method for a not current task has no 
-   effect. */
-void CoreTask_Complete( CoreTask _this )
-{
-  if (( _this->queue != 0 ) && ( _this->queue->current == _this ))
-    CoreTaskQueue_completeTask( _this->queue );
-}
-
-/* Wrapper function for the virtual method : 'Core::Task.Complete()' */
-void CoreTask__Complete( void* _this )
-{
-  ((CoreTask)_this)->_.VMT->Complete((CoreTask)_this );
-}
-
-/* The method Cancel() removes this task from the task queue where the task has 
-   been previously scheduled. In the case the task is already in progress, the queue 
-   will advise the task to abort its work immediately before the task is removed 
-   from the queue (see @OnCancel()).
-   Whether a task is waiting for execution can be determined by @IsScheduled(). 
-   Whether a task is in progress can be determined by @IsCurrent().
-   Canceling a running task will cause the task queue to start the next available 
-   task. */
-void CoreTask_Cancel( CoreTask _this )
-{
-  if ( _this->queue != 0 )
-    CoreTaskQueue_CancelTask( _this->queue, _this );
-}
-
-/* The method IsCurrent() returns 'true' if the affected task is currently performed. 
-   The method returns 'false' if the task is done, waiting for execution or it simply 
-   doesn't belong to any task queue. */
-XBool CoreTask_IsCurrent( CoreTask _this )
-{
-  return (XBool)(( _this->queue != 0 ) && ( _this->queue->current == _this ));
-}
-
-/* Variants derived from the class : 'Core::Task' */
-EW_DEFINE_CLASS_VARIANTS( CoreTask )
-EW_END_OF_CLASS_VARIANTS( CoreTask )
-
-/* Virtual Method Table (VMT) for the class : 'Core::Task' */
-EW_DEFINE_CLASS( CoreTask, XObject, queue, queue, _.VMT, _.VMT, _.VMT, _.VMT, "Core::Task" )
-  CoreTask_OnComplete,
-  CoreTask_OnCancel,
-  CoreTask_OnStart,
-  CoreTask_Complete,
-EW_END_OF_CLASS( CoreTask )
 
 /* Initializer for the class 'Core::Resource' */
 void CoreResource__Init( CoreResource _this, XObject aLink, XHandle aArg )

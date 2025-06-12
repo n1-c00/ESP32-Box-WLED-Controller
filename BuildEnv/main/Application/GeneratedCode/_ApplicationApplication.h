@@ -42,22 +42,16 @@
   #error Wrong version of Embedded Wizard Graphics Engine.
 #endif
 
-#include "_ApplicationcolorSelection.h"
-#include "_ApplicationhomeScreen.h"
 #include "_CoreRoot.h"
-#include "_CoreSlideTouchHandler.h"
 #include "_CoreTimer.h"
+#include "_ViewsRectangle.h"
+#include "_WidgetSetHorizontalSlider.h"
+#include "_WidgetSetToggleButton.h"
 
 /* Forward declaration of the class Application::Application */
 #ifndef _ApplicationApplication_
   EW_DECLARE_CLASS( ApplicationApplication )
 #define _ApplicationApplication_
-#endif
-
-/* Forward declaration of the class Core::DialogContext */
-#ifndef _CoreDialogContext_
-  EW_DECLARE_CLASS( CoreDialogContext )
-#define _CoreDialogContext_
 #endif
 
 /* Forward declaration of the class Core::Group */
@@ -78,22 +72,10 @@
 #define _CoreLayoutContext_
 #endif
 
-/* Forward declaration of the class Core::TaskQueue */
-#ifndef _CoreTaskQueue_
-  EW_DECLARE_CLASS( CoreTaskQueue )
-#define _CoreTaskQueue_
-#endif
-
 /* Forward declaration of the class Core::View */
 #ifndef _CoreView_
   EW_DECLARE_CLASS( CoreView )
 #define _CoreView_
-#endif
-
-/* Forward declaration of the class Effects::Fader */
-#ifndef _EffectsFader_
-  EW_DECLARE_CLASS( EffectsFader )
-#define _EffectsFader_
 #endif
 
 /* Forward declaration of the class Graphics::Canvas */
@@ -105,10 +87,9 @@
 
 /* This is the root component of the entire GUI application. */
 EW_DEFINE_FIELDS( ApplicationApplication, CoreRoot )
-  EW_OBJECT  ( colorSelection,  ApplicationcolorSelection )
-  EW_OBJECT  ( homeScreen,      ApplicationhomeScreen )
-  EW_OBJECT  ( SlideTouchHandler, CoreSlideTouchHandler )
-  EW_VARIABLE( currentView,     XBool )
+  EW_OBJECT  ( Rectangle,       ViewsRectangle )
+  EW_OBJECT  ( toggleLightButton, WidgetSetToggleButton )
+  EW_OBJECT  ( BrightnessSlider, WidgetSetHorizontalSlider )
 EW_END_OF_FIELDS( ApplicationApplication )
 
 /* Virtual Method Table (VMT) for the class : 'Application::Application' */
@@ -132,7 +113,6 @@ EW_DEFINE_METHODS( ApplicationApplication, CoreRoot )
   EW_METHOD( ChangeViewState,   void )( CoreRoot _this, XSet aSetState, XSet aClearState )
   EW_METHOD( OnSetBounds,       void )( CoreGroup _this, XRect value )
   EW_METHOD( OnSetFocus,        void )( CoreRoot _this, CoreView value )
-  EW_METHOD( OnSetOpacity,      void )( CoreRoot _this, XInt32 value )
   EW_METHOD( DispatchEvent,     XObject )( CoreRoot _this, CoreEvent aEvent )
   EW_METHOD( BroadcastEvent,    XObject )( CoreRoot _this, CoreEvent aEvent, XSet 
     aFilter )
@@ -145,8 +125,16 @@ EW_END_OF_METHODS( ApplicationApplication )
    statements. */
 void ApplicationApplication_Init( ApplicationApplication _this, XHandle aArg );
 
-/* 'C' function for method : 'Application::Application.Slot()' */
-void ApplicationApplication_Slot( ApplicationApplication _this, XObject sender );
+/* 'C' function for method : 'Application::Application.LightOnSlot()' */
+void ApplicationApplication_LightOnSlot( ApplicationApplication _this, XObject sender );
+
+/* 'C' function for method : 'Application::Application.LightOffSlot()' */
+void ApplicationApplication_LightOffSlot( ApplicationApplication _this, XObject 
+  sender );
+
+/* 'C' function for method : 'Application::Application.BrightnessSlot()' */
+void ApplicationApplication_BrightnessSlot( ApplicationApplication _this, XObject 
+  sender );
 
 #ifdef __cplusplus
   }

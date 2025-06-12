@@ -194,7 +194,9 @@ class DeviceClass : Templates::DeviceClass
     native{
       extern void LedSet(XString key, XString setpoint, XString dataType);
       LedSet(key, setpoint, dataType);
+       
     }
+
   }
 
   // new created Methods for LED Controlls
@@ -365,66 +367,61 @@ class Application : Core::Root
     attr Bounds = <390,250,1170,480>;
   }
 
-  $rect <20,20,160,60>
-  object Application::homeScreen homeScreen
-  {
-    preset Bounds = <0,0,320,240>;
-  }
-
-  $rect <20,20,160,60>
-  object Application::colorSelection colorSelection
-  {
-    preset Bounds = <0,0,320,240>;
-  }
-
   $rect <0,260,150,300>
   inherited method Init()
   {
-    PresentDialog( homeScreen, null, null, null, null, null, null, null, null, false );
-  }
-
-  $rect <340,70,540,110>
-  slot Slot
-  {
-      currentView = !currentView;
-      if ( currentView ){
-        SwitchToDialog( colorSelection, null, null, null, null, null, null, null, null, null, false );
-       }
-       else{
-        SwitchToDialog( homeScreen, null, null, null, null, null, null, null, null, null, false );
-       }
+    //PresentDialog( homeScreen, null, null, null, null, null, null, null, null, false );
   }
 
   $rect <20,20,160,60>
-  object Core::SlideTouchHandler SlideTouchHandler
+  object Views::Rectangle Rectangle
   {
     preset Bounds = <0,0,320,240>;
-    preset MaxOffset = <320,240>;
-    preset OnSlide = null;
-    preset OnEnd = Slot;
-    preset OnStart = null;
-    preset SlideVert = false;
-    preset RubberBandEffectElasticity = 5.0;
-    preset ResetSpace = -1;
-    preset ResetDelay = 200;
-    preset Friction = 1.0;
   }
 
-  $rect <340,130,540,170>
-  var bool currentView;
+  $rect <20,20,160,60>
+  object WidgetSet::ToggleButton toggleLightButton
+  {
+    preset Bounds = <108,43,212,102>;
+    preset OnUpdate = null;
+    preset Outlet = ^Application::Device.buttonValue;
+    preset OnSwitchOn = LightOnSlot;
+    preset OnSwitchOff = LightOffSlot;
+    preset LabelOn = "";
+    preset LabelOff = "";
+    preset Label = "";
+    preset Appearance = WidgetSet::Switch_Lime_Large;
+  }
 
-  // Directives to adapt the order of the above members according to how these members 
-  // where arranged when the project content was stored. In this manner the storage 
-  // and the expected order of the members don't depend. Merging of changes in the 
-  // project files is simplified.
-  $member Bounds
-  $member Note1
-  $member colorSelection
-  $member homeScreen
-  $member Init
-  $member Slot
-  $member SlideTouchHandler
-  $member currentView
+  $rect <558,35,758,75>
+  slot LightOnSlot
+  {
+    Application::Device.LedSetMethod("on", "true", "bool");
+  }
+
+  $rect <560,80,760,120>
+  slot LightOffSlot
+  {
+    Application::Device.LedSetMethod("on", "false", "bool");
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalSlider BrightnessSlider
+  {
+    preset Bounds = <60,135,260,195>;
+    preset OnEnd = BrightnessSlot;
+    preset Outlet = ^Application::Device.brightnessValue;
+    preset MaxValue = 255;
+    preset CurrentValue = 40;
+    preset Appearance = WidgetSet::HorizontalSlider_Lime_Large;
+  }
+
+  $rect <560,130,760,170>
+  slot BrightnessSlot
+  {
+    var string brightnessString = string(BrightnessSlider.CurrentValue);
+    Application::Device.LedSetMethod("bri", brightnessString, "int");
+  }
 
   // Directives to adapt the order of members belonging to this class so they appear 
   // correctly arranged relative to the members inherited from the ancestor (super) 
@@ -623,8 +620,6 @@ class Application : Core::Root
   $reorder Styles 1
   $reorder Language 1
   $reorder Note1 1
-  $reorder colorSelection 1
-  $reorder homeScreen 1
 }
 
 // GUI
