@@ -77,7 +77,10 @@ EW_END_OF_FIELDS( CoreTask )
 
 /* Virtual Method Table (VMT) for the class : 'Core::Task' */
 EW_DEFINE_METHODS( CoreTask, XObject )
+  EW_METHOD( OnComplete,        void )( CoreTask _this, CoreTaskQueue aQueue )
+  EW_METHOD( OnCancel,          void )( CoreTask _this, CoreTaskQueue aQueue )
   EW_METHOD( OnStart,           void )( CoreTask _this, CoreTaskQueue aQueue )
+  EW_METHOD( Complete,          void )( CoreTask _this )
 EW_END_OF_METHODS( CoreTask )
 
 /* The method OnComplete() is called when the task is done with its work. The default 
@@ -89,6 +92,9 @@ EW_END_OF_METHODS( CoreTask )
    again a task to the same queue, etc. */
 void CoreTask_OnComplete( CoreTask _this, CoreTaskQueue aQueue );
 
+/* Wrapper function for the virtual method : 'Core::Task.OnComplete()' */
+void CoreTask__OnComplete( void* _this, CoreTaskQueue aQueue );
+
 /* The method OnCancel() is called when the task is canceled after being started. 
    The default implementation of this method does nothing. You can override this 
    method in derived task classes and implement what to do when the task is prematurely 
@@ -98,6 +104,9 @@ void CoreTask_OnComplete( CoreTask _this, CoreTaskQueue aQueue );
    aQueue refers to the queue this task belonged to. It can be used e.g. to schedule 
    again a task to the same queue, etc. */
 void CoreTask_OnCancel( CoreTask _this, CoreTaskQueue aQueue );
+
+/* Wrapper function for the virtual method : 'Core::Task.OnCancel()' */
+void CoreTask__OnCancel( void* _this, CoreTaskQueue aQueue );
 
 /* The method OnStart() is called at the begin of the execution of this task. The 
    default implementation of the method simply cancels the task causing the next 
@@ -129,6 +138,9 @@ void CoreTask__OnStart( void* _this, CoreTaskQueue aQueue );
    effect. */
 void CoreTask_Complete( CoreTask _this );
 
+/* Wrapper function for the virtual method : 'Core::Task.Complete()' */
+void CoreTask__Complete( void* _this );
+
 /* The method Cancel() removes this task from the task queue where the task has 
    been previously scheduled. In the case the task is already in progress, the queue 
    will advise the task to abort its work immediately before the task is removed 
@@ -138,6 +150,11 @@ void CoreTask_Complete( CoreTask _this );
    Canceling a running task will cause the task queue to start the next available 
    task. */
 void CoreTask_Cancel( CoreTask _this );
+
+/* The method IsCurrent() returns 'true' if the affected task is currently performed. 
+   The method returns 'false' if the task is done, waiting for execution or it simply 
+   doesn't belong to any task queue. */
+XBool CoreTask_IsCurrent( CoreTask _this );
 
 #ifdef __cplusplus
   }

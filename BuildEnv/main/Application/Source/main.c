@@ -19,12 +19,18 @@
 #include "cJSON.h"
 #include "httpTasks/httpTasks.h"
 
-//Json object aswell as the initial JSON string
+/*Includes for Embedded Wizard*/
+#include "ewmain.h"
+#include "ewrte.h"
+#include "ew_bsp_system.h"
+#include "Application.h"
+
+//Json object for the Local WLED status (gWledJson) and the new WLED status (nWledJson)
 static cJSON *gWledJson = NULL;
 static cJSON *nWledJson = NULL;
 
-
-char json[1024]; // Buffer for the JSON string
+// buffer for ingoing JSON data and a default JSON status
+char json[1024];
 static const char *default_json =
   "{\"on\":true,\"bri\":40,\"transition\":7,\"ps\":-1,"
   "\"pl\":-1,\"ledmap\":0,\"AudioReactive\":{\"on\":false},"
@@ -39,13 +45,6 @@ static const char *default_json =
   "\"o2\":false,\"o3\":false,\"si\":0,\"m12\":0}]}";
 
 
-/*Includes for Embedded Wizard*/
-#include "ewmain.h"
-#include "ewrte.h"
-#include "ew_bsp_system.h"
-#include "Application.h"
-
-
 static const char *TAG = "WLED_control";
 
 /* Create a queue to send requests from the frontend to the task, aswell as 2 variables that serve as parameters*/
@@ -55,10 +54,13 @@ char _key[20];
 char _value[20];
 char _dataType[20];
 
-
+/***********************************************************************
+The following functions are a thread-safe way to update the GUI. They
+get the access to the Device Interface instance and call the corresponding
+Method defined in Embedded Wizard.
+************************************************************************/
 void _EWUpdateSliderPROC()
 {
-
     /* Obtain access to the Device Interface instance */
     ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
                                                     ApplicationDeviceClass );
@@ -66,11 +68,45 @@ void _EWUpdateSliderPROC()
     /* Get the value of the "bri" parameter from the JSON object */
     cJSON *bri = cJSON_GetObjectItem(gWledJson, "bri");
     /* Invoke the function to trigger the event */
-    ApplicationDeviceClass__EWUpdateSlider( device, bri->valueint );
+    ApplicationDeviceClass_EWUpdateSlider( device, bri->valueint );
+}
+void _EWUpdateButtonPROC()
+{
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the "on" parameter from the JSON object */
+    cJSON *on = cJSON_GetObjectItem(gWledJson, "on");
+    
+    // FEHLEND: Der Aufruf der EW-Funktion!
+    ApplicationDeviceClass_EWUpdateButton( device, on->valueint );
+}
+void _EWUpdateColorPROC()
+{
+    int r = 0; 
+    int g = 0; 
+    int b = 0;
+    /* Obtain access to the Device Interface instance */
+    ApplicationDeviceClass device = EwGetAutoObject( &ApplicationDevice,
+                                                    ApplicationDeviceClass );
+
+    /* Get the value of the rgb-array and seperate it into r, g, b values */
+    cJSON *segments = cJSON_GetObjectItem(gWledJson, "seg");
+    cJSON *firstSeg = cJSON_GetArrayItem(segments, 0);
+    cJSON *array = cJSON_GetObjectItem(firstSeg, "col");
+    cJSON *color = cJSON_GetArrayItem(array, 0);
+
+    r = cJSON_GetArrayItem(color, 0)->valueint; // Get the red value
+    g = cJSON_GetArrayItem(color, 1)->valueint; // Get the green value
+    b = cJSON_GetArrayItem(color, 2)->valueint; // Get the blue value
+
+    /*Invoke the function to trigger the event*/
+    ApplicationDeviceClass__EWUpdateColor(device, r, g, b);
 }
 /***********************************************************************
-Initialize the JSON object at startup with a HTTP request or a default JSON
-object.
+Initialize the JSON object at startup with a HTTP request or a default 
+JSON object.
 ************************************************************************/
 void JsonInit()
 {
@@ -105,6 +141,10 @@ void JsonInit()
     }
 
     ESP_LOGI(TAG, "Set light state to: %s", json_start);
+    
+    EwInvoke(_EWUpdateSliderPROC, 0); // Update the slider with the current brightness
+    EwInvoke(_EWUpdateButtonPROC, 0); // Update the button with the current on/off state
+    EwInvoke(_EWUpdateColorPROC, 0); // Update the color with the current RGB values
 }
 
 /***********************************************************************
@@ -142,16 +182,47 @@ static int _LedModify(char *key, char *value, char *dataType)
                                   key,
                                   cJSON_CreateNumber(v));
         return 0;
-    }
-    else {
-        return -1; // error: unknown Key
+    }else if (strcmp(dataType, "rgb") == 0){
+        cJSON *segments = cJSON_GetObjectItem(gWledJson, "seg");
+        cJSON *firstSeg = cJSON_GetArrayItem(segments, 0);
+
+        cJSON *array = cJSON_GetObjectItem(firstSeg, key);
+        // Parse the RGB values from the semicolon-separated string
+        int r, g, b;
+        uint8_t Index = 0;
+       
+        // Check if the value is in the expected format
+        if (sscanf(value, "%d;%d;%d;%d", &Index, &r, &g, &b) == 4) {
+
+            // Create a new array with the RGB values
+            cJSON *new_array = cJSON_CreateArray();
+            if (new_array == NULL) {
+                return -1; // Failed to create array
+            }
+            
+            // Add the RGB values to the array
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(r));
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(g));
+            cJSON_AddItemToArray(new_array, cJSON_CreateNumber(b));
+
+            // Replace the existing array with the new one
+            cJSON_ReplaceItemInArray(array, 
+                                    Index, 
+                                    new_array);
+
+            return 0;
+        } else {
+            return -1; // Failed to parse RGB values
+        }
+    }else {
+        return -2; // error: unknown Key
     }
 }
 
-/************************************************************ 
-    This is the task that handels the queue from the frontend.
-    It will run in the FreeRTOS event loop.
-************************************************************/
+/***********************************************************************
+This is the task that handels the queue from the frontend.
+It will run in the FreeRTOS event loop.
+************************************************************************/
 static void _wled_send_task(void *pvParameters)
 {
     bool trigger;
@@ -178,16 +249,17 @@ static void _wled_send_task(void *pvParameters)
     }
 }
 
-/*
-
-*/
+/***********************************************************************
+This task checks the current state of the WLED device every 3 seconds
+If a mismatch between the local Status and the WLED device is detected,
+it will update the local JSON object and trigger the GUI update.
+************************************************************************/
 static void _wled_getStatus_task(void *pvParameters)
 {
-    char incoming_json[1024];
 
     // ***Send the HTTP request to the WLED device***
     while(1){
-        int r = http_GET(incoming_json, sizeof(incoming_json));
+        int r = http_GET(json, sizeof(json));
         if (r != 200) {
             ESP_LOGE(TAG, "Failed to get JSON object.");
             vTaskDelay(3000 / portTICK_PERIOD_MS);
@@ -195,11 +267,11 @@ static void _wled_getStatus_task(void *pvParameters)
         }
 
         // ***Format the response***
-        char *json_start = strstr(incoming_json, "\r\n\r\n");  // Use incoming_json instead of json
+        char *json_start = strstr(json, "\r\n\r\n");  // Use incoming_json instead of json
         if (json_start != NULL) {
             json_start += 4; // Skip the \r\n\r\n separator
         } else {
-            json_start = strstr(incoming_json, "{"); // Fallback: look for first {
+            json_start = strstr(json, "{"); // Fallback: look for first {
         }
 
         if (json_start == NULL) {
@@ -215,7 +287,7 @@ static void _wled_getStatus_task(void *pvParameters)
             continue;
         }
         
-        //***Compare "bri" parameter***
+        //Compare "bri" parameter
         cJSON *bri_gWled = cJSON_GetObjectItem(gWledJson, "bri");
         cJSON *bri_nWled = cJSON_GetObjectItem(nWledJson, "bri");
         if (bri_gWled && bri_nWled && bri_gWled->valueint != bri_nWled->valueint) {
@@ -225,18 +297,66 @@ static void _wled_getStatus_task(void *pvParameters)
             EwInvoke(_EWUpdateSliderPROC, 0);
         }
 
-        // ***Compare "on" parameter***
+        // Compare "on" parameter
         cJSON *on_gWled = cJSON_GetObjectItem(gWledJson, "on");
         cJSON *on_nWled = cJSON_GetObjectItem(nWledJson, "on");
         if (on_gWled && on_nWled && cJSON_IsTrue(on_gWled) != cJSON_IsTrue(on_nWled)) {
             ESP_LOGI(TAG, "On state changed: gWledJson=%s, nWledJson=%s", 
                     cJSON_IsTrue(on_gWled) ? "true" : "false", 
                     cJSON_IsTrue(on_nWled) ? "true" : "false");
-            
             // Update the local JSON object with the new on/off state
             cJSON_ReplaceItemInObject(gWledJson, "on", cJSON_CreateBool(cJSON_IsTrue(on_nWled)));
-            
+            EwInvoke(_EWUpdateButtonPROC, 0);      
         }
+
+        // Compare "col" parameter
+        cJSON *segments_gWled = cJSON_GetObjectItem(gWledJson, "seg");
+        cJSON *segments_nWled = cJSON_GetObjectItem(nWledJson, "seg");
+        cJSON *firstSeg_gWled = cJSON_GetArrayItem(segments_gWled, 0);
+        cJSON *firstSeg_nWled = cJSON_GetArrayItem(segments_nWled, 0);
+        cJSON *array_gWled = cJSON_GetObjectItem(firstSeg_gWled, "col");
+        cJSON *array_nWled = cJSON_GetObjectItem(firstSeg_nWled, "col");
+
+        // Convert JSON arrays to strings for comparison
+        char* gWled_str = cJSON_PrintUnformatted(array_gWled);
+        char* nWled_str = cJSON_PrintUnformatted(array_nWled);
+
+        // Log the strings for debugging
+        // ESP_LOGI(TAG, "Comparing colors: gWledJson=%s, nWledJson=%s", 
+        //           gWled_str ? gWled_str : "NULL", 
+        //           nWled_str ? nWled_str : "NULL");
+
+        // Compare the strings and trigger if they don't match
+        if (gWled_str && nWled_str && strcmp(gWled_str, nWled_str) != 0) {
+            // Don't forget to free the allocated strings when appropriate
+            free(gWled_str);
+            free(nWled_str);
+            cJSON *color_gWled = cJSON_GetArrayItem(array_gWled, 0);
+            cJSON *color_nWled = cJSON_GetArrayItem(array_nWled, 0);
+            
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         0, 
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 0)->valueint));
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         1,
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 1)->valueint));
+            // cJSON_ReplaceItemInArray(color_gWled,
+            //                         2,
+            //                         cJSON_CreateNumber(cJSON_GetArrayItem(color_nWled, 2)->valueint));
+
+            ESP_LOGI(TAG, "Color changed: gWledJson=[%d, %d, %d], nWledJson=[%d, %d, %d]",
+                    cJSON_GetArrayItem(color_gWled, 0)->valueint,
+                    cJSON_GetArrayItem(color_gWled, 1)->valueint,
+                    cJSON_GetArrayItem(color_gWled, 2)->valueint,
+
+                    cJSON_GetArrayItem(color_nWled, 0)->valueint,
+                    cJSON_GetArrayItem(color_nWled, 1)->valueint,
+                    cJSON_GetArrayItem(color_nWled, 2)->valueint);
+                
+            // Update the local JSON object with the new color values
+            cJSON_ReplaceItemInArray(color_gWled, 0, color_nWled);
+            EwInvoke(_EWUpdateColorPROC, 0);
+            }   
 
         // Free the parsed JSON object
         cJSON_Delete(nWledJson);
@@ -245,9 +365,9 @@ static void _wled_getStatus_task(void *pvParameters)
     }
 }
 
-/**************************************************************************
+/***********************************************************************
   The GUI_Task() function implements the main loop of the Embedded Wizard
-**************************************************************************/
+************************************************************************/
 void _GUI_task(void *pvParameters)
 {
   unsigned int stack;
@@ -277,10 +397,10 @@ void _GUI_task(void *pvParameters)
 
 
 
-/**************************************************************************
+/***********************************************************************
   The main function is the entry point of the application. It initializes
   the system and starts the GUI task, as well as the WLED HTTP task.
-**************************************************************************/
+************************************************************************/
 void app_main(void)
 {
     /* Set up the flash-storage for the Wi-Fi module*/
@@ -301,9 +421,9 @@ void app_main(void)
 
     
     /* Start the GUI task */
-    xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 4, NULL );
+    xTaskCreate(&_GUI_task, "GUI_Task", EW_GUI_THREAD_STACK_SIZE, NULL, 6, NULL );
 
     /* Put the wled task into the event-loop*/
     xTaskCreate(&_wled_send_task, "wled_send_task", 4096, NULL, 5, NULL);
-    xTaskCreate(&_wled_getStatus_task, "wled_update_frontedn", 4096, NULL, 5, NULL);
+    xTaskCreate(&_wled_getStatus_task, "wled_update_frontend", 4096, NULL, 5, NULL);
 }

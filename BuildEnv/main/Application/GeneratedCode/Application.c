@@ -94,10 +94,14 @@ void ApplicationApplication__Init( ApplicationApplication _this, XObject aLink, 
   WidgetSetToggleButton_OnSetAppearance( &_this->toggleLightButton, EwGetAutoObject( 
   &WidgetSetSwitch_Lime_Large, WidgetSetToggleButtonConfig ));
   _this->BrightnessSlider.OnEnd = EwNewSlot( _this, ApplicationApplication_BrightnessSlot );
-  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( &_this->BrightnessSlider, 
-  WidgetSetHorizontalSlider_OnGetCurrentValue, WidgetSetHorizontalSlider_OnSetCurrentValue ));
+  WidgetSetHorizontalSlider_OnSetOutlet( &_this->BrightnessSlider, EwNewRef( EwGetAutoObject( 
+  &ApplicationDevice, ApplicationDeviceClass ), ApplicationDeviceClass_OnGetbrightnessValue, 
+  ApplicationDeviceClass_OnSetbrightnessValue ));
   WidgetSetHorizontalSlider_OnSetAppearance( &_this->BrightnessSlider, EwGetAutoObject( 
   &WidgetSetHorizontalSlider_Lime_Large, WidgetSetHorizontalSliderConfig ));
+
+  /* Call the user defined constructor */
+  ApplicationApplication_Init( _this, aArg );
 }
 
 /* Re-Initializer for the class 'Application::Application' */
@@ -125,6 +129,16 @@ void ApplicationApplication__Done( ApplicationApplication _this )
 
   /* Don't forget to deinitialize the super class ... */
   CoreRoot__Done( &_this->_.Super );
+}
+
+/* The method Init() is invoked automatically after the component has been created. 
+   This method can be overridden and filled with logic containing additional initialization 
+   statements. */
+void ApplicationApplication_Init( ApplicationApplication _this, XHandle aArg )
+{
+  /* Dummy expressions to avoid the 'C' warning 'unused argument'. */
+  EW_UNUSED_ARG( _this );
+  EW_UNUSED_ARG( aArg );
 }
 
 /* 'C' function for method : 'Application::Application.LightOnSlot()' */
@@ -341,11 +355,7 @@ void ApplicationDeviceClass_EWUpdateSlider( ApplicationDeviceClass _this, XInt32
   aNewValue )
 {
   if ( aNewValue != _this->brightnessValue )
-  {
     _this->brightnessValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbrightnessValue, 
-      ApplicationDeviceClass_OnSetbrightnessValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateSlider()' */
@@ -360,17 +370,36 @@ void ApplicationDeviceClass_EWUpdateButton( ApplicationDeviceClass _this, XBool
   aNewValue )
 {
   if ( aNewValue != _this->buttonValue )
-  {
     _this->buttonValue = aNewValue;
-    EwNotifyRefObservers( EwNewRef( _this, ApplicationDeviceClass_OnGetbuttonValue, 
-      ApplicationDeviceClass_OnSetbuttonValue ), 0 );
-  }
 }
 
 /* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateButton()' */
 void ApplicationDeviceClass__EWUpdateButton( void* _this, XBool aNewValue )
 {
   ApplicationDeviceClass_EWUpdateButton((ApplicationDeviceClass)_this, aNewValue );
+}
+
+/* This method is intended to be called by the device to notify the GUI application 
+   about an alternation of its setting or state value. */
+void ApplicationDeviceClass_EWUpdateColor( ApplicationDeviceClass _this, XInt32 
+  aNewValueRed, XInt32 aNewValueGreen, XInt32 aNewValueBlue )
+{
+  if ( aNewValueRed != _this->redValue )
+    _this->redValue = aNewValueRed;
+
+  if ( aNewValueGreen != _this->greenValue )
+    _this->greenValue = aNewValueGreen;
+
+  if ( aNewValueBlue != _this->blueValue )
+    _this->blueValue = aNewValueBlue;
+}
+
+/* Wrapper function for the non virtual method : 'Application::DeviceClass.EWUpdateColor()' */
+void ApplicationDeviceClass__EWUpdateColor( void* _this, XInt32 aNewValueRed, XInt32 
+  aNewValueGreen, XInt32 aNewValueBlue )
+{
+  ApplicationDeviceClass_EWUpdateColor((ApplicationDeviceClass)_this, aNewValueRed
+  , aNewValueGreen, aNewValueBlue );
 }
 
 /* Default onget method for the property 'brightnessValue' */
