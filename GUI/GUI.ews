@@ -1,5 +1,6 @@
 $version 1.0
 
+attr active = Application::Application;
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
 attr currentCodeInspector = Application::DeviceClass.EWUpdateButton;
@@ -36,18 +37,18 @@ view Project
   attr zoom = 0.75;
 }
 
-view class Application::colorSelection
+view unit Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-98,-71>;
-  attr zoom = 0.75;
+  attr scrollTo = <-583,-55>;
+  attr zoom = 1.0;
 }
 
-view class WidgetSet::VerticalSlider
+view class Application::Application
 {
   attr enableWireMode = false;
-  attr scrollTo = <-70,391>;
-  attr zoom = 0.75;
+  attr scrollTo = <-7,-7>;
+  attr zoom = 1.0;
 }
 
 codeview Application::colorSelection.ColorSlot
