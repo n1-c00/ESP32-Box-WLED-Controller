@@ -2,7 +2,7 @@ $version 1.0
 
 attr callStackMonitor_Show = false;
 attr connectInspectors = false;
-attr currentCodeInspector = Application::DeviceClass.EWUpdateSlider;
+attr currentCodeInspector = Application::DeviceClass.EWUpdateButton;
 attr debug_TrackUpdates = false;
 attr extractDoc_ClassOverview = true;
 attr extractDoc_DeleteOldFiles = false;
@@ -28,36 +28,25 @@ attr search_WildCards = false;
 
 view Project
 {
+  attr aspectRatio = 1.0;
+  attr enableGrid = true;
   attr enableWireMode = false;
-  attr scrollTo = <-23,56>;
-  attr zoom = 1.0;
-}
-
-view unit Application
-{
-  attr enableWireMode = false;
-  attr scrollTo = <-375,-23>;
-  attr zoom = 1.0;
-}
-
-view class Application::DeviceClass
-{
-  attr enableWireMode = false;
-  attr scrollTo = <863,-20>;
+  attr grid = 10;
+  attr scrollTo = <-29,-25>;
   attr zoom = 0.75;
 }
 
-view class Application::homeScreen
+view class Application::colorSelection
 {
   attr enableWireMode = false;
-  attr scrollTo = <-7,-23>;
+  attr scrollTo = <-98,-71>;
   attr zoom = 0.75;
 }
 
-view class Application::Application
+view class WidgetSet::VerticalSlider
 {
   attr enableWireMode = false;
-  attr scrollTo = <-7,-7>;
+  attr scrollTo = <-70,391>;
   attr zoom = 0.75;
 }
 
@@ -77,6 +66,14 @@ codeview Application::DeviceClass.EWUpdateColor
   attr codeSelStart = <11,16>;
 }
 
+codeview Application::Application.Slot
+{
+  attr codeColSelect = false;
+  attr codeFirstPos = <0,0>;
+  attr codeSelEnd = <22,2>;
+  attr codeSelStart = <22,2>;
+}
+
 codeview Core::Group.Add
 {
   attr codeColSelect = false;
@@ -89,16 +86,16 @@ codeview Application::DeviceClass.EWUpdateSlider
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <35,4>;
-  attr codeSelStart = <35,4>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
 }
 
 codeview Application::DeviceClass.LedSetMethod
 {
   attr codeColSelect = false;
   attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <0,5>;
-  attr codeSelStart = <0,5>;
+  attr codeSelEnd = <0,0>;
+  attr codeSelStart = <0,0>;
 }
 
 codeview Application::DeviceClass.EWUpdateButton
@@ -107,20 +104,4 @@ codeview Application::DeviceClass.EWUpdateButton
   attr codeFirstPos = <0,0>;
   attr codeSelEnd = <0,0>;
   attr codeSelStart = <0,0>;
-}
-
-codeview Application::homeScreen.UpdateLayout
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <56,5>;
-  attr codeSelStart = <56,5>;
-}
-
-codeview Application::Application.Init
-{
-  attr codeColSelect = false;
-  attr codeFirstPos = <0,0>;
-  attr codeSelEnd = <2,0>;
-  attr codeSelStart = <2,0>;
 }
